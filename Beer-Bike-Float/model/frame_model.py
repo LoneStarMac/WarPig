@@ -72,6 +72,7 @@ EDGE_PERSON = 250.0
 MOVING = dict(lower_center=200.0, hatch_edge=250.0)   # in motion: 1 below, 1 sitting at the hatch edge (you said 1; this is 2)
 SKIN_PSF, DECK_PSF = 3.0, 2.3
 SHOCK, SWAY_G, TOW_FRACTION = 2.0, 0.30, 0.15
+STOP_G = 0.30                        # Stop case: moving, braked at the rear wheels only (chocks or a tread brake), reacted at the road
 PLY_GT_EFF = 15_000.0               # lb/in effective shear rigidity of a 3/4" ply deck screwed ~8" o.c. (APA ~60-80k, cut for fastener slip)
 SKIN_GT_EFF = 4_000.0               # lb/in for the 3/8" skin on the upper chamfers, nutserts/bolts ~12" o.c. along every panel edge
 
@@ -231,7 +232,7 @@ class Frame:
         self.m.add_node_load(node, 'FY', -SWAY_G*P, case='EY_'+case)
 
 
-def build(lift_caster=None):
+def build(lift_caster=None, brake=False):
     F = Frame()
     f = FLAT/2; hw = W/2; rx = RAIL_X; jx = JOIST_X; CZ = CHASSIS_Z; OCT = UNDERBODY == 'octagon'
     xs5 = [-hw, -rx, 0.0, rx, hw]
@@ -407,11 +408,14 @@ def build(lift_caster=None):
             for sx in (-1, 1):
                 F.diaphragm((sx*hw, y1, 0.0), (sx*hw, y1, Z_HI), (sx*hw, y2, Z_HI), (sx*hw, y2, 0.0), y2-y1, Z_HI, Gt=SKIN_GT_EFF)
 
-    # ----- SUPPORTS: casters under the rails
+    # ----- SUPPORTS: casters under the rails. Each caster is a stiff leg from the rail down to the road, pinned at the tyre
+    # contact, so sideways and braking forces overturn about the road and the caster's height loads the rail as it should.
     for y in CASTER_Y:
         for sx in (-1, 1):
+            top, gnd = F.node(sx*rx, y, CZ), F.node(sx*rx, y, Z_GROUND)
+            F.m.add_member(f"CL_{'R' if sx > 0 else 'L'}_{y:g}", top, gnd, 'steel', '2.50x12')   # not in F.members: not steel to buy, not checked
             if lift_caster and abs(sx*rx - lift_caster[0]) < 1e-6 and abs(y - lift_caster[1]) < 1e-6: continue
-            F.m.def_support(F.node(sx*rx, y, CZ), True, True, True, False, False, False)
+            F.m.def_support(gnd, True, not (brake and y != CASTER_Y[0]), True, False, False, False)
 
     # ----- LOADS
     def by_group_name(group):
@@ -496,6 +500,8 @@ def build(lift_caster=None):
     F.m.add_load_combo('Shock',  {'D': SHOCK, 'LM': SHOCK})
     F.m.add_load_combo('Sway',   {'D': 1, 'L': 1, 'EX_D': 1, 'EX_L': 1})
     F.m.add_load_combo('Tow',    {'D': 1, 'LM': 1, 'EY_D': 1, 'EY_LM': 1, 'T': 1})
+    k = STOP_G / SWAY_G
+    F.m.add_load_combo('Stop',   {'D': 1, 'LM': 1, 'EY_D': -k, 'EY_LM': -k})   # inertia forward, held at the rear tyres only
     F.m.add_load_combo('DeadOnly', {'D': 1})
     F.total_weight, F.total_moving = tot_w, tot_move
     return F
@@ -595,7 +601,9 @@ def run_all():
     res = check(F, combos)
     F2 = build(lift_caster=LIFT_CASTER); F2.m.analyze(check_statics=False)
     res2 = check(F2, ['Static'])
-    for mm in F.members: res[mm['name']]['Lifted'] = res2[mm['name']]['Static']
+    F3 = build(brake=True); F3.m.analyze(check_statics=False)
+    res3 = check(F3, ['Stop'])
+    for mm in F.members: res[mm['name']]['Lifted'] = res2[mm['name']]['Static']; res[mm['name']]['Stop'] = res3[mm['name']]['Stop']
     return F, F2, res
 
 def optimize(max_rounds=8):
@@ -607,7 +615,7 @@ def optimize(max_rounds=8):
         F, F2, res = run_all()
         changed = False
         for name, fam in FAMILIES.items():
-            u = max((res[m['name']][c]['u'] for m in F.members if m['group'] in fam['groups'] for c in ['Static', 'Shock', 'Sway', 'Tow', 'Lifted']), default=0.0)   # a family may be absent in this layout
+            u = max((res[m['name']][c]['u'] for m in F.members if m['group'] in fam['groups'] for c in ['Static', 'Shock', 'Sway', 'Tow', 'Lifted', 'Stop']), default=0.0)   # a family may be absent in this layout
             cur = GROUP_SEC[fam['groups'][0]]
             if u > U_TARGET:
                 heavier = [k for k in SECTIONS_BY_WEIGHT if SECTIONS[k]['wpf'] > SECTIONS[cur]['wpf']]
@@ -635,7 +643,12 @@ if __name__ == '__main__':
     for mm in F.members: res[mm['name']]['Lifted'] = res2[mm['name']]['Static']
     for n in disp: disp[n]['Lifted'] = disp2[n]['Static']
     for n in rx: rx[n]['Lifted'] = rx2.get(n, {}).get('Static', dict(FX=0, FY=0, FZ=0))
-    combos_all = combos + ['Lifted']
+    F3 = build(brake=True); F3.m.analyze(check_statics=True)
+    res3, rx3, disp3 = check(F3, ['Stop']), reactions(F3, ['Stop']), node_disp(F3, ['Stop'])
+    for mm in F.members: res[mm['name']]['Stop'] = res3[mm['name']]['Stop']
+    for n in disp: disp[n]['Stop'] = disp3[n]['Stop']
+    for n in rx: rx[n]['Stop'] = rx3[n]['Stop']
+    combos_all = combos + ['Lifted', 'Stop']
     # sensitivity: the same frame with T-90 brackets at post tops and bottoms (post ends carry moment)
     def racking(disp_, cb):
         return max(abs(v[cb][1]) for n, v in disp_.items() if abs(F.nodes[n][2] - Z_HI) < 1e-6)
@@ -662,7 +675,7 @@ if __name__ == '__main__':
                            LONG_BRACES=LONG_BRACES, SIDE_BRACING=SIDE_BRACING, POST_Y=POST_Y, UPPER_JOISTS=UPPER_JOISTS, RIM_CROSS=RIM_CROSS, LOWER_WEB=LOWER_WEB, SPINE=SPINE, CHAMFER_Y=CHAMFER_Y, CABLES=list(CABLES), CABLE_D=CABLE_D,
                            Z_GROUND=Z_GROUND, RAIL_X=RAIL_X, CASTER_Y=CASTER_Y, HATCH=HATCH, JOIST_X=JOIST_X, C=C,
                            PEOPLE_LOWER=PEOPLE_LOWER_PARKED, EDGE_PERSON=EDGE_PERSON, MOVING=MOVING, PERSON_LB=PERSON_LB, SKIN_PSF=SKIN_PSF, DECK_PSF=DECK_PSF,
-                           SHOCK=SHOCK, SWAY_G=SWAY_G, TOW_FRACTION=TOW_FRACTION, PLY_GT_EFF=PLY_GT_EFF, SKIN_GT_EFF=SKIN_GT_EFF, FY=FY,
+                           SHOCK=SHOCK, SWAY_G=SWAY_G, STOP_G=STOP_G, TOW_FRACTION=TOW_FRACTION, PLY_GT_EFF=PLY_GT_EFF, SKIN_GT_EFF=SKIN_GT_EFF, FY=FY,
                            total_weight_lb=round(F.total_weight), total_moving_lb=round(F.total_moving), steel_ft=round(tot_ft), steel_lb=round(tot_lb),
                            sections=SECTIONS, group_sec=GROUP_SEC, families={k: v['groups'] for k, v in FAMILIES.items()}, u_target=U_TARGET, stiffness=stiffness,
                            weight_by_role={r: round(sum(m['L']/12*SECTIONS[m['sec']]['wpf'] for m in F.members if ROLE[m['group']] == r)) for r in ROLE_ORDER}),

@@ -199,7 +199,15 @@ p { margin: 0; max-width: 70ch; }
   const SEQ = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b'];
   const CRIT = '#d03b3b';
   const GROUP_LABEL = D.labels;
-  const COMBO_LABEL = { Static: 'Parked, 6 aboard  (D + L)', Shock: 'Moving, road shock  2.0 × (D + 2 aboard)', Sway: 'Parked + 0.3 g sideways', Tow: 'Moving + rope snatch', Lifted: 'Parked, one wheel in a pothole' };
+  const tipText = () => {
+    const rx = Object.entries(D.reactions);
+    const wind = rx.filter(([n, r]) => r.Sway.FZ < r.Static.FZ);
+    const st = wind.reduce((a, [n, r]) => a + r.Static.FZ, 0), sw = wind.reduce((a, [n, r]) => a + r.Sway.FZ, 0);
+    const rear = rx.filter(([n, r]) => D.nodes[n][1] < P.L / 2);
+    const rs = rear.reduce((a, [n, r]) => a + r.Shock.FZ / P.SHOCK, 0), rb = rear.reduce((a, [n, r]) => a + r.Stop.FZ, 0);
+    return `With 6 aboard the uphill wheels keep ${fmt(sw)} of their ${fmt(st)} lb at ${P.SWAY_G} g sideways, so tipping starts at about ${(P.SWAY_G * st / (st - sw)).toFixed(2)} g. Braking at ${P.STOP_G} g the rear wheels keep ${fmt(rb)} of ${fmt(rs)} lb, so the rear lifts at about ${(P.STOP_G * rs / (rs - rb)).toFixed(2)} g.`;
+  };
+  const COMBO_LABEL = { Static: 'Parked, 6 aboard  (D + L)', Shock: 'Moving, road shock  2.0 × (D + 2 aboard)', Sway: 'Parked + 0.3 g sideways', Tow: 'Moving + rope snatch', Lifted: 'Parked, one wheel in a pothole', Stop: 'Moving + 0.3 g stop on the rear wheels' };
 
   const isDark = () => {
     const t = document.documentElement.getAttribute('data-theme');
@@ -221,7 +229,7 @@ p { margin: 0; max-width: 70ch; }
     <div class="stat"><div class="eyebrow">Steel</div><div class="v num">${fmt(P.steel_ft)}<small>ft</small></div><div class="d">${Object.entries(D.stock).map(([s, v]) => `${s.replace('x14', '" ×14ga').replace('x12', '" ×12ga')}: ${v.sticks10} × 10' or ${v.sticks20} × 20'`).join(' · ')}</div></div>
     <div class="stat"><div class="eyebrow">Worst tube, any case</div><div class="v num">${fmt(worstU * 100)}<small>% of capacity</small></div><div class="d">${GROUP_LABEL[S[worstCombo].group]} under ${worstCombo} <span class="pill ${worstU <= 1 ? 'ok' : 'bad'}">${worstU <= 1 ? 'PASS' : 'OVER'}</span></div></div>
     <div class="stat"><div class="eyebrow">Flex</div><div class="v num">${P.stiffness.hatch_sag_static.toFixed(2)}<small>in hatch-edge sag</small></div><div class="d">Front-to-back racking under a rope snatch: ${P.stiffness.tow_rack_pinned.toFixed(1)}" with pinned posts, ${P.stiffness.tow_rack_bracketed.toFixed(2)}" with post brackets</div></div>
-    <div class="stat"><div class="eyebrow">Max caster load</div><div class="v num">${fmt(Math.max(S.Shock.caster, S.Lifted.caster))}<small>lb</small></div><div class="d">${fmt(S.Static.caster)} lb parked · spec 16" casters ≥ 1,200 lb each</div></div>`;
+    <div class="stat"><div class="eyebrow">Max caster load</div><div class="v num">${fmt(Math.max(...D.combos.map(c => S[c].caster)))}<small>lb</small></div><div class="d">${fmt(S.Static.caster)} lb parked · spec 16" casters ≥ 1,200 lb each</div></div>`;
 
   // ---------------- three.js scene
   const canvas = document.getElementById('c');
@@ -571,12 +579,13 @@ p { margin: 0; max-width: 70ch; }
     const vrows = Object.keys(D.valence_hist).sort((a, b) => b - a).map(n => `<tr><td class="l">${n}</td><td>${D.valence_hist[n]}</td><td class="l">${n == 1 ? 'points along one stick: caster mounts, mid-span load points' : (D.valence_where[n] || []).slice(0, 3).map(w => `${w.count}× ${w.desc}`).join('; ')}</td></tr>`).join('');
     document.getElementById('pane-joints').innerHTML = `
       <div class="cols">
-        <div><h2>Caster loads, lb</h2><p class="muted" style="margin:4px 0 10px">Vertical reaction at each wheel. "Lifted" removes the right-rear wheel, as on a crowned road or a pothole.</p>
+        <div><h2>Caster loads, lb</h2><p class="muted" style="margin:4px 0 10px">Vertical reaction at each tyre contact. "Lifted" removes the right-rear wheel, as on a crowned road or a pothole; "Stop" brakes the rear wheels at ${P.STOP_G} g with the crowd moving.</p>
           <div class="scroll"><table class="sched"><thead><tr><th class="l">Wheel</th>${D.combos.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${cast}</tbody></table></div>
           <h3 style="margin-top:18px">What it means</h3>
-          <ul class="notes"><li>Buy casters for the Lifted/Shock number, not the parked one: ${fmt(Math.max(S.Shock.caster, S.Lifted.caster))} lb per wheel.</li>
-          <li>Horizontal restraint is caster friction. The frame is braced so it does not depend on it.</li>
-          <li>Track is 48" (rails at ±24"). Tipping starts at about 0.35 g sideways with 6 aboard; fine at parade speed, and the low deck helps.</li>
+          <ul class="notes"><li>Buy casters for the worst number, not the parked one: ${fmt(Math.max(...D.combos.map(c => S[c].caster)))} lb per wheel.</li>
+          <li>Each caster is modelled as a stiff leg from the rail down to the road, pinned at the tyre, so a sideways or braking force overturns about the road and its ${fmt(P.CHASSIS_Z - P.Z_GROUND)}" lever twists the rail and bends the cross-members, as a bolted-on caster plate does. Horizontal restraint is caster friction; the frame is braced so it does not depend on it.</li>
+          <li>Track is ${fmt(2 * P.RAIL_X)}" (rails at ±${fmt(P.RAIL_X)}"), wheelbase ${fmt(P.CASTER_Y[1] - P.CASTER_Y[0])}". ${tipText()}</li>
+          <li>Braking is a pitch problem before it is a strength problem: the body is tall and the crowd sits high, so a hard stop lifts the rear wheels before anything in the frame is near capacity (frame at ${(S.Stop.u * 100).toFixed(0)}% in the Stop case). Any brake goes on the rear wheels, should be self-limiting (tread shoe or a skidding tyre: friction falls as the wheel unloads) and should not try for more than about 0.3 g. A chock the rear tyre climbs is a positive stop at walking pace; at 3 mph it is marginal, because the pitch unloads the wheel just as it climbs.</li>
           <li>With the sides braced, brackets at the post ends change the pothole twist from ${P.stiffness.lifted_twist_pinned.toFixed(2)}" to ${P.stiffness.lifted_twist_bracketed.toFixed(2)}" and the rope-snatch racking from ${P.stiffness.tow_rack_pinned.toFixed(2)}" to ${P.stiffness.tow_rack_bracketed.toFixed(2)}". Six diagonals did what sixteen brackets used to.</li>
           <li>Rigid casters at the rear, swivels at the front: the float tracks like a wagon instead of crabbing on a crowned road, and the rear legs can be slimmer.</li></ul>
         </div>
@@ -731,12 +740,13 @@ p { margin: 0; max-width: 70ch; }
         <li>Parked: ${P.PEOPLE_LOWER} people standing below (${fmt(P.PERSON_LB)} lb each, spread) plus one ${fmt(P.EDGE_PERSON)} lb person sitting at the centre of each hatch edge. Six aboard.</li>
         <li>Moving: one ${fmt(P.MOVING.lower_center)} lb person mid-deck below and one ${fmt(P.MOVING.hatch_edge)} lb person at a hatch edge (you said one; this is two). Road shock is ${P.SHOCK}× that.</li>
         <li>Sway: ${P.SWAY_G} g sideways, parked crowd. Tow: ${P.TOW_FRACTION * 2} × moving weight snatched at two eyes on the front rail ends, rope 20° up, with matching inertia.</li>
-        <li>Lifted: right-rear caster off the ground, parked crowd.</li></ul></div>
+        <li>Lifted: right-rear caster off the ground, parked crowd.</li>
+        <li>Stop: moving crowd, ${P.STOP_G} g forward inertia held at the rear tyres only (front casters free to roll): a chock or tread brake on the rear wheels.</li></ul></div>
       <div><h2>Model</h2><ul class="notes">
         <li>PyNite 3D frame, 1D beam elements. Two tubes crossing at 90° share one bolt, so every such joint is modelled as a pin: posts, chamfer stubs, skirt pieces, cone stringers at both ends; deck beams, rails, joists and X-braces at their ends. Moment exists only inside continuous sticks and in the chassis grillage (welded, or bolted and squared by the ply).</li>
         <li>Deck plywood modelled as shear panels (effective G·t ${fmt(P.PLY_GT_EFF)} lb/in for ¾" screwed 6–8" o.c.; APA tables give 60–80k before fastener slip). The 3/8" skin on the two upper chamfer faces is counted at ${fmt(P.SKIN_GT_EFF || 4000)} lb/in; no other skin is counted. Remove those panels and the rim becomes a handrail that sways 2" under a tow snatch.</li>
         <li>Casters modelled as pins. 12 ga section properties from the Unistrut Telespar datasheet (net area at a hole); 14 ga derived from them by the gross-section ratio, so the datasheet's hole knock-down carries over. F<sub>y</sub> = ${fmt(P.FY / 1000)} ksi; confirm the grade on the 14 ga you actually buy, some generic perforated tube is 33–36 ksi, which would push the chassis back to 12 ga.</li>
-        <li>Capacity: yield (P/A + M/S) and AISC E3 column buckling with K = 1 over the node-to-node length. Static, Sway, Tow, Lifted are checked against ASD allowables (÷1.67); Shock already carries a 2× factor so it is checked against nominal strength.</li>
+        <li>Capacity: yield (P/A + M/S) and AISC E3 column buckling with K = 1 over the node-to-node length. Static, Sway, Tow, Lifted, Stop are checked against ASD allowables (÷1.67); Shock already carries a 2× factor so it is checked against nominal strength.</li>
         <li>Not modelled: local wall dimpling under a bolt, hole slop, skin on the sides, belly and cones (helps), wind on a skinned box.</li></ul></div>
       <div><h2>Dimensions I assumed</h2><ul class="notes">
         <li>Snout ${fmt(P.L_NOSE)}" long to a ${fmt(P.NOSE_W)}" × ${fmt(P.NOSE_H)}" panel centred on the octagon. Tail ${fmt(P.L_TAIL)}" long to a ${fmt(P.TAIL_W)}" × ${fmt(P.TAIL_H)}" panel, 6" high of centre. All four are one-line edits.</li>

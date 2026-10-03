@@ -22,9 +22,9 @@ with an interactive 3D viewer, cut list, joint schedule and caster loads.
 | Underbody | The full octagon: 20.5" lower chamfer to the 55" bottom flat, 17" off the road, with the casters below it. Optional coroplast sleeves with a rubber-seal hoof round each caster, no steel. Rigid casters at the rear, swivels at the front. |
 | Steel | ≈ 384 ft, ≈ 532 lb, all 14 ga: 28 ten-ft sticks of 1½", 12 of 1¾", 3 of 2", 2 of 2½". (v2 at 12 ga was 1,016 lb.) |
 | Weight | ≈ 2,980 lb parked with 6 aboard; ≈ 2,130 lb moving with 2. |
-| Casters | 850 lb each parked, 1,630 lb with one wheel in a pothole. Spec 16" wheels ≥ 1,200 lb. |
-| Worst member | Chassis rail, 75% of allowable, one wheel lifted. The rails were checked at 2": 121% at 14 ga, 92% at 12 ga, so they stay 2½". Target is 85%; nothing else over 44% (the hatch-edge beams, under road shock). Cross-members 6%. |
-| Flex | 0.09" sag at the hatch edge with someone sitting on it (the long braces prop it). Front-to-back racking under a rope snatch: 0.08" with every joint a pin. Pothole twist 0.25". |
+| Casters | 810 lb each parked, 1,490 lb with one wheel in a pothole, 1,420 lb on the downhill side at 0.3 g sideways. Spec 16" wheels ≥ 1,200 lb. Tipping starts at about 0.43 g sideways with 6 aboard; braking lifts the rear wheels at about 0.54 g, so any brake is a rear-wheel, self-limiting one at ≤ 0.3 g. |
+| Worst member | Chassis rail, 85% of allowable at 0.3 g sideways, now that the caster's 17" lever is in the model (73% with one wheel lifted). The rails were checked at 2": over 100%, so they stay 2½"; 12 ga rails buy margin for 14 lb. Target is 85%; nothing else over 47% (the hatch-edge beams, braking). Cross-members 34%. |
+| Flex | 0.08" sag at the hatch edge with someone sitting on it (the long braces prop it). Front-to-back racking under a rope snatch: 0.09" with every joint a pin. Pothole twist 0.28". |
 
 ### Sizing philosophy
 
@@ -129,8 +129,10 @@ chassis centreline. The road is at Z = −17.25 (16" caster + half a 2½" tube).
 
 ## What the model does and does not do
 
-* 1D beam elements, linear static. Five load cases: parked with 6 aboard; moving with 2 aboard × 2.0 road shock;
-  parked + 0.3 g sideways; moving + rope snatch at the front rail ends; parked with the right-rear wheel off the ground.
+* 1D beam elements, linear static. Six load cases: parked with 6 aboard; moving with 2 aboard × 2.0 road shock;
+  parked + 0.3 g sideways; moving + rope snatch at the front rail ends; parked with the right-rear wheel off the ground;
+  moving + 0.3 g stop held at the rear wheels only. Casters are stiff legs from the rails to the road, pinned at the tyre,
+  so sideways and braking forces overturn about the road and the caster's lever loads the rail and cross-members.
 * Member checks: yield (P/A + M/S) and AISC E3 column buckling over the node-to-node length. Shock is checked
   against nominal strength (it already carries a 2× factor); the other cases against ASD allowables (÷1.67).
 * 12 ga section properties are the perforated net values from the Unistrut Telespar datasheet; 14 ga is scaled from
