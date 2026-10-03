@@ -222,6 +222,12 @@ p { margin: 0; max-width: 70ch; }
     const rs = rear.reduce((a, [n, r]) => a + r.Shock.FZ / P.SHOCK, 0), rb = rear.reduce((a, [n, r]) => a + r.Stop.FZ, 0);
     return `With 6 aboard the uphill wheels keep ${fmt(sw)} of their ${fmt(st)} lb at ${P.SWAY_G} g sideways, so tipping starts at about ${(P.SWAY_G * st / (st - sw)).toFixed(2)} g. Braking at ${P.STOP_G} g the rear wheels keep ${fmt(rb)} of ${fmt(rs)} lb, so the rear lifts at about ${(P.STOP_G * rs / (rs - rb)).toFixed(2)} g.`;
   };
+  const brakeCap = () => {   // a rear-wheel brake is self-limiting: braking unloads the rear tyres, and they can only hold mu x load
+    const rx = Object.entries(D.reactions), rear = rx.filter(([n, r]) => D.nodes[n][1] < P.L / 2);
+    const rs = rear.reduce((a, [n, r]) => a + r.Shock.FZ / P.SHOCK, 0), rb = rear.reduce((a, [n, r]) => a + r.Stop.FZ, 0);
+    const mu = 0.8, k = (rs - rb) / P.STOP_G, a = mu * rs / (P.total_moving_lb + mu * k);
+    return `So the rear brake cannot be too strong: even a locked rear wheel on dry asphalt (μ ${mu}) can only manage about ${a.toFixed(2)} g, because the harder it brakes the less load it has to brake with. Size a spring-applied shoe to lock the wheel and let the tyre do the limiting; 3 mph stops in about ${(4.4 * 4.4 / (2 * a * 32.2)).toFixed(1)} ft.`;
+  };
   const COMBO_LABEL = { Static: 'Parked, 6 aboard  (D + L)', Shock: 'Moving, road shock  2.0 × (D + 2 aboard)', Sway: 'Parked + 0.3 g sideways', Tow: 'Moving + rope snatch', Lifted: 'Parked, one wheel in a pothole', Stop: 'Moving + 0.3 g stop on the rear wheels' };
 
   const isDark = () => {
@@ -600,7 +606,7 @@ p { margin: 0; max-width: 70ch; }
           <ul class="notes"><li>Buy casters for the worst number, not the parked one: ${fmt(Math.max(...D.combos.map(c => S[c].caster)))} lb per wheel.</li>
           <li>Each caster is modelled as a stiff leg from the rail down to the road, pinned at the tyre, so a sideways or braking force overturns about the road and its ${fmt(P.CHASSIS_Z - P.Z_GROUND)}" lever twists the rail and bends the cross-members, as a bolted-on caster plate does. Horizontal restraint is caster friction; the frame is braced so it does not depend on it.</li>
           <li>Track is ${fmt(2 * P.RAIL_X)}" (rails at ±${fmt(P.RAIL_X)}"), wheelbase ${fmt(P.CASTER_Y[1] - P.CASTER_Y[0])}". ${tipText()}</li>
-          <li>Braking is a pitch problem before it is a strength problem: the body is tall and the crowd sits high, so a hard stop lifts the rear wheels before anything in the frame is near capacity (frame at ${(S.Stop.u * 100).toFixed(0)}% in the Stop case). Any brake goes on the rear wheels, should be self-limiting (tread shoe or a skidding tyre: friction falls as the wheel unloads) and should not try for more than about 0.3 g. A chock the rear tyre climbs is a positive stop at walking pace; at 3 mph it is marginal, because the pitch unloads the wheel just as it climbs.</li>
+          <li>Braking is a pitch problem before it is a strength problem: the body is tall and the crowd sits high, so a hard stop lifts the rear wheels before anything in the frame is near capacity (frame at ${(S.Stop.u * 100).toFixed(0)}% in the Stop case). Any brake goes on the rear wheels, should be self-limiting (tread shoe or a skidding tyre: friction falls as the wheel unloads) and should not try for more than about 0.3 g. A chock the rear tyre climbs is a positive stop at walking pace; at 3 mph it is marginal, because the pitch unloads the wheel just as it climbs. ${brakeCap()}</li>
           <li>With the sides braced, brackets at the post ends change the pothole twist from ${P.stiffness.lifted_twist_pinned.toFixed(2)}" to ${P.stiffness.lifted_twist_bracketed.toFixed(2)}" and the rope-snatch racking from ${P.stiffness.tow_rack_pinned.toFixed(2)}" to ${P.stiffness.tow_rack_bracketed.toFixed(2)}". Six diagonals did what sixteen brackets used to.</li>
           <li>Rigid casters at the rear, swivels at the front: the float tracks like a wagon instead of crabbing on a crowned road, and the rear legs can be slimmer.</li></ul>
         </div>
