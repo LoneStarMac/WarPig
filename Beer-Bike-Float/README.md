@@ -122,6 +122,7 @@ Open `docs/index.html` in a browser. It loads three.js and fonts from CDNs, so i
 | `docs/exports/frame.FCMacro` | FreeCAD macro: Macro → Macros… → Execute. One Part object per member group, inches, plus a compound of all members. |
 | `docs/exports/frame.dxf` | Same wireframe as 3D lines, one layer per member group. |
 | `docs/exports/cutlist.csv` | Model segments by group, section and length. The viewer's Cut list tab merges them into physical sticks. |
+| `notes/` | Design notes for things not yet in the model (the brake). |
 | `docs/exports/results.json` | Everything the viewer shows: member forces per load case, displacements, reactions, joint schedule. |
 
 Units: inches and pounds. X across, Y along the length (rear body rib = 0, snout forward), Z up; Z = 0 is the
@@ -148,6 +149,13 @@ chassis centreline. The road is at Z = −17.25 (16" caster + half a 2½" tube).
   the chassis at the lower deck with the casters inside the body, which rides 20" lower.
 * Not modelled: local wall dimpling under a bolt, hole slop, skin on the sides, belly, legs and cones, wind.
 
+
+## To do
+
+* **Brake.** Not designed in. A rear-wheel-only tread-shoe brake, over-centre handbrake lever with a gas-strut assist
+  and a ratchet, drop chocks as the no-operator backstop; the physics (rear lifts at ~0.54 g, a locked rear tyre can
+  only give ~0.22 g, so the brake cannot be too strong) and the mechanism are written up in
+  [`notes/brake.md`](notes/brake.md) for when the design moves forward.
 
 ## Sources
 
