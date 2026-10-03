@@ -9,7 +9,7 @@ with an interactive 3D viewer, cut list, joint schedule and caster loads.
 > Not a stamped design. It is a parametric model built so the team can change dimensions, loads and tube sizes and
 > see the consequences. If people ride on it, have a qualified engineer look at the rider load cases before you build.
 
-## Current design (v4)
+## Current design (v5)
 
 | | |
 |---|---|
@@ -20,9 +20,9 @@ with an interactive 3D viewer, cut list, joint schedule and caster loads.
 | Upper deck | 2" perimeter and cross beams, two 1½" joists, 48 × 32 in hatch in the middle, 57" above the road. |
 | Rim | 1½" handrail ring 20.5" above the upper deck, on 1½" chamfer stubs. Top of frame 93" above the road (was 115"). |
 | Bracing | 1½" 45° X in the nose wall, six 1½" side-wall diagonals, skinned tail-wall panels beside the door, deck plywood. |
-| Underbody | Flat belly at the chassis, 16" clear. Each caster in its own 1½" leg box 4" off the road: rear 12 × 22 in for rigid casters, front 26 in square for swivels. |
-| Steel | ≈ 433 ft, ≈ 636 lb, all 14 ga: 28 ten-ft sticks of 1½", 7 of 1¾", 6 of 2", 7 of 2½". (v2 at 12 ga was 1,016 lb.) |
-| Weight | ≈ 3,130 lb parked with 6 aboard; ≈ 2,280 lb moving with 2. |
+| Underbody | The octagon's lower taper, as skin framing (eight 45° stubs, four bottom crosses, two edge stringers, 62 lb) down to an 81½" belly 10" off the road. Casters in round coroplast legs (26" front for swivels, 22" rear for rigid casters) with a rubber garage-door seal as the hoof, 4" off the road. No steel in the legs. |
+| Steel | ≈ 418 ft, ≈ 617 lb, all 14 ga. (v2 at 12 ga was 1,016 lb.) |
+| Weight | ≈ 3,100 lb parked with 6 aboard; ≈ 2,250 lb moving with 2. |
 | Casters | 800 lb each parked, 1,540 lb with one wheel in a pothole. Spec 16" wheels ≥ 1,200 lb. |
 | Worst member | Chassis rail, 72% of allowable, one wheel lifted. Target is 85%; nothing else over 60%. |
 | Flex | 0.5" sag at the hatch edge with someone sitting on it. Front-to-back racking under a rope snatch: 0.05" with every joint a pin (v3's open sides: 2.1"). Pothole twist 0.6". |
@@ -117,7 +117,9 @@ chassis centreline. The road is at Z = −17.25 (16" caster + half a 2½" tube).
 * `--optimize` re-sizes every family from scratch; a plain run uses the sizes baked into `GROUP_SEC`.
 * Plywood decks modelled as shear panels at an effective G·t of 15,000 lb/in (APA gives 60–80k for ¾" sheathing
   before fastener slip). This is the assumption most worth an engineer's eye.
-* `UNDERBODY` ('legs' or 'skirt') and `ENTRY` ('tail' or 'side') switch between the v4 and v3 layouts.
+* `UNDERBODY` ('chamfer', 'legs' or 'skirt') and `ENTRY` ('tail' or 'side') switch between the v5, v4 and v3 layouts.
+  `BELLY_CLEAR` sets how far the taper comes down: the 16" casters put the chassis 17" above the road, so every inch
+  of belly is an inch less of leg showing; the full 20.5" chamfer would need 24" wheels.
 * Not modelled: local wall dimpling under a bolt, hole slop, skin on the sides, belly, legs and cones, wind.
 
 ## Setup (once)
