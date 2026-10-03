@@ -42,10 +42,10 @@ LEGS = {                            # legs in plan. 'legs': steel boxes (x half-
 }
 LEG_SKIN_LB = 4.0                   # per coroplast leg incl. the rubber hoof seal (4 mm coroplast is ~0.2 psf)
 DOOR_HALF = 15.0                    # tail door half-width (ENTRY='tail'): jambs at +/-15, 30" clear
-LONG_BRACES = True                  # front V: chassis spine front end up to the hatch-edge beam at Y=64, landing at +/-12;
-                                    # rear pair: tail cross-member at +/-18 up to the hatch-edge beam at Y=32, landing at +/-24.
-                                    # Offsets keep every brace clear of the lower deck joists where it passes through the deck ply.
-LB_FRONT_X, LB_REAR_X0, LB_REAR_X1 = 12.0, 18.0, 24.0
+LONG_BRACES = True                  # four braces from the hatch-edge beams down to the lower deck beams ON the truss lines (x = +/-RAIL_X),
+                                    # so the columns carry them to the rails: front pair Y=64 beam at +/-12 -> front deck beam at +/-26;
+                                    # rear pair Y=32 beam at +/-24 -> tail deck beam at +/-26. They stand on the deck, no ply slots.
+LB_FRONT_X, LB_REAR_X1 = 12.0, 24.0
 POST_Y      = [16.0, 48.0, 80.0]    # side posts, staggered between the rib stations (v8); [0, 32, 64, 96] puts them on the ribs
 UPPER_JOISTS = 'hatch'              # 'hatch': only the two hatch-side pieces at +/-24 in the middle bay; 'full': joists at +/-24 and 0 throughout
 RIM_CROSS   = 'ends'                # 'ends': rim cross pieces at the nose and tail ribs only (nothing to sit on across the opening); 'all'
@@ -233,7 +233,6 @@ def build(lift_caster=None):
         extra = [x for leg in LEGS.values() if UNDERBODY == 'legs' and y in (leg['y0'], leg['y1']) for sx in (-1, 1) for x in (sx*rx - leg['halfw'], sx*rx + leg['halfw'])]
         if ENTRY == 'tail' and y == tail_rib and not OCT: extra += [-DOOR_HALF, DOOR_HALF]
         xs = [-rx, 0.0, rx] if OCT else xs5          # on the bottom flat the cross-member is only 52" wide
-        if LONG_BRACES and y == tail_rib: xs = xs + [-LB_REAR_X0, LB_REAR_X0]
         F.chain([(x, y, CZ) for x in sorted(set(xs + extra))], 'chassis_cross')
 
     # ----- LOWER DECK FRAME (octagon mode): beams at the ribs, joists over the rails, columns down to the chassis, chamfer stubs to the corners
@@ -286,9 +285,10 @@ def build(lift_caster=None):
 
     # ----- LONG BRACES in the attics under the upper decks
     if LONG_BRACES:
+        zb = 0.0 if OCT else CZ          # stand on the lower deck beams at the truss lines (octagon); on the chassis rails otherwise
         for sx in (-1, 1):
-            F.chain([(0.0, nose_rib, CZ), (sx*LB_FRONT_X, HATCH[1], Z_HI)], 'long_brace')
-            F.chain([(sx*LB_REAR_X0, tail_rib, CZ), (sx*LB_REAR_X1, HATCH[0], Z_HI)], 'long_brace')
+            F.chain([(sx*rx, nose_rib, zb), (sx*LB_FRONT_X, HATCH[1], Z_HI)], 'long_brace')
+            F.chain([(sx*rx, tail_rib, zb), (sx*LB_REAR_X1, HATCH[0], Z_HI)], 'long_brace')
 
     # ----- SIDE WALL DIAGONALS (tail entry: sides are braced and hard-skinned; one 45-ish diagonal per bay, alternating)
     if ENTRY == 'tail' and SIDE_BRACING == 'diagonals':

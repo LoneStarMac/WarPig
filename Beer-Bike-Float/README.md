@@ -18,12 +18,12 @@ with an interactive 3D viewer, cut list, joint schedule and caster loads.
 | Sides | Three 1¾" posts per side at Y = 16, 48, 80, staggered between the beam stations so each laps a continuous rail. Hard-skinned; the panels are the side bracing (fastened along every edge). Entry is through the tail. |
 | Upper deck | 1¾" side rails, end beams and two hatch-edge cross beams, 1½" hatch sides; ply spans 32" between the beams. 48 × 32 in hatch, 97" above the road. |
 | Rim | 1½" handrail stringers 20.5" above the upper deck on 1½" chamfer stubs, cross pieces at the nose and tail only (nothing to sit on across the opening). Top of frame 113" above the road. |
-| Bracing | 1½" 45° X in the nose wall; four 1½" long braces from the chassis ends up to the hatch-edge beams (a V at the front, a pair at the rear); V-braces below the deck in the nose and tail walls; skinned tail-wall panels beside the door; deck, belly, chamfer and side plywood. |
+| Bracing | 1½" 45° X in the nose wall; four 1½" long braces from the lower deck beams, standing over the truss columns at ±26", up to the hatch-edge beams (front pair to ±12" on the Y=64 beam, rear pair to ±24" on the Y=32 beam); V-braces below the deck in the nose and tail walls; skinned tail-wall panels beside the door; deck, belly, chamfer and side plywood. |
 | Underbody | The full octagon: 20.5" lower chamfer to the 55" bottom flat, 17" off the road, with the casters below it. Optional coroplast sleeves with a rubber-seal hoof round each caster, no steel. Rigid casters at the rear, swivels at the front. |
-| Steel | ≈ 417 ft, ≈ 569 lb, all 14 ga: 30 ten-ft sticks of 1½", 12 of 1¾", 2 of 2", 2 of 2½". (v2 at 12 ga was 1,016 lb.) |
+| Steel | ≈ 411 ft, ≈ 562 lb, all 14 ga: 30 ten-ft sticks of 1½", 12 of 1¾", 2 of 2", 2 of 2½". (v2 at 12 ga was 1,016 lb.) |
 | Weight | ≈ 3,020 lb parked with 6 aboard; ≈ 2,170 lb moving with 2. |
 | Casters | 850 lb each parked, 1,630 lb with one wheel in a pothole. Spec 16" wheels ≥ 1,200 lb. |
-| Worst member | Chassis rail, 75% of allowable, one wheel lifted. The rails were checked at 2": 121% at 14 ga, 92% at 12 ga, so they stay 2½". Target is 85%; nothing else over 70%. |
+| Worst member | Chassis rail, 76% of allowable, one wheel lifted. The rails were checked at 2": 121% at 14 ga, 92% at 12 ga, so they stay 2½". Target is 85%; nothing else over 71%. Cross-members 10%. |
 | Flex | 0.11" sag at the hatch edge with someone sitting on it (the long braces prop it). Front-to-back racking under a rope snatch: 0.06" with every joint a pin. Pothole twist 0.24". |
 
 ### Sizing philosophy
@@ -77,8 +77,9 @@ The viewer's **Build** tab has the full sequence; the short version:
 2. Chassis upside down on sawhorses: rails on cross-members, corner plates, caster plates with crush sleeves,
    belly ply. Flip it onto its wheels.
 3. Lower box: columns, joists, deck beams, chamfer stubs, edge stringers, diagonals, V-braces. Square and level it.
-4. Long braces, *then* the lower deck ply slotted round them (two 4 × 8 sheets from above).
-5. Posts, side rails, end and hatch-edge beams, hatch sides, nose X-brace, tail-door jambs.
+4. Lower deck ply (two 4 × 8 sheets from above).
+5. Posts, side rails, end and hatch-edge beams, hatch sides, nose X-brace, tail-door jambs; then the four long
+   braces, standing on the deck beams over the columns and rising to the hatch-edge beams.
 6. Upper deck ply from above (a 48" sheet fits the 55" top opening), rim, nose and tail frames, door.
 7. Skin bottom up and outside in, every panel fastened along all four edges; paint; decorations; hooves.
 
