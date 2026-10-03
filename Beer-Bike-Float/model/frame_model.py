@@ -46,7 +46,9 @@ LONG_BRACES = True                  # four braces from the hatch-edge beams down
                                     # so the columns carry them to the rails: front pair Y=64 beam at +/-12 -> front deck beam at +/-26;
                                     # rear pair Y=32 beam at +/-24 -> tail deck beam at +/-26. They stand on the deck, no ply slots.
 LB_FRONT_X, LB_REAR_X1 = 12.0, 24.0
-POST_Y      = [16.0, 48.0, 80.0]    # side posts, staggered between the rib stations (v8); [0, 32, 64, 96] puts them on the ribs
+POST_Y      = [0.0, 48.0, 96.0]     # side posts: on the body corners (a nailer for both ply sheets that meet there, and the corner is
+                                    # carried directly) and one mid-side. Each side skin is then two 48 x 55 pieces, every edge on steel.
+                                    # [16, 48, 80] staggers them off the corners (v8a); [0, 32, 64, 96] puts them on the ribs (v3-v7)
 UPPER_JOISTS = 'hatch'              # 'hatch': only the two hatch-side pieces at +/-24 in the middle bay; 'full': joists at +/-24 and 0 throughout
 RIM_CROSS   = 'ends'                # 'ends': rim cross pieces at the nose and tail ribs only (nothing to sit on across the opening); 'all'
 LOWER_WEB   = 'vee'                 # 'vee'  : a 2" deck spine at x=0 and a V at every rib from the rail ends up to it; no joists, columns or web
@@ -54,6 +56,9 @@ LOWER_WEB   = 'vee'                 # 'vee'  : a 2" deck spine at x=0 and a V at
 CHAMFER_Y   = [0.0, 24.0, 72.0, 96.0]   # upper chamfer stubs: the inner pair moved off the hatch-beam stations so those rail joints are plain T's
 SPINE       = False                 # chassis spine and centre joist/columns; False drops them (the deck ply spans 32" between the deck beams)
 SIDE_BRACING = 'skin'               # 'diagonals': one 1.5" diagonal per side bay (v4-v6); 'skin': the hard side panels as shear panels; 'none'
+CABLES      = ()                    # tension-only cable X's with turnbuckles: 'sides' (corner to corner across each side wall, the
+                                    # four upper corners down to the opposite lower corners), 'nose' (replaces the tube X in the nose wall)
+CABLE_D     = 0.1875                # 7x19 galvanized aircraft cable diameter: 0.125, 0.1875 or 0.25
 HATCH    = (32.0, 64.0)             # upper-deck hatch between these ribs, X between the joists at +/-24
 JOIST_X  = 24.0
 L_NOSE, NOSE_W, NOSE_H, NOSE_ZC = 36.0, 30.0, 18.0, (Z_RIM + (-C)) / 2    # snout panel, centred on the octagon (z = 27.5)
@@ -92,7 +97,13 @@ def _derive_14ga():
                                  J=round(s12['J']*t14/t12, 2), wpf=round(s12['wpf']*A14/A12, 3), size=b, t=t14)
     SECTIONS.update(out)
 _derive_14ga()
-SECTIONS_BY_WEIGHT = sorted(SECTIONS, key=lambda k: SECTIONS[k]['wpf'])
+# 7x19 galvanized aircraft cable: metallic area, rated breaking strength, lb/ft. Checked at breaking/5 (design factor 5, the
+# usual for rigging) and breaking/2.5 under the 2x Shock case. E = 10 Msi effective for 7x19 (it stretches ~3x more than a rod).
+CABLE_SPEC = {0.125: (0.0059, 2000.0, 0.029), 0.1875: (0.0134, 4200.0, 0.065), 0.25: (0.0238, 7000.0, 0.11)}
+_ca, _cbs, _cw = CABLE_SPEC[CABLE_D]
+SECTIONS['cable'] = dict(A=_ca, I=1e-6, S=1e-6, r=math.sqrt(1e-6/_ca), J=1e-6, wpf=_cw, size=CABLE_D, t=0.0, BS=_cbs)
+E_CABLE = 10.0e6
+SECTIONS_BY_WEIGHT = sorted((k for k in SECTIONS if k != 'cable'), key=lambda k: SECTIONS[k]['wpf'])
 # Member families share one tube size so there are few sizes to buy and few joint patterns. The auto-sizer
 # (python frame_model.py --optimize) picks the lightest allowed section per family that keeps every member under
 # U_TARGET in every load case (strength only: yield and buckling; deflection is reported, not limited).
@@ -121,7 +132,7 @@ GROUP_SEC = {
     'skirt_stub': '1.50x14', 'skirt_bottom': '1.50x14', 'skirt_drop': '1.50x14', 'skirt_stringer': '1.50x14',
     'leg_top': '1.50x14', 'leg_drop': '1.50x14', 'leg_ring': '1.50x14', 'side_diag': '1.50x14', 'door_jamb': '1.75x14',
     'deck_lo_beam': '1.50x14', 'joist_lo': '1.50x14', 'column': '1.50x14', 'vbrace_lo': '1.50x14', 'long_brace': '1.50x14', 'web_diag': '1.50x14', 'deck_spine': '2.00x14',
-    'nose_stringer': '1.50x14', 'nose_rim': '1.50x14', 'tail_stringer': '1.50x14', 'tail_rim': '1.50x14',
+    'nose_stringer': '1.50x14', 'nose_rim': '1.50x14', 'tail_stringer': '1.50x14', 'tail_rim': '1.50x14', 'cable': 'cable',
 }
 GROUP_LABEL = {
     'chassis_rail': 'Chassis rail (casters bolt under)', 'chassis_spine': 'Chassis spine', 'chassis_cross': 'Chassis cross-member',
@@ -134,7 +145,7 @@ GROUP_LABEL = {
     'side_diag': 'Side wall diagonal (under skin)', 'door_jamb': 'Tail door jamb',
     'deck_lo_beam': 'Lower deck beam (96")', 'joist_lo': 'Lower deck joist', 'column': 'Lower deck column', 'vbrace_lo': 'V-brace, rail ends up to the deck spine',
     'deck_spine': 'Lower deck spine',
-    'long_brace': 'Long brace, chassis end to hatch edge', 'web_diag': 'Lower box diagonal (rail to joist)',
+    'long_brace': 'Long brace, chassis end to hatch edge', 'web_diag': 'Lower box diagonal (rail to joist)', 'cable': 'Cable X (7x19 aircraft cable, turnbuckle)',
     'tail_stringer': 'Tail stringer', 'tail_rim': 'Tail frame',
 }
 ROLE = {
@@ -144,7 +155,7 @@ ROLE = {
     'xbrace_end': 'Bracing',
     'skirt_stub': 'Skirt', 'skirt_bottom': 'Skirt', 'skirt_drop': 'Skirt', 'skirt_stringer': 'Skirt',
     'leg_top': 'Legs', 'leg_drop': 'Legs', 'leg_ring': 'Legs', 'side_diag': 'Bracing', 'door_jamb': 'Posts & rim',
-    'deck_lo_beam': 'Lower deck', 'joist_lo': 'Lower deck', 'column': 'Lower deck', 'vbrace_lo': 'Lower deck', 'long_brace': 'Bracing', 'web_diag': 'Lower deck', 'deck_spine': 'Lower deck',
+    'deck_lo_beam': 'Lower deck', 'joist_lo': 'Lower deck', 'column': 'Lower deck', 'vbrace_lo': 'Lower deck', 'long_brace': 'Bracing', 'web_diag': 'Lower deck', 'deck_spine': 'Lower deck', 'cable': 'Bracing',
     'nose_stringer': 'Nose & tail', 'nose_rim': 'Nose & tail', 'tail_stringer': 'Nose & tail', 'tail_rim': 'Nose & tail',
 }
 if UNDERBODY == 'octagon': ROLE['skirt_stub'] = 'Lower deck'
@@ -154,7 +165,7 @@ ROLE_ORDER = ['Chassis', 'Lower deck' if UNDERBODY == 'octagon' else ('Legs' if 
 # which is either welded or squared by the deck ply. Posts are pinned top and bottom; the deck diaphragms and the nose/tail
 # pyramids do the racking work. The X-braces are continuous through their crossing (one stick + two halves). Nose/tail
 # tip frames are left rigid (4 short pieces, bracketed); everything else, skirt included, is pinned.
-PIN_BOTH       = {'post', 'chamfer_hi', 'nose_stringer', 'tail_stringer', 'skirt_stub', 'skirt_drop', 'side_diag', 'door_jamb', 'column', 'vbrace_lo', 'long_brace', 'web_diag'}   # leg corner posts stay rigid: the leg box is skinned on 4 sides
+PIN_BOTH       = {'cable', 'post', 'chamfer_hi', 'nose_stringer', 'tail_stringer', 'skirt_stub', 'skirt_drop', 'side_diag', 'door_jamb', 'column', 'vbrace_lo', 'long_brace', 'web_diag'}   # leg corner posts stay rigid: the leg box is skinned on 4 sides
 PIN_CHAIN_ENDS = {'deck_hi_cross', 'deck_hi_end', 'deck_hi_rail', 'joist_hi', 'rim_stringer', 'rim_cross', 'skirt_stringer', 'skirt_bottom', 'deck_lo_edge', 'xbrace_end', 'leg_top', 'deck_lo_beam', 'joist_lo', 'deck_spine'}
 
 
@@ -163,6 +174,7 @@ class Frame:
         self.m = FEModel3D()
         self.m.add_material('steel', E, G, 0.3, 0.0, FY)
         self.m.add_material('ply', 1.5e6, 0.6e6, 0.3, 0.0)
+        self.m.add_material('cable', E_CABLE, E_CABLE/2.6, 0.3, 0.0)
         for name, s in SECTIONS.items():
             self.m.add_section(name, s['A'], s['I'], s['I'], s['J'])
         self.nodes, self.members, self.proxies = {}, [], []
@@ -177,13 +189,14 @@ class Frame:
     def member(self, a, b, group, sec=None):
         sec = sec or GROUP_SEC[group]
         name = f"M{next(self._mid):03d}_{group}"
-        self.m.add_member(name, a, b, 'steel', sec)
+        cable = group == 'cable'
+        self.m.add_member(name, a, b, 'cable' if cable else 'steel', sec, tension_only=cable)
         if group in PIN_BOTH:
             self.m.def_releases(name, Ryi=True, Rzi=True, Ryj=True, Rzj=True)
         Lm = math.dist(self.nodes[a], self.nodes[b])
         self.members.append(dict(name=name, i=a, j=b, group=group, sec=sec, L=Lm))
-        w = SECTIONS[sec]['wpf'] / 12.0
-        self.dist(name, w, 'D')
+        if not cable:   # a cable's own weight is a few pounds and it cannot take a transverse load anyway
+            self.dist(name, SECTIONS[sec]['wpf'] / 12.0, 'D')
         return name
 
     def chain(self, pts, group, sec=None):
@@ -277,9 +290,12 @@ def build(lift_caster=None):
         if end and not (ENTRY == 'tail' and y == tail_rib):
             # 45-degree X-brace in the nose wall, rise = run = Z_HI so the braces cross at 90. Bottoms on the truss lines (pratt)
             # or on the deck-ring corners over the chamfer stubs (vee); tops on the end beam.
-            xb = hw if VEE else rx; xt = Z_HI - xb; zx = Z_HI * xb / (2 * xb) if xb > 0 else 0   # crossing at x = 0
-            F.chain([(-xb, y, 0.0), (0.0, y, xb), (xt, y, Z_HI)], 'xbrace_end')
-            F.chain([(xb, y, 0.0), (0.0, y, xb), (-xt, y, Z_HI)], 'xbrace_end')
+            xb = hw if VEE else rx; xt = Z_HI - xb
+            if 'nose' in CABLES:   # two cables, same corners, no crossing node (they just pass each other)
+                F.chain([(-xb, y, 0.0), (xt, y, Z_HI)], 'cable'); F.chain([(xb, y, 0.0), (-xt, y, Z_HI)], 'cable')
+            else:                  # tube X, continuous through the crossing at x = 0
+                F.chain([(-xb, y, 0.0), (0.0, y, xb), (xt, y, Z_HI)], 'xbrace_end')
+                F.chain([(xb, y, 0.0), (0.0, y, xb), (-xt, y, Z_HI)], 'xbrace_end')
         if ENTRY == 'tail' and y == tail_rib:   # door jambs from the chassis to the upper deck beam; the beam is the header
             for sx in (-1, 1):
                 F.chain([(sx*DOOR_HALF, y, 0.0), (sx*DOOR_HALF, y, Z_HI)], 'door_jamb')
@@ -305,6 +321,12 @@ def build(lift_caster=None):
             for bi, (y1, y2) in enumerate(zip(RIBS[:-1], RIBS[1:])):
                 a, b = ((y1, 0.0), (y2, Z_HI)) if (bi + (sx > 0)) % 2 == 0 else ((y2, 0.0), (y1, Z_HI))
                 F.chain([(sx*hw, a[0], a[1]), (sx*hw, b[0], b[1])], 'side_diag')
+
+    # ----- SIDE CABLES: one X per side from the four corners (upper corner to the opposite lower corner), tension only
+    if 'sides' in CABLES:
+        for sx in (-1, 1):
+            F.chain([(sx*hw, RIBS[0], 0.0), (sx*hw, RIBS[-1], Z_HI)], 'cable')
+            F.chain([(sx*hw, RIBS[-1], 0.0), (sx*hw, RIBS[0], Z_HI)], 'cable')
 
     # ----- UPPER CHAMFERS + RIM (handrail level)
     for y in CHAMFER_Y:
@@ -504,8 +526,8 @@ def check(F, combos):
         mem = F.m.members[mm['name']]; s = SECTIONS[mm['sec']]
         KL_r = mm['L']/s['r']; Fcr = aisc_fcr(KL_r); r = {}
         for cb in combos:
-            Pmax, Pmin = mem.max_axial(cb), mem.min_axial(cb)
-            P_c, P_t = max(0.0, -Pmin), max(0.0, Pmax)
+            Pmax, Pmin = mem.max_axial(cb), mem.min_axial(cb)     # PyNite: axial force is + in COMPRESSION
+            P_c, P_t = max(0.0, Pmax), max(0.0, -Pmin)
             Mz = max(abs(mem.max_moment('Mz', cb)), abs(mem.min_moment('Mz', cb)))
             My = max(abs(mem.max_moment('My', cb)), abs(mem.min_moment('My', cb)))
             Vy = max(abs(mem.max_shear('Fy', cb)), abs(mem.min_shear('Fy', cb)))
@@ -514,10 +536,12 @@ def check(F, combos):
             omega = 1.0 if cb == 'Shock' else 1.67
             u_yield = (sig_a + sig_b)/(FY/omega)
             u_buck = P_c/(Fcr*s['A']/omega) + sig_b/(FY/omega)
+            if 'BS' in s:   # cable: tension against the rated breaking strength / design factor
+                sig_b = 0.0; u_yield = u_buck = P_t / (s['BS'] / (2.5 if cb == 'Shock' else 5.0))
             d = max(abs(mem.max_deflection(k, cb)) for k in ('dy', 'dz')) if True else 0
             d = max(d, max(abs(mem.min_deflection(k, cb)) for k in ('dy', 'dz')))
             V_end = math.hypot(Vy, Vz)
-            r[cb] = dict(P=round(Pmax if P_t >= P_c else Pmin, 1), M=round(Mz+My, 1), sig_ksi=round((sig_a+sig_b)/1000, 2),
+            r[cb] = dict(P=round(P_t if P_t >= P_c else -P_c, 1), M=round(Mz+My, 1), sig_ksi=round((sig_a+sig_b)/1000, 2),   # P reported + tension / - compression
                          u_yield=round(u_yield, 3), u_buck=round(u_buck, 3), u=round(max(u_yield, u_buck), 3),
                          defl=round(d, 3), joint_lb=round(math.hypot(V_end, max(P_c, P_t)), 1), V=round(V_end, 1))
         r['KL_r'] = round(KL_r, 1); r['Fcr_ksi'] = round(Fcr/1000, 1)
@@ -558,7 +582,8 @@ def write_cutlist(F, path):
     with open(path, 'w', newline='') as fh:
         w = csv.writer(fh); w.writerow(['group', 'section', 'length_in', 'qty', 'total_ft', 'total_lb'])
         for (g, s, Lm), q in sorted(rows.items()):
-            ft = Lm*q/12; lb = ft*SECTIONS[s]['wpf']; tot_ft += ft; tot_lb += lb
+            ft = Lm*q/12; lb = ft*SECTIONS[s]['wpf']
+            if s != 'cable': tot_ft += ft; tot_lb += lb
             w.writerow([g, s, Lm, q, round(ft, 1), round(lb, 1)])
         w.writerow(['TOTAL', '', '', sum(rows.values()), round(tot_ft, 1), round(tot_lb, 1)])
     return tot_ft, tot_lb
@@ -634,7 +659,7 @@ if __name__ == '__main__':
                params=dict(W=W, H=H_OCT, L=L, FLAT=FLAT, RIBS=RIBS, L_NOSE=L_NOSE, NOSE_W=NOSE_W, NOSE_H=NOSE_H, NOSE_ZC=NOSE_ZC,
                            L_TAIL=L_TAIL, TAIL_W=TAIL_W, TAIL_H=TAIL_H, TAIL_ZC=TAIL_ZC, Z_LO=0.0, Z_HI=Z_HI, Z_RIM=Z_RIM, Z_SKIRT=Z_SKIRT, X_SKIRT=X_SKIRT,
                            UNDERBODY=UNDERBODY, ENTRY=ENTRY, LEGS=LEGS, Z_LEG=Z_LEG, LEG_CLEAR=LEG_CLEAR, BELLY_CLEAR=BELLY_CLEAR, DOOR_HALF=DOOR_HALF, CHASSIS_Z=CHASSIS_Z,
-                           LONG_BRACES=LONG_BRACES, SIDE_BRACING=SIDE_BRACING, POST_Y=POST_Y, UPPER_JOISTS=UPPER_JOISTS, RIM_CROSS=RIM_CROSS, LOWER_WEB=LOWER_WEB, SPINE=SPINE, CHAMFER_Y=CHAMFER_Y,
+                           LONG_BRACES=LONG_BRACES, SIDE_BRACING=SIDE_BRACING, POST_Y=POST_Y, UPPER_JOISTS=UPPER_JOISTS, RIM_CROSS=RIM_CROSS, LOWER_WEB=LOWER_WEB, SPINE=SPINE, CHAMFER_Y=CHAMFER_Y, CABLES=list(CABLES), CABLE_D=CABLE_D,
                            Z_GROUND=Z_GROUND, RAIL_X=RAIL_X, CASTER_Y=CASTER_Y, HATCH=HATCH, JOIST_X=JOIST_X, C=C,
                            PEOPLE_LOWER=PEOPLE_LOWER_PARKED, EDGE_PERSON=EDGE_PERSON, MOVING=MOVING, PERSON_LB=PERSON_LB, SKIN_PSF=SKIN_PSF, DECK_PSF=DECK_PSF,
                            SHOCK=SHOCK, SWAY_G=SWAY_G, TOW_FRACTION=TOW_FRACTION, PLY_GT_EFF=PLY_GT_EFF, SKIN_GT_EFF=SKIN_GT_EFF, FY=FY,
