@@ -1,13 +1,12 @@
 # Octagon Float Frame
 
-Structural model of a bolted perforated-square-steel-tube frame for an 8 × 8 × 8 ft octagonal parade float
-(the pig), replacing a rotting 15-year-old wood frame. Space-frame analysis in [PyNite](https://github.com/JWock82/Pynite),
+Structural model of a bolted perforated-square-steel-tube frame for an 8 × 8 × 8 ft octagonal War Pig, replacing a rotting 15-year-old wood frame. Space-frame analysis in [PyNite](https://github.com/JWock82/Pynite),
 with an interactive 3D viewer, cut list, joint schedule and caster loads.
 
-**Live page:** https://lonestarmac.github.io/WarPig/Beer-Bike-Float/ (after Pages is enabled, see *Setup* below)
+**Live page:** https://lonestarmac.github.io/WarPig/Beer-Bike-Float/ 
 
 > Not a stamped design. It is a parametric model built so the team can change dimensions, loads and tube sizes and
-> see the consequences. If people ride on it, have a qualified engineer look at the rider load cases before you build.
+> see the consequences. If people ride on it, have an engineer review rider load cases.
 
 ## Current design (v7)
 
@@ -122,11 +121,6 @@ chassis centreline. The road is at Z = −17.25 (16" caster + half a 2½" tube).
   the chassis at the lower deck with the casters inside the body, which rides 20" lower.
 * Not modelled: local wall dimpling under a bolt, hole slop, skin on the sides, belly, legs and cones, wind.
 
-## Setup (once)
-
-1. Repo Settings → Pages → Build and deployment → Source: **GitHub Actions**.
-2. Push to `main` (or run the *Run models and publish site* workflow by hand). The site URL appears on the
-   workflow's deploy step; this design is at `/Beer-Bike-Float/`.
 
 ## Sources
 
