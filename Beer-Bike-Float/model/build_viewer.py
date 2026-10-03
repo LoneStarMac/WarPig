@@ -76,7 +76,7 @@ for m in d['members']:
 def angle(u, v):
     c = abs(sum(a*b for a, b in zip(u, v))); c = min(1.0, c)
     return math.degrees(math.acos(c))
-CONE = lambda g: g in ('nose_stringer', 'tail_stringer', 'side_diag')   # flattened-end one-bolt pins, no bracket
+CONE = lambda g: g in ('nose_stringer', 'tail_stringer', 'side_diag', 'long_brace')   # flattened-end one-bolt pins, no bracket
 joints = []
 for n, st in node_sticks.items():
     through = [sid for sid, g in st if stick_nodes[sid][n] >= 2]

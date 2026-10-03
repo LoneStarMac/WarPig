@@ -42,6 +42,11 @@ LEGS = {                            # legs in plan. 'legs': steel boxes (x half-
 }
 LEG_SKIN_LB = 4.0                   # per coroplast leg incl. the rubber hoof seal (4 mm coroplast is ~0.2 psf)
 DOOR_HALF = 15.0                    # tail door half-width (ENTRY='tail'): jambs at +/-15, 30" clear
+LONG_BRACES = True                  # front V: chassis spine front end up to the hatch-edge beam at Y=64, landing at +/-12;
+                                    # rear pair: tail cross-member at +/-18 up to the hatch-edge beam at Y=32, landing at +/-24.
+                                    # Offsets keep every brace clear of the lower deck joists where it passes through the deck ply.
+LB_FRONT_X, LB_REAR_X0, LB_REAR_X1 = 12.0, 18.0, 24.0
+SIDE_BRACING = 'skin'               # 'diagonals': one 1.5" diagonal per side bay (v4-v6); 'skin': the hard side panels as shear panels; 'none'
 HATCH    = (32.0, 64.0)             # upper-deck hatch between these ribs, X between the joists at +/-24
 JOIST_X  = 24.0
 L_NOSE, NOSE_W, NOSE_H, NOSE_ZC = 36.0, 30.0, 18.0, (Z_RIM + (-C)) / 2    # snout panel, centred on the octagon (z = 27.5)
@@ -90,6 +95,7 @@ FAMILIES = {
     'rim':       dict(groups=['chamfer_hi', 'rim_cross', 'rim_stringer'], min='1.50x14'),   # handrail: 1.5" minimum for feel
     'joists':    dict(groups=['joist_hi'], min='1.50x14'),
     'brace':     dict(groups=['xbrace_end', 'side_diag', 'vbrace_lo'], min='1.50x14'),
+    'longbrace': dict(groups=['long_brace'], min='1.50x14'),
     'lowerdeck': dict(groups=['deck_lo_beam', 'joist_lo', 'column'], min='1.50x14'),
     'legs':      dict(groups=['leg_top', 'leg_drop', 'leg_ring'], min='1.50x14'),
     'skirt':     dict(groups=['skirt_stub', 'skirt_bottom', 'skirt_drop', 'skirt_stringer'], min='1.50x14'),
@@ -99,12 +105,12 @@ U_TARGET = 0.85
 # v3 sizes, from --optimize with U_TARGET = 0.85. (v2 was 2.5"/2"/1.75" x 12 ga everywhere: 1,016 lb.)
 GROUP_SEC = {
     'chassis_rail': '2.50x14', 'chassis_spine': '2.50x14', 'chassis_cross': '2.50x14',
-    'deck_hi_rail': '2.00x14', 'deck_hi_end': '2.00x14', 'deck_hi_cross': '2.00x14', 'xbrace_end': '1.50x14',
+    'deck_hi_rail': '1.75x14', 'deck_hi_end': '1.75x14', 'deck_hi_cross': '1.75x14', 'xbrace_end': '1.50x14',
     'deck_lo_edge': '1.75x14', 'post': '1.75x14', 'chamfer_hi': '1.50x14', 'rim_cross': '1.50x14', 'rim_stringer': '1.50x14',
     'joist_hi': '1.50x14',
     'skirt_stub': '1.50x14', 'skirt_bottom': '1.50x14', 'skirt_drop': '1.50x14', 'skirt_stringer': '1.50x14',
     'leg_top': '1.50x14', 'leg_drop': '1.50x14', 'leg_ring': '1.50x14', 'side_diag': '1.50x14', 'door_jamb': '1.75x14',
-    'deck_lo_beam': '1.50x14', 'joist_lo': '1.50x14', 'column': '1.50x14', 'vbrace_lo': '1.50x14',
+    'deck_lo_beam': '1.50x14', 'joist_lo': '1.50x14', 'column': '1.50x14', 'vbrace_lo': '1.50x14', 'long_brace': '1.50x14',
     'nose_stringer': '1.50x14', 'nose_rim': '1.50x14', 'tail_stringer': '1.50x14', 'tail_rim': '1.50x14',
 }
 GROUP_LABEL = {
@@ -117,6 +123,7 @@ GROUP_LABEL = {
     'leg_top': 'Leg box, top ring', 'leg_drop': 'Leg box, corner post', 'leg_ring': 'Leg box, bottom ring',
     'side_diag': 'Side wall diagonal (under skin)', 'door_jamb': 'Tail door jamb',
     'deck_lo_beam': 'Lower deck beam (96")', 'joist_lo': 'Lower deck joist', 'column': 'Lower deck column', 'vbrace_lo': 'V-brace below the deck, nose & tail',
+    'long_brace': 'Long brace, chassis end to hatch edge',
     'tail_stringer': 'Tail stringer', 'tail_rim': 'Tail frame',
 }
 ROLE = {
@@ -126,7 +133,7 @@ ROLE = {
     'xbrace_end': 'Bracing',
     'skirt_stub': 'Skirt', 'skirt_bottom': 'Skirt', 'skirt_drop': 'Skirt', 'skirt_stringer': 'Skirt',
     'leg_top': 'Legs', 'leg_drop': 'Legs', 'leg_ring': 'Legs', 'side_diag': 'Bracing', 'door_jamb': 'Posts & rim',
-    'deck_lo_beam': 'Lower deck', 'joist_lo': 'Lower deck', 'column': 'Lower deck', 'vbrace_lo': 'Bracing',
+    'deck_lo_beam': 'Lower deck', 'joist_lo': 'Lower deck', 'column': 'Lower deck', 'vbrace_lo': 'Bracing', 'long_brace': 'Bracing',
     'nose_stringer': 'Nose & tail', 'nose_rim': 'Nose & tail', 'tail_stringer': 'Nose & tail', 'tail_rim': 'Nose & tail',
 }
 if UNDERBODY == 'octagon': ROLE['skirt_stub'] = 'Lower deck'
@@ -136,7 +143,7 @@ ROLE_ORDER = ['Chassis', 'Lower deck' if UNDERBODY == 'octagon' else ('Legs' if 
 # which is either welded or squared by the deck ply. Posts are pinned top and bottom; the deck diaphragms and the nose/tail
 # pyramids do the racking work. The X-braces are continuous through their crossing (one stick + two halves). Nose/tail
 # tip frames are left rigid (4 short pieces, bracketed); everything else, skirt included, is pinned.
-PIN_BOTH       = {'post', 'chamfer_hi', 'nose_stringer', 'tail_stringer', 'skirt_stub', 'skirt_drop', 'side_diag', 'door_jamb', 'column', 'vbrace_lo'}   # leg corner posts stay rigid: the leg box is skinned on 4 sides
+PIN_BOTH       = {'post', 'chamfer_hi', 'nose_stringer', 'tail_stringer', 'skirt_stub', 'skirt_drop', 'side_diag', 'door_jamb', 'column', 'vbrace_lo', 'long_brace'}   # leg corner posts stay rigid: the leg box is skinned on 4 sides
 PIN_CHAIN_ENDS = {'deck_hi_cross', 'deck_hi_end', 'deck_hi_rail', 'joist_hi', 'rim_stringer', 'rim_cross', 'skirt_stringer', 'skirt_bottom', 'deck_lo_edge', 'xbrace_end', 'leg_top', 'deck_lo_beam', 'joist_lo'}
 
 
@@ -217,6 +224,7 @@ def build(lift_caster=None):
         extra = [x for leg in LEGS.values() if UNDERBODY == 'legs' and y in (leg['y0'], leg['y1']) for sx in (-1, 1) for x in (sx*rx - leg['halfw'], sx*rx + leg['halfw'])]
         if ENTRY == 'tail' and y == tail_rib and not OCT: extra += [-DOOR_HALF, DOOR_HALF]
         xs = [-rx, 0.0, rx] if OCT else xs5          # on the bottom flat the cross-member is only 52" wide
+        if LONG_BRACES and y == tail_rib: xs = xs + [-LB_REAR_X0, LB_REAR_X0]
         F.chain([(x, y, CZ) for x in sorted(set(xs + extra))], 'chassis_cross')
 
     # ----- LOWER DECK FRAME (octagon mode): beams at the ribs, joists over the rails, columns down to the chassis, chamfer stubs to the corners
@@ -239,6 +247,8 @@ def build(lift_caster=None):
             F.chain([(sx*hw, y, 0.0), (sx*hw, y, Z_HI)], 'post')
         end = y in (RIBS[0], RIBS[-1])
         xs_hi = list(xs5)
+        if LONG_BRACES and y == HATCH[1]: xs_hi += [-LB_FRONT_X, LB_FRONT_X]
+        if LONG_BRACES and y == HATCH[0]: xs_hi += [-LB_REAR_X1, LB_REAR_X1]
         if end and not (ENTRY == 'tail' and y == tail_rib): xs_hi += [-(Z_HI - rx), Z_HI - rx]
         if ENTRY == 'tail' and y == tail_rib: xs_hi += [-DOOR_HALF, DOOR_HALF]
         F.chain([(x, y, Z_HI) for x in sorted(set(xs_hi))], 'deck_hi_end' if end else 'deck_hi_cross')
@@ -256,8 +266,14 @@ def build(lift_caster=None):
     F.chain([(0.0, y, Z_HI) for y in RIBS if y <= HATCH[0]], 'joist_hi')
     F.chain([(0.0, y, Z_HI) for y in RIBS if y >= HATCH[1]], 'joist_hi')
 
+    # ----- LONG BRACES in the attics under the upper decks
+    if LONG_BRACES:
+        for sx in (-1, 1):
+            F.chain([(0.0, nose_rib, CZ), (sx*LB_FRONT_X, HATCH[1], Z_HI)], 'long_brace')
+            F.chain([(sx*LB_REAR_X0, tail_rib, CZ), (sx*LB_REAR_X1, HATCH[0], Z_HI)], 'long_brace')
+
     # ----- SIDE WALL DIAGONALS (tail entry: sides are braced and hard-skinned; one 45-ish diagonal per bay, alternating)
-    if ENTRY == 'tail':
+    if ENTRY == 'tail' and SIDE_BRACING == 'diagonals':
         for sx in (-1, 1):
             for bi, (y1, y2) in enumerate(zip(RIBS[:-1], RIBS[1:])):
                 a, b = ((y1, 0.0), (y2, Z_HI)) if (bi + (sx > 0)) % 2 == 0 else ((y2, 0.0), (y1, Z_HI))
@@ -336,6 +352,10 @@ def build(lift_caster=None):
     if ENTRY == 'tail':
         for sx in (-1, 1):
             F.diaphragm((sx*DOOR_HALF, tail_rib, 0.0), (sx*hw, tail_rib, 0.0), (sx*hw, tail_rib, Z_HI), (sx*DOOR_HALF, tail_rib, Z_HI), Z_HI, hw - DOOR_HALF, Gt=SKIN_GT_EFF)
+    if ENTRY == 'tail' and SIDE_BRACING == 'skin':   # hard side panels as shear panels, one per bay per side
+        for y1, y2 in zip(RIBS[:-1], RIBS[1:]):
+            for sx in (-1, 1):
+                F.diaphragm((sx*hw, y1, 0.0), (sx*hw, y1, Z_HI), (sx*hw, y2, Z_HI), (sx*hw, y2, 0.0), y2-y1, Z_HI, Gt=SKIN_GT_EFF)
 
     # ----- SUPPORTS: casters under the rails
     for y in CASTER_Y:
@@ -520,7 +540,7 @@ def optimize(max_rounds=8):
         F, F2, res = run_all()
         changed = False
         for name, fam in FAMILIES.items():
-            u = max(res[m['name']][c]['u'] for m in F.members if m['group'] in fam['groups'] for c in ['Static', 'Shock', 'Sway', 'Tow', 'Lifted'])
+            u = max((res[m['name']][c]['u'] for m in F.members if m['group'] in fam['groups'] for c in ['Static', 'Shock', 'Sway', 'Tow', 'Lifted']), default=0.0)   # a family may be absent in this layout
             cur = GROUP_SEC[fam['groups'][0]]
             if u > U_TARGET:
                 heavier = [k for k in SECTIONS_BY_WEIGHT if SECTIONS[k]['wpf'] > SECTIONS[cur]['wpf']]
@@ -572,6 +592,7 @@ if __name__ == '__main__':
                params=dict(W=W, H=H_OCT, L=L, FLAT=FLAT, RIBS=RIBS, L_NOSE=L_NOSE, NOSE_W=NOSE_W, NOSE_H=NOSE_H, NOSE_ZC=NOSE_ZC,
                            L_TAIL=L_TAIL, TAIL_W=TAIL_W, TAIL_H=TAIL_H, TAIL_ZC=TAIL_ZC, Z_LO=0.0, Z_HI=Z_HI, Z_RIM=Z_RIM, Z_SKIRT=Z_SKIRT, X_SKIRT=X_SKIRT,
                            UNDERBODY=UNDERBODY, ENTRY=ENTRY, LEGS=LEGS, Z_LEG=Z_LEG, LEG_CLEAR=LEG_CLEAR, BELLY_CLEAR=BELLY_CLEAR, DOOR_HALF=DOOR_HALF, CHASSIS_Z=CHASSIS_Z,
+                           LONG_BRACES=LONG_BRACES, SIDE_BRACING=SIDE_BRACING,
                            Z_GROUND=Z_GROUND, RAIL_X=RAIL_X, CASTER_Y=CASTER_Y, HATCH=HATCH, JOIST_X=JOIST_X, C=C,
                            PEOPLE_LOWER=PEOPLE_LOWER_PARKED, EDGE_PERSON=EDGE_PERSON, MOVING=MOVING, PERSON_LB=PERSON_LB, SKIN_PSF=SKIN_PSF, DECK_PSF=DECK_PSF,
                            SHOCK=SHOCK, SWAY_G=SWAY_G, TOW_FRACTION=TOW_FRACTION, PLY_GT_EFF=PLY_GT_EFF, SKIN_GT_EFF=SKIN_GT_EFF, FY=FY,

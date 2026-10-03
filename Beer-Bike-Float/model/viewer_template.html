@@ -125,7 +125,7 @@ p { margin: 0; max-width: 70ch; }
 
 <header class="top">
   <div>
-    <div class="eyebrow">v6 · full octagon on its feet · tail door, braced sides · 14 ga perforated square tube · PyNite / inches · lb</div>
+    <div class="eyebrow">v7 · full octagon on its feet · long braces, panel-braced sides · 14 ga perforated square tube · PyNite / inches · lb</div>
     <h1>Octagon Float Frame</h1>
   </div>
   <p class="sub" id="subline"></p>
@@ -470,7 +470,7 @@ p { margin: 0; max-width: 70ch; }
             <tr><td class="l"><strong>A · 90° saddle</strong></td><td>${fmt((K.T90 || 0) + (K.C90 || 0))}</td><td class="l">a tube ending square on another: posts to chassis and rail, joists and cross beams to rails, rim crosses, skirt pieces. U-channel that wraps the host tube, 2 bolts through it, tab along the ending tube with 2 bolts.</td></tr>
             <tr><td class="l"><strong>B · 45° saddle</strong></td><td>${fmt((K.T45 || 0) + (K.C45 || 0) + (K.T90e || 0) + (K.C90e || 0))}</td><td class="l">X-brace ends, upper chamfer stubs, skirt stubs. Same channel, tab bent at 45°. (${fmt((K.T90e || 0) + (K.C90e || 0))} of these are chamfer stubs that could sit on a rail edge instead; host them on the post and they are pattern B.)</td></tr>
             <tr><td class="l">C · crossing plate</td><td>${fmt(K.X90 || 0)}</td><td class="l">optional: flat plate with 4 holes where rails cross cross-members and joists cross beams. One bolt through the crossing is enough structurally; the plate squares it.</td></tr>
-            <tr><td class="l">pin, no bracket</td><td>${fmt(K.pin || 0)}</td><td class="l">nose and tail stringer ends and the side-wall diagonals (60°, they carry almost nothing): flatten 2" of the tube in a vise, one bolt.</td></tr>
+            <tr><td class="l">pin, no bracket</td><td>${fmt(K.pin || 0)}</td><td class="l">nose and tail stringer ends and the long braces (odd angles, light loads): flatten 2" of the tube in a vise, one bolt.</td></tr>
           </tbody></table></div>
           <p class="muted" style="font-size:12px;margin-top:6px">Your cut-and-brake cap does the same job as pattern A (tabs wrapped round the host, two bolt axes). The kit is for consistency and speed; the model does not depend on either, it is sized with every one of these joints as a pin.</p>
           <h3 style="margin-top:18px">Sticks meeting at each joint</h3>
@@ -529,12 +529,14 @@ p { margin: 0; max-width: 70ch; }
       ${P.UNDERBODY === 'skirt' ? `<text x="${X(0)}" y="${Y(ZS / 2) + 4}" text-anchor="middle" ${mask} style="fill:var(--ink-3);paint-order:stroke;stroke:var(--surface);stroke-width:5px">skirt: skin framing on droppers</text>` : ''}
     </svg>`;
     document.getElementById('pane-section').innerHTML = `<div><h2>Rib elevation, looking from the tail</h2><p class="muted" style="margin:4px 0 10px">Inches. Orange: chassis (heavy line, squares are the rails and spine) and the upper deck frame.</p>${svg}</div><div class="cols">
-      <div><h2>What changed in v6</h2>
-        <ul class="notes"><li>Full octagon. The 2½" chassis ladder sits on the bottom flat (rails at ±${P.RAIL_X}", inside the 55"), the 16" casters hang entirely below it as the feet, and the lower deck is a 1½" frame (beams at the ribs, joists over the rails, 20.5" columns, 45° chamfer stubs to the corners) on top of a 20.5"-deep braced box. Deck ${fmt(-ZG + 2)}" above the road, rim ${fmt(P.Z_RIM - ZG)}": your current float's numbers.</li>
+      <div><h2>What changed in v7</h2>
+        <ul class="notes"><li>Four long braces in the attics under the upper decks: a V from the chassis spine's front end up to the Y=64 hatch-edge beam (landing at ±${fmt(P.LB_FRONT_X || 12)}"), and a pair from the tail cross-member at ±18" up to the Y=32 hatch-edge beam at ±24". They prop the hatch-edge beams at mid-span: sag with someone sitting on the edge went from 0.48" to ${P.stiffness.hatch_sag_static.toFixed(2)}", pothole twist from 0.55" to ${P.stiffness.lifted_twist_pinned.toFixed(2)}", and the upper deck frame dropped a size. 34 lb of 1½" tube at 4% of capacity. Each passes through the lower deck ply through a slot, offset so it clears the joists; the rear pair sits just outside the tail-door path.</li>
+          <li>Side-wall diagonals removed. The hard side panels are counted as shear panels instead (same ${fmt(P.SKIN_GT_EFF)} lb/in as the chamfer skin, fastened along every edge); racking under a rope snatch is ${P.stiffness.tow_rack_pinned.toFixed(2)}" with them and 0.18" if they did nothing. ${fmt(P.steel_lb)} lb of steel.</li></ul>
+        <h3 style="margin-top:16px">Earlier versions</h3>
+        <ul class="notes"><li>v6 full octagon. The 2½" chassis ladder sits on the bottom flat (rails at ±${P.RAIL_X}", inside the 55"), the 16" casters hang entirely below it as the feet, and the lower deck is a 1½" frame (beams at the ribs, joists over the rails, 20.5" columns, 45° chamfer stubs to the corners) on top of a 20.5"-deep braced box. Deck ${fmt(-ZG + 2)}" above the road, rim ${fmt(P.Z_RIM - ZG)}": your current float's numbers.</li>
           <li>The lower box is stiff for free: the lower chamfer skin and belly ply count as shear panels, V-braces in the nose and tail walls below the deck, and the whole thing is 20.5" deep. Pothole twist ${P.stiffness.lifted_twist_pinned.toFixed(2)}", rope-snatch racking ${P.stiffness.tow_rack_pinned.toFixed(2)}".</li>
           <li>Entry through the tail is a ${fmt(-ZG + 2)}" step up now, so the tail needs two or three steps, as today.</li></ul>
-        <h3 style="margin-top:16px">Earlier versions</h3>
-        <ul class="notes"><li>v5 belly taper to ${fmt(P.BELLY_CLEAR)}" clearance: the octagon's lower chamfer comes back as skin framing (eight 45° stubs, four bottom crosses, two edge stringers, 62 lb) down to a ${fmt(2 * XS, 1)}" belly ${fmt(P.Z_SKIRT - ZG)}" off the road. The casters' 16" wheels fix the chassis at ${fmt(-ZG)}" above the road, so <span class="num">BELLY_CLEAR</span> is the trade: every inch of belly is an inch less of leg showing. The full 20.5" chamfer would need 24" wheels.</li>
+        <li>v5 belly taper to ${fmt(P.BELLY_CLEAR)}" clearance: the octagon's lower chamfer comes back as skin framing (eight 45° stubs, four bottom crosses, two edge stringers, 62 lb) down to a ${fmt(2 * XS, 1)}" belly ${fmt(P.Z_SKIRT - ZG)}" off the road. The casters' 16" wheels fix the chassis at ${fmt(-ZG)}" above the road, so <span class="num">BELLY_CLEAR</span> is the trade: every inch of belly is an inch less of leg showing. The full 20.5" chamfer would need 24" wheels.</li>
           <li>Coroplast leg sleeves with a rubber garage-door seal hoof still work here if you want to hide the casters; they weigh nothing and the model carries 4 lb each for them. Rigid casters at the rear, swivels at the front.</li>
           <li>You get in through the tail: a ${fmt(2 * P.DOOR_HALF)}" × ${P.Z_HI}" door between jambs in the tail wall, and the tail cone is a short flat-floored tunnel to a ${fmt(P.TAIL_W)}" × ${fmt(P.TAIL_H)}" flap. The side walls are braced with one diagonal per bay and hard-skinned. Rope-snatch racking: ${P.stiffness.tow_rack_pinned.toFixed(2)}" with every joint a pin (v3 was 2.1"). Brackets are now optional.</li>
           <li>Sized for strength only. Every member family gets the lightest tube that stays under ${fmt(P.u_target * 100)}% of capacity in every load case; deflection is reported, not limited. Steel went from 1,016 lb to ${fmt(P.steel_lb)} lb: chassis 2½", upper deck 2", posts 1¾", everything else 1½", all 14 ga.</li>
@@ -546,7 +548,8 @@ p { margin: 0; max-width: 70ch; }
         <h3 style="margin-top:16px">The load path</h3>
         <ul class="notes"><li>People → deck ply → lower deck joists (26" o.c.) → columns at every rib → chassis rails → casters. Posts and the upper deck come down the side posts into the deck beams, then the chamfer stubs carry them to the chassis corners.</li>
           <li>Sideways racking → deck ply diaphragms → the X-braced nose wall and the skinned tail-wall panels beside the door → chassis.</li>
-          <li>Front-to-back racking (tow snatch, stopping) → the diagonals in the side walls, straight down to the chassis. The nose and tail pyramids help; the body is a closed braced tube now.</li>
+          <li>Front-to-back racking (tow snatch, stopping) → the four long braces and the hard side panels, straight down to the chassis. The nose and tail pyramids help; the body is a closed braced tube.</li>
+          <li>Someone sits on a hatch edge → hatch-edge beam → long braces → chassis, instead of the beam spanning 96" on its own.</li>
           <li>Every joint is modelled as a pin, so nothing relies on a bracket. Add the brackets anyway: they are what turns "strong enough" into "stiff".</li></ul>
       </div></div>`;
   })();

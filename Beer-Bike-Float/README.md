@@ -9,23 +9,23 @@ with an interactive 3D viewer, cut list, joint schedule and caster loads.
 > Not a stamped design. It is a parametric model built so the team can change dimensions, loads and tube sizes and
 > see the consequences. If people ride on it, have a qualified engineer look at the rider load cases before you build.
 
-## Current design (v6)
+## Current design (v7)
 
 | | |
 |---|---|
 | Body | 96 × 96 × 96 in octagon, 55 in flats, top open. 36 in snout to a 30 × 18 in panel; 24 in flat-floored tail tunnel to a 40 × 55 in flap, which is the door. |
 | Chassis | 2½" × 14 ga ladder on the octagon's 55" bottom flat: two rails at ±26", a spine, four 52" cross-members at the ribs (Y = 0, 32, 64, 96). 16" casters under the rails at 11" from each end, entirely below the body: the feet. |
 | Lower deck | 1½" frame 20.5" above the chassis: beams at the ribs, three joists over the rails, columns down to the chassis, 45° chamfer stubs out to the deck-ring corners. ¾" ply, 40" above the road, i.e. where it is now. |
-| Sides | 1¾" posts, one 1½" diagonal per bay, hard-skinned. Entry is through the tail, so the sides are closed and braced. |
-| Upper deck | 2" perimeter and cross beams, two 1½" joists, 48 × 32 in hatch in the middle, 57" above the road. |
+| Sides | 1¾" posts, hard-skinned; the panels are the side bracing (fastened along every edge). Entry is through the tail. |
+| Upper deck | 1¾" perimeter and cross beams, two 1½" joists, 48 × 32 in hatch in the middle, 97" above the road. |
 | Rim | 1½" handrail ring 20.5" above the upper deck, on 1½" chamfer stubs. Top of frame 113" above the road. |
-| Bracing | 1½" 45° X in the nose wall, six 1½" side-wall diagonals, V-braces below the deck in the nose and tail walls, skinned tail-wall panels beside the door, deck and belly plywood. |
+| Bracing | 1½" 45° X in the nose wall; four 1½" long braces from the chassis ends up to the hatch-edge beams (a V at the front, a pair at the rear); V-braces below the deck in the nose and tail walls; skinned tail-wall panels beside the door; deck, belly, chamfer and side plywood. |
 | Underbody | The full octagon: 20.5" lower chamfer to the 55" bottom flat, 17" off the road, with the casters below it. Optional coroplast sleeves with a rubber-seal hoof round each caster, no steel. Rigid casters at the rear, swivels at the front. |
-| Steel | ≈ 461 ft, ≈ 655 lb, all 14 ga. (v2 at 12 ga was 1,016 lb.) |
-| Weight | ≈ 3,260 lb parked with 6 aboard; ≈ 2,340 lb moving with 2. |
+| Steel | ≈ 457 ft, ≈ 638 lb, all 14 ga. (v2 at 12 ga was 1,016 lb.) |
+| Weight | ≈ 3,240 lb parked with 6 aboard; ≈ 2,320 lb moving with 2. |
 | Casters | 850 lb each parked, 1,630 lb with one wheel in a pothole. Spec 16" wheels ≥ 1,200 lb. |
-| Worst member | Chassis rail, 82% of allowable, one wheel lifted (the float is 20" taller than v5, so sway and twist work the rails harder). Target is 85%; nothing else over 75%. |
-| Flex | 0.5" sag at the hatch edge with someone sitting on it. Front-to-back racking under a rope snatch: 0.04" with every joint a pin. Pothole twist 0.55". |
+| Worst member | Chassis rail, 81% of allowable, one wheel lifted. Target is 85%; nothing else over 71%. |
+| Flex | 0.08" sag at the hatch edge with someone sitting on it (the long braces prop it). Front-to-back racking under a rope snatch: 0.05" with every joint a pin, 0.18" if the side panels did nothing. Pothole twist 0.3". |
 
 ### Sizing philosophy
 
@@ -37,9 +37,9 @@ The 14 ga section properties are derived from the 12 ga Telespar datasheet by th
 yield grade of the 14 ga tube you buy**, since some generic perforated tube is 33–36 ksi rather than 50, which would
 push the chassis back to 12 ga.
 
-Rigidity then comes from the six side-wall diagonals (24 lb), the deck plywood screwed to the frame, and the nose and
-tail pyramids. With the sides braced the body is a closed tube and post brackets no longer matter for stiffness
-(0.05" racking pinned vs 0.04" bracketed); they are still worth having for consistency of construction.
+Rigidity then comes from the four long braces (34 lb), the deck, belly, chamfer and side plywood screwed to the
+frame, and the nose and tail pyramids. The body is a closed tube and post brackets no longer matter for stiffness;
+they are still worth having for consistency of construction.
 
 ### Joint philosophy, because that is what makes it buildable
 
@@ -117,8 +117,8 @@ chassis centreline. The road is at Z = −17.25 (16" caster + half a 2½" tube).
 * `--optimize` re-sizes every family from scratch; a plain run uses the sizes baked into `GROUP_SEC`.
 * Plywood decks modelled as shear panels at an effective G·t of 15,000 lb/in (APA gives 60–80k for ¾" sheathing
   before fastener slip). This is the assumption most worth an engineer's eye.
-* `UNDERBODY` ('octagon', 'chamfer', 'legs' or 'skirt') and `ENTRY` ('tail' or 'side') switch between the v6, v5,
-  v4 and v3 layouts. 'octagon' puts the chassis on the bottom flat with the casters below it; the other three keep
+* `UNDERBODY` ('octagon', 'chamfer', 'legs' or 'skirt'), `ENTRY` ('tail' or 'side'), `LONG_BRACES` and
+  `SIDE_BRACING` ('skin', 'diagonals', 'none') switch between the v7 to v3 layouts. 'octagon' puts the chassis on the bottom flat with the casters below it; the other three keep
   the chassis at the lower deck with the casters inside the body, which rides 20" lower.
 * Not modelled: local wall dimpling under a bolt, hole slop, skin on the sides, belly, legs and cones, wind.
 
