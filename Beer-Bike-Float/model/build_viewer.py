@@ -1,6 +1,7 @@
-"""Builds the 3D results viewer from docs/exports/results.json.
-   python model/build_viewer.py               -> docs/viewer_fragment.html (artifact-style fragment, no <html> skeleton)
-   python model/build_viewer.py --standalone  -> docs/index.html (full page for GitHub Pages, with a downloads bar)
+"""Turns docs/exports/results.json into docs/data.js for the viewer page.
+   python model/build_viewer.py            -> docs/data.js  (merged sticks, stock packing, joint census, hardware schedule)
+   python model/build_viewer.py <dir>      -> <dir>/data.js from <dir>/results.json (for variant runs)
+The page (docs/index.html), its style (docs/viewer.css) and script (docs/viewer.js) are static and hand-edited.
 """
 import json, math, re, os, sys
 from collections import defaultdict
@@ -179,29 +180,9 @@ for c in d['combos']:
 payload = dict(params=P, labels=d['labels'], roles=d['roles'], role_order=d['role_order'], nodes=d['nodes'], members=d['members'], results=d['results'], reactions=d['reactions'],
                disp=d['disp'], combos=d['combos'], sticks=stick_list, stock=stock, summary=summary, joints=joints, valence_hist=dict(valence_hist), valence_where=valence_where, patterns=patterns, kinds=dict(kinds), hardware=hardware, plates=plates_spec)
 
-html = open(os.path.join(HERE, 'viewer_template.html')).read()
-payload['standalone'] = '--standalone' in sys.argv
-html = html.replace('/*__DATA__*/', json.dumps(payload))
-if '--standalone' in sys.argv:
-    downloads = '''
-  <nav class="downloads" aria-label="Downloads"><span class="eyebrow">Files</span>
-    <a href="exports/frame.FCMacro" download>FreeCAD macro</a><a href="exports/frame.dxf" download>DXF wireframe</a>
-    <a href="exports/cutlist.csv" download>Cut list CSV</a><a href="exports/results.json" download>Results JSON</a>
-    <a href="https://github.com/__REPO__/blob/main/__DESIGN__/model/frame_model.py">Edit the model on GitHub</a></nav>'''
-    html = html.replace('<main class="wrap">\n  <section class="stats" id="stats" aria-label="Summary"></section>',
-                        '<main class="wrap">\n  <section class="stats" id="stats" aria-label="Summary"></section>' + downloads)
-    html = html.replace('</style>', '''.downloads { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 13px; }
-.downloads a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
-.downloads a:hover, .downloads a:focus-visible { border-bottom-color: var(--accent); outline: none; }
-</style>''', 1)
-    repo = os.environ.get('GITHUB_REPOSITORY', 'LoneStarMac/WarPig')
-    html = html.replace('__REPO__', repo).replace('__DESIGN__', os.path.basename(ROOT))
-    head, body = html.split('<header class="top">', 1)      # title, font links and <style> go in <head>; the rest is the body
-    page = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
-            '<meta name="description" content="Structural check of a perforated-steel-tube parade float frame: 3D viewer, cut list, joints, assumptions.">\n'
-            + head + '</head>\n<body>\n<header class="top">' + body + '\n</body>\n</html>\n')
-    out = os.path.join(EXPORTS, 'index.html') if _args else os.path.join(ROOT, 'docs', 'index.html'); open(out, 'w').write(page)
-else:
-    out = os.path.join(EXPORTS, 'viewer_fragment.html') if _args else os.path.join(ROOT, 'docs', 'viewer_fragment.html'); open(out, 'w').write(html)
-print(os.path.relpath(out, ROOT), len(html)//1024, 'KB')
+# The page itself (docs/index.html), its style (viewer.css) and its script (viewer.js) are static files, edited by hand.
+# This script only writes the data they read: docs/data.js, one global.
+out = os.path.join(EXPORTS, 'data.js') if _args else os.path.join(ROOT, 'docs', 'data.js')
+open(out, 'w').write('window.FLOAT_DATA = ' + json.dumps(payload, separators=(',', ':')) + ';\n')
+print(os.path.relpath(out, ROOT), os.path.getsize(out) // 1024, 'KB')
 print(json.dumps({s: {k: x[k] for k in ('sticks10', 'sticks20', 'scrap10', 'scrap20', 'ft', 'lb')} for s, x in stock.items()}, indent=1)); print(json.dumps(summary, indent=1))

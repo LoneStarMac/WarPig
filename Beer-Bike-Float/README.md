@@ -98,13 +98,24 @@ stiffness. Change a value, push to `main`, and the GitHub Action re-runs the mod
 export files, and redeploys. Open a pull request instead and the Action runs the model and attaches the exports
 to the run without deploying, so you can review a change before it goes live.
 
+The page itself is plain files you edit by hand, nothing is generated except the data:
+
+* `docs/index.html` is the page: title, headings, the prose in every tab, the build steps. Edit the words here.
+  A number that comes from the model is a `<span data-v="…">` whose attribute is a small expression over the
+  model data (`P` is the parameter block, `S` the per-case summary, `D` everything; `fmt()` formats). A table or
+  figure the script draws is a `<div data-fill="name">`.
+* `docs/viewer.css` is the style. `docs/viewer.js` is the script: the 3D scene, the table renderers (the `FILLS`
+  map) and the helpers the `data-v` expressions can use.
+* `docs/data.js` is written by `model/build_viewer.py` from the model run. Do not edit it; it is overwritten.
+* three.js and its OrbitControls load from jsDelivr, pinned to r128 (the last release with the plain-script build).
+
 To run locally, from this directory:
 
 ```bash
 pip install -r requirements.txt
 python model/frame_model.py            # prints worst members, writes docs/exports/*
 python model/make_plates.py            # plate DXFs
-python model/build_viewer.py --standalone   # writes docs/index.html
+python model/build_viewer.py            # writes docs/data.js for the page
 ```
 
 Open `docs/index.html` in a browser. It loads three.js and fonts from CDNs, so it needs a network connection.
@@ -114,11 +125,11 @@ Open `docs/index.html` in a browser. It loads three.js and fonts from CDNs, so i
 | Path | What |
 |---|---|
 | `model/frame_model.py` | The model: geometry, loads, load cases, checks, exports. Edit this. |
-| `model/build_viewer.py` | Turns `results.json` into the viewer page, including the joint census, plate counts and bolt schedule. |
+| `model/build_viewer.py` | Turns `results.json` into `docs/data.js`: merged sticks, stock packing, joint census, plate counts, bolt schedule. |
 | `model/make_plates.py` | Writes the plate DXFs and their spec to `docs/exports/plates/`. |
-| `model/viewer_template.html` | The viewer (three.js scene, tabs, cross-section drawing). |
 | `model/v1/` | The first, fully-triangulated design, kept for reference. |
-| `docs/index.html` | Built viewer, served by GitHub Pages. |
+| `docs/index.html`, `viewer.css`, `viewer.js` | The page, its style and its script: hand-edited, served by GitHub Pages. |
+| `docs/data.js` | Generated model data the page reads. |
 | `docs/exports/frame.FCMacro` | FreeCAD macro: Macro → Macros… → Execute. One Part object per member group, inches, plus a compound of all members. |
 | `docs/exports/frame.dxf` | Same wireframe as 3D lines, one layer per member group. |
 | `docs/exports/cutlist.csv` | Model segments by group, section and length. The viewer's Cut list tab merges them into physical sticks. |
