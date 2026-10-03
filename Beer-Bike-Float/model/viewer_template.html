@@ -1,0 +1,536 @@
+<title>Octagon Float Frame</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: shop-drawing sheet. Stat strip, then a CAD-style viewport with a control rail, then tabbed schedules (cut list, joints, assumptions, section). */
+:root {
+  --bg: #eceef1;          /* cool steel grey ground */
+  --surface: #fbfbfc;     /* sheet */
+  --surface-2: #f2f3f6;
+  --ink: #15181c;
+  --ink-2: #4c5563;
+  --ink-3: #7b8491;
+  --line: #d3d8df;
+  --accent: #c8650f;      /* traffic-sign orange: this tube is sign-post stock */
+  --accent-ink: #ffffff;
+  --viewport: #f6f7f9;    /* 3D chart surface */
+  --grid: #d8dce2;
+  --ground: #e3e6eb;
+  --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
+  --font-display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 4px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #13161a; --surface: #1b1f25; --surface-2: #22272e; --ink: #eef0f3; --ink-2: #a6aeb9; --ink-3: #727b87;
+    --line: #2d343d; --accent: #ec8a3a; --accent-ink: #15181c; --viewport: #1a1a19; --grid: #30343a; --ground: #22252a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #13161a; --surface: #1b1f25; --surface-2: #22272e; --ink: #eef0f3; --ink-2: #a6aeb9; --ink-3: #727b87;
+  --line: #2d343d; --accent: #ec8a3a; --accent-ink: #15181c; --viewport: #1a1a19; --grid: #30343a; --ground: #22252a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 14px; line-height: 1.45; margin: 0; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 0 48px; padding-inline: 16px; display: grid; gap: 20px; }
+header.top { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 6px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 24px; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: 38px; line-height: 1; margin: 0; letter-spacing: 0.005em; text-wrap: balance; }
+.sub { margin: 0; color: var(--ink-2); font-size: 14px; }
+.eyebrow { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+h2 { font-family: var(--font-display); font-weight: 600; font-size: 22px; margin: 0; line-height: 1.1; text-wrap: balance; }
+h3 { font-family: var(--font-display); font-weight: 600; font-size: 17px; margin: 0 0 6px; line-height: 1.1; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* stat strip */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.stat { background: var(--surface); padding: 12px 14px; min-width: 0; }
+.stat .v { font-family: var(--font-display); font-weight: 600; font-size: 30px; line-height: 1; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.stat .v small { font-size: 15px; font-weight: 500; color: var(--ink-2); margin-left: 3px; }
+.stat .d { color: var(--ink-2); font-size: 12px; margin-top: 4px; }
+.pill { display: inline-block; font-family: var(--font-mono); font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); vertical-align: middle; }
+.pill.ok { border-color: var(--good); color: var(--good); }
+.pill.bad { border-color: var(--critical); color: var(--critical); }
+
+/* viewer */
+.viewer { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 0; border: 1px solid var(--line); background: var(--surface); }
+.canvas-wrap { position: relative; min-width: 0; background: var(--viewport); height: clamp(380px, 62vh, 720px); }
+canvas#c { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
+canvas#c:focus-visible { box-shadow: inset 0 0 0 2px var(--accent); }
+.hud { position: absolute; left: 12px; bottom: 10px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); pointer-events: none; }
+.legend { position: absolute; right: 12px; top: 12px; background: color-mix(in srgb, var(--surface) 86%, transparent); border: 1px solid var(--line); padding: 8px 10px; font-size: 12px; min-width: 150px; }
+.legend .ramp { display: flex; height: 10px; margin: 6px 0 3px; }
+.legend .ramp i { flex: 1; display: block; }
+.legend .ticks { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 10px; color: var(--ink-2); }
+.legend .sw { display: flex; align-items: center; gap: 7px; margin-top: 4px; }
+.legend .sw i { width: 12px; height: 12px; display: inline-block; border-radius: 2px; }
+.panel { border-left: 1px solid var(--line); padding: 14px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.ctl { display: grid; gap: 6px; }
+.ctl label { font-size: 12px; color: var(--ink-2); }
+.seg { display: flex; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.seg button { flex: 1; background: var(--surface); color: var(--ink-2); border: 0; padding: 6px 4px; font: inherit; font-size: 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.seg button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+select, input[type=range] { font: inherit; width: 100%; }
+select { padding: 6px 8px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); }
+.checks { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; font-size: 13px; }
+.checks label { display: flex; align-items: center; gap: 6px; }
+.detail { border-top: 1px solid var(--line); padding-top: 12px; min-width: 0; }
+.detail .name { font-family: var(--font-mono); font-size: 12px; color: var(--ink-2); word-break: break-all; }
+.detail table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+.detail th, .detail td { text-align: right; padding: 3px 4px; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.detail th:first-child, .detail td:first-child { text-align: left; }
+.detail th { font-weight: 500; color: var(--ink-2); font-family: var(--font-mono); font-size: 11px; }
+.detail td.u { font-weight: 600; }
+.muted { color: var(--ink-3); }
+
+/* tabs */
+.tabs { border: 1px solid var(--line); background: var(--surface); }
+.tablist { display: flex; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.tablist button { background: transparent; border: 0; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 11px 16px; font: inherit; font-family: var(--font-display); font-size: 17px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+.tablist button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.tablist button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.tabpanel { padding: 18px 16px 20px; display: grid; gap: 18px; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px 28px; }
+.cols > div { min-width: 0; }
+table.sched { width: 100%; border-collapse: collapse; font-size: 13px; }
+table.sched th, table.sched td { padding: 5px 8px; border-bottom: 1px solid var(--line); text-align: right; font-variant-numeric: tabular-nums; }
+table.sched th:first-child, table.sched td:first-child, table.sched th.l, table.sched td.l { text-align: left; }
+table.sched th { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2); }
+table.sched tr.total td { font-weight: 600; border-top: 2px solid var(--ink-2); }
+.scroll { overflow-x: auto; }
+ul.notes { margin: 0; padding-left: 18px; display: grid; gap: 5px; max-width: 70ch; }
+p { margin: 0; max-width: 70ch; }
+.section-svg { width: 100%; max-width: 760px; height: auto; display: block; }
+.section-svg text { font-family: var(--font-mono); font-size: 11px; fill: var(--ink-2); }
+.section-svg .steel { stroke: var(--ink); stroke-width: 2.2; fill: none; stroke-linejoin: round; }
+.section-svg .deck { stroke: var(--accent); stroke-width: 2.2; }
+.section-svg .brace { stroke: var(--ink-3); stroke-width: 1.4; stroke-dasharray: 4 3; }
+.section-svg .dim { stroke: var(--ink-3); stroke-width: 0.8; fill: none; }
+.section-svg .ground { stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 6 4; }
+.section-svg .wheel { fill: var(--surface-2); stroke: var(--ink-2); stroke-width: 1.4; }
+@media (max-width: 900px) {
+  .viewer { grid-template-columns: 1fr; }
+  .panel { border-left: 0; border-top: 1px solid var(--line); }
+  .canvas-wrap { height: clamp(300px, 55vh, 520px); }
+  h1 { font-size: 30px; }
+}
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<header class="top">
+  <div>
+    <div class="eyebrow">v2 · chassis at deck level, open sides · perforated square tube · PyNite / inches · lb</div>
+    <h1>Octagon Float Frame</h1>
+  </div>
+  <p class="sub" id="subline"></p>
+</header>
+
+<main class="wrap">
+  <section class="stats" id="stats" aria-label="Summary"></section>
+
+  <section class="viewer" aria-label="3D model">
+    <div class="canvas-wrap">
+      <canvas id="c" tabindex="0" aria-label="3D view of the frame. Drag to orbit, wheel to zoom, shift-drag to pan, click a member for its numbers."></canvas>
+      <div class="legend" id="legend"></div>
+      <div class="hud">drag orbit · wheel zoom · shift-drag pan · click a tube</div>
+    </div>
+    <aside class="panel">
+      <div class="ctl">
+        <label for="combo">Load case</label>
+        <select id="combo"></select>
+      </div>
+      <div class="ctl">
+        <label id="colorby-label">Color tubes by</label>
+        <div class="seg" role="group" aria-labelledby="colorby-label" id="colorby">
+          <button data-v="u" aria-pressed="true">Utilization</button>
+          <button data-v="role" aria-pressed="false">Role</button>
+          <button data-v="sec" aria-pressed="false">Size</button>
+        </div>
+      </div>
+      <div class="checks">
+        <label><input type="checkbox" id="ck-skin" checked> Plywood skin</label>
+        <label><input type="checkbox" id="ck-decks" checked> Decks</label>
+        <label><input type="checkbox" id="ck-casters" checked> Casters</label>
+        <label><input type="checkbox" id="ck-def"> Deflected ×<span id="defscale-v" class="num">25</span></label>
+      </div>
+      <div class="ctl" id="defscale-wrap" hidden>
+        <label for="defscale">Deflection exaggeration</label>
+        <input type="range" id="defscale" min="1" max="100" value="25">
+      </div>
+      <div class="detail" id="detail">
+        <div class="eyebrow">Selected tube</div>
+        <p class="muted" style="margin-top:6px">Click any tube in the view to read its forces, stress and joint load for every load case.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="tabs" aria-label="Schedules">
+    <div class="tablist" role="tablist">
+      <button role="tab" id="tab-cut" aria-selected="true" aria-controls="pane-cut">Cut list</button>
+      <button role="tab" id="tab-joints" aria-selected="false" aria-controls="pane-joints">Joints &amp; casters</button>
+      <button role="tab" id="tab-section" aria-selected="false" aria-controls="pane-section">Cross-section</button>
+      <button role="tab" id="tab-assume" aria-selected="false" aria-controls="pane-assume">Assumptions</button>
+    </div>
+    <div class="tabpanel" role="tabpanel" id="pane-cut" aria-labelledby="tab-cut"></div>
+    <div class="tabpanel" role="tabpanel" id="pane-joints" aria-labelledby="tab-joints" hidden></div>
+    <div class="tabpanel" role="tabpanel" id="pane-section" aria-labelledby="tab-section" hidden></div>
+    <div class="tabpanel" role="tabpanel" id="pane-assume" aria-labelledby="tab-assume" hidden></div>
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script id="data" type="application/json">/*__DATA__*/</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById('data').textContent);
+  const P = D.params;
+  const fmt = (n, d = 0) => Number(n).toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d });
+  const ROLE = D.roles, ROLE_ORDER = D.role_order;
+  const CAT = { light: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#4a3aa7'], dark: ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#9085e9'] };
+  const SEQ = ['#cde2fb', '#9ec5f4', '#6da7ec', '#3987e5', '#256abf', '#184f95', '#0d366b'];
+  const CRIT = '#d03b3b';
+  const GROUP_LABEL = D.labels;
+  const COMBO_LABEL = { Static: 'Parked, 6 aboard  (D + L)', Shock: 'Moving, road shock  2.0 × (D + 2 aboard)', Sway: 'Parked + 0.3 g sideways', Tow: 'Moving + rope snatch', Lifted: 'Parked, one wheel in a pothole' };
+
+  const isDark = () => {
+    const t = document.documentElement.getAttribute('data-theme');
+    if (t === 'dark') return true; if (t === 'light') return false;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  };
+  const SEQ_DARK = ['#184f95', '#1c5cab', '#256abf', '#3987e5', '#6da7ec', '#9ec5f4', '#cde2fb'];
+  const seqRamp = () => isDark() ? SEQ_DARK : SEQ;    // lowest step sits nearest the surface in both themes
+  const uColor = (u) => { if (u > 1) return CRIT; const r = seqRamp(); return r[Math.min(6, Math.floor(u / 0.15))]; };
+
+  // ---------------- summary strip
+  let combo = 'Shock';
+  const S = D.summary;
+  const worstU = Math.max(...D.combos.map(c => S[c].u));
+  const worstCombo = D.combos.find(c => S[c].u === worstU);
+  document.getElementById('subline').textContent = `${fmt(P.W)} × ${fmt(P.H)} × ${fmt(P.L)} in octagon body + ${fmt(P.L_NOSE)} in snout + ${fmt(P.L_TAIL)} in tail · ${D.members.length} tubes · ${D.combos.length} load cases`;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="eyebrow">Weight, parked with 6 aboard</div><div class="v num">${fmt(P.total_weight_lb)}<small>lb</small></div><div class="d">${fmt(P.total_moving_lb)} lb moving with 2 · ${fmt(P.steel_lb)} lb steel · skin ${P.SKIN_PSF} psf</div></div>
+    <div class="stat"><div class="eyebrow">Steel</div><div class="v num">${fmt(P.steel_ft)}<small>ft</small></div><div class="d">${Object.entries(D.stock).map(([s, v]) => `${s.replace('x12', '" ×12ga')}: ${v.sticks10} ten-ft sticks`).join(' · ')}</div></div>
+    <div class="stat"><div class="eyebrow">Worst tube, any case</div><div class="v num">${fmt(worstU * 100)}<small>% of capacity</small></div><div class="d">${GROUP_LABEL[S[worstCombo].group]} under ${worstCombo} <span class="pill ${worstU <= 1 ? 'ok' : 'bad'}">${worstU <= 1 ? 'PASS' : 'OVER'}</span></div></div>
+    <div class="stat"><div class="eyebrow">Max deflection</div><div class="v num">${S.Static.defl.toFixed(2)}<small>in static</small></div><div class="d">${S.Shock.defl.toFixed(2)} in under road shock · hatch-edge beam ≈ L/${fmt(96 / S.Static.defl)}</div></div>
+    <div class="stat"><div class="eyebrow">Max caster load</div><div class="v num">${fmt(Math.max(S.Shock.caster, S.Lifted.caster))}<small>lb</small></div><div class="d">${fmt(S.Static.caster)} lb parked · spec 16" casters ≥ 1,200 lb each</div></div>`;
+
+  // ---------------- three.js scene
+  const canvas = document.getElementById('c');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(38, 1, 1, 4000);
+  const toT = (x, y, z) => new THREE.Vector3(x, z, -y);     // model X,Y,Z  ->  three x (across), y (up), z (= -length)
+  const center = toT(0, (P.L + P.L_NOSE - P.L_TAIL) / 2, (P.Z_RIM + P.Z_SKIRT) / 2);
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x667080, 0.95));
+  const sun = new THREE.DirectionalLight(0xffffff, 0.75); sun.position.set(180, 260, 220); scene.add(sun);
+
+  // ground + grid at the road (16" below the base rails)
+  const ROAD = P.Z_GROUND;
+  const groundMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 });
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(260, 300), groundMat); ground.rotation.x = -Math.PI / 2; ground.position.set(0, ROAD - 0.2, -(P.L + P.L_NOSE - P.L_TAIL) / 2); scene.add(ground);
+  const grid = new THREE.GridHelper(300, 25); grid.position.set(0, ROAD, -(P.L + P.L_NOSE - P.L_TAIL) / 2); scene.add(grid);
+
+  // members
+  const memberMeshes = [];
+  const unitY = new THREE.Vector3(0, 1, 0);
+  const geoCache = {};
+  for (const m of D.members) {
+    const r = P.sections[m.sec].size / 2;
+    const key = m.sec;
+    geoCache[key] = geoCache[key] || new THREE.CylinderGeometry(r, r, 1, 10);
+    const mat = new THREE.MeshLambertMaterial({ color: 0x888888 });
+    const mesh = new THREE.Mesh(geoCache[key], mat);
+    mesh.userData = m; scene.add(mesh); memberMeshes.push(mesh);
+  }
+  function placeMembers() {
+    const dfl = document.getElementById('ck-def').checked, k = +document.getElementById('defscale').value;
+    for (const mesh of memberMeshes) {
+      const m = mesh.userData;
+      let a = D.nodes[m.i].slice(), b = D.nodes[m.j].slice();
+      if (dfl) { const da = D.disp[m.i][combo], db = D.disp[m.j][combo]; a = a.map((v, i) => v + k * da[i]); b = b.map((v, i) => v + k * db[i]); }
+      const A = toT(...a), B = toT(...b), dir = B.clone().sub(A), L = dir.length();
+      mesh.position.copy(A).add(B).multiplyScalar(0.5);
+      mesh.quaternion.setFromUnitVectors(unitY, dir.normalize());
+      mesh.scale.set(1, L, 1);
+    }
+  }
+
+  // skin faces (translucent) and decks
+  const V = (() => { const f = P.FLAT / 2; return { V0: [-P.X_SKIRT, P.Z_SKIRT], V1: [P.X_SKIRT, P.Z_SKIRT], V2: [P.W / 2, 0], V3: [P.W / 2, P.Z_HI], V4: [f, P.Z_RIM], V5: [-f, P.Z_RIM], V6: [-P.W / 2, P.Z_HI], V7: [-P.W / 2, 0] }; })();
+  function quad(pts, mat) { // pts: 4 model points, in order
+    const g = new THREE.BufferGeometry(); const v = [];
+    const T = pts.map(p => toT(...p)); const tri = [[0, 1, 2], [0, 2, 3]];
+    for (const t of tri) for (const i of t) v.push(T[i].x, T[i].y, T[i].z);
+    g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3)); g.computeVertexNormals();
+    return new THREE.Mesh(g, mat);
+  }
+  function tri3(pts, mat) { const g = new THREE.BufferGeometry(); const v = []; for (const p of pts) { const t = toT(...p); v.push(t.x, t.y, t.z); } g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3)); g.computeVertexNormals(); return new THREE.Mesh(g, mat); }
+  const skinMat = new THREE.MeshLambertMaterial({ color: 0xc9a06a, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false });
+  const deckMat = new THREE.MeshLambertMaterial({ color: 0xc8650f, transparent: true, opacity: 0.28, side: THREE.DoubleSide, depthWrite: false });
+  const skin = new THREE.Group(), decks = new THREE.Group();
+  const faces = [['V0', 'V1'], ['V1', 'V2'], ['V2', 'V3'], ['V3', 'V4'], ['V5', 'V6'], ['V6', 'V7'], ['V7', 'V0']];
+  const Y0 = P.RIBS[0], Y1 = P.RIBS[P.RIBS.length - 1];
+  for (const [a, b] of faces) skin.add(quad([[V[a][0], Y0, V[a][1]], [V[b][0], Y0, V[b][1]], [V[b][0], Y1, V[b][1]], [V[a][0], Y1, V[a][1]]], skinMat));
+  // nose and tail cones: 4 trapezoid faces + 4 triangles + the tip panel
+  function cone(y0, ytip, wid, hgt, zc) {
+    const nw = wid / 2, nh = hgt / 2;
+    const N = [[-nw, ytip, zc - nh], [nw, ytip, zc - nh], [nw, ytip, zc + nh], [-nw, ytip, zc + nh]];
+    const fv = k => [V[k][0], y0, V[k][1]];
+    skin.add(quad([fv('V0'), fv('V1'), N[1], N[0]], skinMat)); skin.add(quad([fv('V2'), fv('V3'), N[2], N[1]], skinMat));
+    skin.add(quad([fv('V4'), fv('V5'), N[3], N[2]], skinMat)); skin.add(quad([fv('V6'), fv('V7'), N[0], N[3]], skinMat));
+    skin.add(tri3([fv('V1'), fv('V2'), N[1]], skinMat)); skin.add(tri3([fv('V3'), fv('V4'), N[2]], skinMat));
+    skin.add(tri3([fv('V5'), fv('V6'), N[3]], skinMat)); skin.add(tri3([fv('V7'), fv('V0'), N[0]], skinMat));
+    skin.add(quad(N, skinMat));
+  }
+  cone(Y1, P.L + P.L_NOSE, P.NOSE_W, P.NOSE_H, P.NOSE_ZC);
+  cone(Y0, -P.L_TAIL, P.TAIL_W, P.TAIL_H, P.TAIL_ZC);
+  scene.add(skin);
+  const jx = P.JOIST_X, hw = P.W / 2, [h1, h2] = P.HATCH;
+  decks.add(quad([[-hw, Y0, 0], [hw, Y0, 0], [hw, Y1, 0], [-hw, Y1, 0]], deckMat));
+  decks.add(quad([[-hw, Y0, P.Z_HI], [hw, Y0, P.Z_HI], [hw, h1, P.Z_HI], [-hw, h1, P.Z_HI]], deckMat));
+  decks.add(quad([[-hw, h2, P.Z_HI], [hw, h2, P.Z_HI], [hw, Y1, P.Z_HI], [-hw, Y1, P.Z_HI]], deckMat));
+  decks.add(quad([[-hw, h1, P.Z_HI], [-jx, h1, P.Z_HI], [-jx, h2, P.Z_HI], [-hw, h2, P.Z_HI]], deckMat));
+  decks.add(quad([[jx, h1, P.Z_HI], [hw, h1, P.Z_HI], [hw, h2, P.Z_HI], [jx, h2, P.Z_HI]], deckMat));
+  scene.add(decks);
+
+  // casters: 16" wheels under the four base corners
+  const casters = new THREE.Group();
+  const wheelMat = new THREE.MeshLambertMaterial({ color: 0x3a3f46 });
+  for (const n of Object.keys(D.reactions)) {
+    const [x, y] = D.nodes[n];
+    const w = new THREE.Mesh(new THREE.CylinderGeometry(8, 8, 4, 24), wheelMat); w.rotation.z = Math.PI / 2;
+    w.position.copy(toT(x, y, P.Z_GROUND + 8)); casters.add(w);
+    const fork = new THREE.Mesh(new THREE.BoxGeometry(6, 10, 2), wheelMat); fork.position.copy(toT(x, y, P.Z_GROUND + 11)); casters.add(fork);
+  }
+  scene.add(casters);
+
+  // ---------------- colouring
+  let colorBy = 'u';
+  function recolor() {
+    const dark = isDark(); const cat = dark ? CAT.dark : CAT.light;
+    groundMat.color.set(getComputedStyle(document.documentElement).getPropertyValue('--ground').trim() || '#e3e6eb');
+    grid.material.color.set(getComputedStyle(document.documentElement).getPropertyValue('--grid').trim() || '#d8dce2');
+    for (const mesh of memberMeshes) {
+      const m = mesh.userData; let c;
+      if (colorBy === 'u') c = uColor(D.results[m.name][combo].u);
+      else if (colorBy === 'role') c = cat[ROLE_ORDER.indexOf(ROLE[m.group])];
+      else c = cat[Object.keys(P.sections).indexOf(m.sec) % cat.length];
+      mesh.material.color.set(c);
+      mesh.material.emissive.set(selected === mesh ? (dark ? 0x555555 : 0x333333) : 0x000000);
+    }
+    renderLegend(cat);
+  }
+  function renderLegend(cat) {
+    const el = document.getElementById('legend');
+    if (colorBy === 'u') {
+      const r = seqRamp();
+      el.innerHTML = `<div class="eyebrow">Utilization · ${combo}</div><div class="ramp">${r.map(c => `<i style="background:${c}"></i>`).join('')}<i style="background:${CRIT}"></i></div><div class="ticks"><span>0</span><span>0.5</span><span>1.0</span><span>&gt;1</span></div><div class="muted" style="font-size:11px;margin-top:4px">demand ÷ capacity, yield or buckling</div>`;
+    } else if (colorBy === 'role') {
+      el.innerHTML = `<div class="eyebrow">Role</div>` + ROLE_ORDER.map((r, i) => `<div class="sw"><i style="background:${cat[i]}"></i>${r}</div>`).join('');
+    } else {
+      el.innerHTML = `<div class="eyebrow">Tube size · 12 ga</div>` + Object.keys(P.sections).filter(s => D.members.some(m => m.sec === s)).map((s, i) => `<div class="sw"><i style="background:${cat[Object.keys(P.sections).indexOf(s)]}"></i>${s.replace('x12', '" square')}</div>`).join('');
+    }
+  }
+
+  // ---------------- orbit controls (small, self-contained)
+  const orb = { theta: Math.PI - 0.8, phi: 1.2, r: 360, target: center.clone() };   // from the snout side, right-hand quarter
+  function updateCamera() {
+    const { theta, phi, r, target } = orb;
+    camera.position.set(target.x + r * Math.sin(phi) * Math.sin(theta), target.y + r * Math.cos(phi), target.z + r * Math.sin(phi) * Math.cos(theta));
+    camera.lookAt(target);
+  }
+  let drag = null, moved = 0; const pointers = new Map();
+  canvas.addEventListener('pointerdown', e => { canvas.setPointerCapture(e.pointerId); pointers.set(e.pointerId, { x: e.clientX, y: e.clientY }); drag = { x: e.clientX, y: e.clientY, pan: e.shiftKey || e.button === 2 }; moved = 0; });
+  canvas.addEventListener('pointermove', e => {
+    if (!pointers.has(e.pointerId)) return;
+    const prev = pointers.get(e.pointerId); pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (pointers.size === 2) { // pinch zoom
+      const [a, b] = [...pointers.values()]; const dist = Math.hypot(a.x - b.x, a.y - b.y);
+      if (orb.lastPinch) orb.r = Math.max(60, Math.min(1500, orb.r * orb.lastPinch / dist)); orb.lastPinch = dist; updateCamera(); return;
+    }
+    const dx = e.clientX - prev.x, dy = e.clientY - prev.y; moved += Math.abs(dx) + Math.abs(dy);
+    if (drag && drag.pan) {
+      const right = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0), up = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1);
+      const s = orb.r / canvas.clientHeight * 1.2; orb.target.addScaledVector(right, -dx * s).addScaledVector(up, dy * s);
+    } else { orb.theta -= dx * 0.006; orb.phi = Math.max(0.08, Math.min(Math.PI - 0.08, orb.phi - dy * 0.006)); }
+    updateCamera();
+  });
+  const endPointer = e => { pointers.delete(e.pointerId); orb.lastPinch = null; if (pointers.size === 0 && drag && moved < 6) pick(e); drag = null; };
+  canvas.addEventListener('pointerup', endPointer); canvas.addEventListener('pointercancel', endPointer);
+  canvas.addEventListener('wheel', e => { e.preventDefault(); orb.r = Math.max(60, Math.min(1500, orb.r * Math.exp(e.deltaY * 0.0012))); updateCamera(); }, { passive: false });
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  canvas.addEventListener('keydown', e => { const k = { ArrowLeft: [0.08, 0], ArrowRight: [-0.08, 0], ArrowUp: [0, -0.06], ArrowDown: [0, 0.06] }[e.key]; if (k) { orb.theta += k[0]; orb.phi = Math.max(0.08, Math.min(Math.PI - 0.08, orb.phi + k[1])); updateCamera(); e.preventDefault(); } if (e.key === '+' || e.key === '=') { orb.r *= 0.9; updateCamera(); } if (e.key === '-') { orb.r *= 1.1; updateCamera(); } });
+
+  // ---------------- picking
+  let selected = null; const ray = new THREE.Raycaster(); ray.params.Line = { threshold: 1 };
+  function pick(e) {
+    const rect = canvas.getBoundingClientRect();
+    const p = new THREE.Vector2(((e.clientX - rect.left) / rect.width) * 2 - 1, -((e.clientY - rect.top) / rect.height) * 2 + 1);
+    ray.setFromCamera(p, camera);
+    const hits = ray.intersectObjects(memberMeshes, false);
+    selected = hits.length ? hits[0].object : null; recolor(); showDetail();
+  }
+  function showDetail() {
+    const el = document.getElementById('detail');
+    if (!selected) { el.innerHTML = `<div class="eyebrow">Selected tube</div><p class="muted" style="margin-top:6px">Click any tube in the view to read its forces, stress and joint load for every load case.</p>`; return; }
+    const m = selected.userData, R = D.results[m.name], s = P.sections[m.sec];
+    const rows = D.combos.map(c => { const r = R[c]; return `<tr><td>${c}</td><td>${fmt(r.P)}</td><td>${fmt(r.M)}</td><td>${r.sig_ksi.toFixed(1)}</td><td class="u" style="color:${r.u > 1 ? CRIT : 'inherit'}">${(r.u * 100).toFixed(0)}%</td><td>${r.defl.toFixed(2)}</td><td>${fmt(r.joint_lb)}</td></tr>`; }).join('');
+    el.innerHTML = `<div class="eyebrow">Selected tube</div>
+      <h3 style="margin-top:4px">${GROUP_LABEL[m.group]}</h3>
+      <div class="name">${m.name} · ${m.sec.replace('x12', '" × 12 ga')} · ${m.L.toFixed(1)}" long · KL/r ${R.KL_r} · F<sub>cr</sub> ${R.Fcr_ksi} ksi</div>
+      <div class="scroll"><table><thead><tr><th>case</th><th>P lb</th><th>M in·lb</th><th>σ ksi</th><th>use</th><th>Δ in</th><th>joint lb</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <p class="muted" style="font-size:11px;margin-top:6px">P: + tension, − compression. σ = P/A + M/S. Use = demand ÷ capacity (yield or AISC E3 buckling); Shock vs nominal, others vs ASD allowable. Joint = resultant end force the bolt group must carry.</p>`;
+  }
+
+  // ---------------- UI wiring
+  const comboSel = document.getElementById('combo');
+  for (const c of D.combos) { const o = document.createElement('option'); o.value = c; o.textContent = COMBO_LABEL[c] || c; comboSel.appendChild(o); }
+  comboSel.value = combo;
+  comboSel.addEventListener('change', () => { combo = comboSel.value; placeMembers(); recolor(); showDetail(); });
+  document.getElementById('colorby').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; colorBy = b.dataset.v; for (const x of e.currentTarget.querySelectorAll('button')) x.setAttribute('aria-pressed', String(x === b)); recolor(); });
+  document.getElementById('ck-skin').addEventListener('change', e => skin.visible = e.target.checked);
+  document.getElementById('ck-decks').addEventListener('change', e => decks.visible = e.target.checked);
+  document.getElementById('ck-casters').addEventListener('change', e => casters.visible = e.target.checked);
+  document.getElementById('ck-def').addEventListener('change', e => { document.getElementById('defscale-wrap').hidden = !e.target.checked; placeMembers(); });
+  document.getElementById('defscale').addEventListener('input', e => { document.getElementById('defscale-v').textContent = e.target.value; placeMembers(); });
+  for (const t of document.querySelectorAll('[role=tab]')) t.addEventListener('click', () => {
+    for (const x of document.querySelectorAll('[role=tab]')) { x.setAttribute('aria-selected', String(x === t)); document.getElementById(x.getAttribute('aria-controls')).hidden = x !== t; }
+  });
+  try { new MutationObserver(recolor).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', recolor); } catch (e) { }
+
+  // ---------------- schedules
+  const secName = s => s.replace('x12', '" sq × 12 ga');
+  (function cutList() {
+    const rows = D.sticks.map(r => `<tr><td class="l">${GROUP_LABEL[r.group]}</td><td class="l">${secName(r.sec)}</td><td>${r.L.toFixed(1)}</td><td>${r.qty}</td><td>${(r.L * r.qty / 12).toFixed(1)}</td></tr>`).join('');
+    const stock = Object.entries(D.stock).map(([s, v]) => `<tr><td class="l">${secName(s)}</td><td>${v.ft}</td><td>${fmt(v.lb)}</td><td>${v.sticks10}</td></tr>`).join('');
+    document.getElementById('pane-cut').innerHTML = `
+      <div class="cols">
+        <div><h2>Stock to buy</h2><p class="muted" style="margin:4px 0 10px">Ten-foot sticks by first-fit packing with ¼" kerf. 1¾" nests inside 2" and 2" inside 2¼"; the 2½" chassis and deck frame are lap-bolted, not sleeved.</p>
+          <table class="sched"><thead><tr><th class="l">Tube</th><th>ft</th><th>lb</th><th>10' sticks</th></tr></thead><tbody>${stock}
+          <tr class="total"><td class="l">Total</td><td>${fmt(P.steel_ft)}</td><td>${fmt(P.steel_lb)}</td><td>${Object.values(D.stock).reduce((a, v) => a + v.sticks10, 0)}</td></tr></tbody></table>
+          <h3 style="margin-top:18px">Hardware</h3>
+          <ul class="notes"><li>Crossings and T's: one ⅜" Grade 5 zinc bolt through both tubes (that is all a 90° crossing can take; the frame is designed so these are pins). ≈ 160 joints, flange nuts or nylocks. No gussets needed anywhere.</li>
+          <li>Straight splices: 12" stub of 1¾" inside the 2" ends, two bolts each side. Keep the 96" sticks whole where you can.</li>
+          <li>Chassis: have a shop weld the 2 rails, spine, 4 cross-members and 4 caster plates as one flat frame from plain 2½" × 12 ga, then paint. ~1 hr of welding. Bolting it instead works too, with the rails stacked on top of the cross-members and the deck ply holding it square.</li>
+          <li>Casters: four 16" rated ≥ 1,200 lb each, under the rails at 12" from each end.</li>
+          <li>Deck ply: screw to the steel every 6–8" along every panel edge with #12 self-drillers. The decks are the sideways bracing; this is the one place fastener spacing matters.</li></ul>
+        </div>
+        <div><h2>Cut list</h2><p class="muted" style="margin:4px 0 10px">Physical pieces (model segments merged). Lap-joint overlaps add ~4" to members that run past a corner; cut after you decide which member runs through.</p>
+          <div class="scroll"><table class="sched"><thead><tr><th class="l">Piece</th><th class="l">Tube</th><th>in</th><th>qty</th><th>ft</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+      </div>`;
+  })();
+  (function joints() {
+    const cast = Object.entries(D.reactions).map(([n, r]) => { const [x, y] = D.nodes[n]; return `<tr><td class="l">${x < 0 ? 'left' : 'right'} ${y < 48 ? 'rear' : 'front'}</td>${D.combos.map(c => `<td>${fmt(r[c].FZ)}</td>`).join('')}</tr>`; }).join('');
+    const groups = [...new Set(D.members.map(m => m.group))];
+    const jrows = groups.map(g => { const ms = D.members.filter(m => m.group === g); const j = Math.max(...ms.map(m => Math.max(...D.combos.map(c => D.results[m.name][c].joint_lb)))); const u = Math.max(...ms.map(m => Math.max(...D.combos.map(c => D.results[m.name][c].u)))); return { g, j, u }; }).sort((a, b) => b.j - a.j)
+      .slice(0, 8).map(r => `<tr><td class="l">${GROUP_LABEL[r.g]}</td><td>${fmt(r.j)}</td><td>${(r.j / 5000 * 100).toFixed(0)}%</td><td>${(r.u * 100).toFixed(0)}%</td></tr>`).join('');
+    const where = { 1: 'points along one stick: caster mounts, mid-span load points', 5: 'lower corners of the end ribs: cross-member end, edge stringer, post, skirt stub, cone stringer', 4: 'lower corners at the middle ribs; chassis rail × cross-member crossings with a skirt dropper; upper deck rail × beam crossings with a post and chamfer stub', 3: 'joist and X-brace landings on the deck beams; skirt corners', 2: 'rim and tip-frame corners' };
+    const vrows = Object.keys(D.valence_hist).sort((a, b) => b - a).map(n => `<tr><td class="l">${n}</td><td>${D.valence_hist[n]}</td><td class="l">${where[n] || ''}</td></tr>`).join('');
+    document.getElementById('pane-joints').innerHTML = `
+      <div class="cols">
+        <div><h2>Caster loads, lb</h2><p class="muted" style="margin:4px 0 10px">Vertical reaction at each wheel. "Lifted" removes the right-rear wheel, as on a crowned road or a pothole.</p>
+          <div class="scroll"><table class="sched"><thead><tr><th class="l">Wheel</th>${D.combos.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>${cast}</tbody></table></div>
+          <h3 style="margin-top:18px">What it means</h3>
+          <ul class="notes"><li>Buy casters for the Lifted/Shock number, not the parked one: ${fmt(Math.max(S.Shock.caster, S.Lifted.caster))} lb per wheel.</li>
+          <li>Horizontal restraint is caster friction. The frame is braced so it does not depend on it.</li>
+          <li>Track is 48" (rails at ±24"). Tipping starts at about 0.35 g sideways with 6 aboard; fine at parade speed, and the 16" lower deck helps.</li></ul>
+        </div>
+        <div><h2>Sticks meeting at each joint</h2><p class="muted" style="margin:4px 0 10px">A continuous stick passing through counts once. Every joint is a one-bolt crossing, so sticks stack: stringer on cross-member end, post beside stringer, skirt stub under the cross-member, cone stringer on the stringer end.</p>
+          <div class="scroll"><table class="sched"><thead><tr><th class="l">Sticks</th><th>Joints</th><th class="l">Where</th></tr></thead><tbody>${vrows}</tbody></table></div>
+          <h3 style="margin-top:18px">Largest joint forces</h3>
+          <div class="scroll"><table class="sched"><thead><tr><th class="l">Member type</th><th>Joint lb</th><th>of 1-bolt</th><th>Member use</th></tr></thead><tbody>${jrows}</tbody></table></div>
+          <p class="muted" style="font-size:12px;margin-top:6px">One ⅜" bolt through two 12 ga walls ≈ 5,000 lb in bearing (2.0·d·t·F<sub>u</sub> ÷ 2, two walls). Nothing here is above 25% of that.</p>
+          <h3 style="margin-top:18px">Tightening</h3>
+          <ul class="notes"><li>These are bearing joints: the bolt shank pushes on the hole edge. Clamp force adds almost nothing, so do not torque to spec.</li>
+          <li>Snug-tight (hand wrench, wall just touching) plus a locking nut or thread locker. Where a bolt passes through a single tube with nothing inside it, a 1¾" sleeve stub inside the 2" tube lets you tighten harder without dimpling.</li>
+          <li>Keep ≥ 2 holes (2") from any cut end to the first bolt; edge tear-out, not bolt shear, is the usual failure.</li></ul>
+        </div>
+      </div>`;
+  })();
+  (function section() {
+    // cross-section elevation, looking from the rear, dimensioned in inches
+    const sc = 3.0, ox = 340, oy = 70;      // svg y grows downward
+    const X = x => ox + x * sc, Y = z => oy + (P.Z_RIM - z) * sc;
+    const pts = ['V0', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7'].map(k => `${X(V[k][0])},${Y(V[k][1])}`).join(' ');
+    const mask = 'style="paint-order:stroke;stroke:var(--surface);stroke-width:5px;stroke-linejoin:round"';
+    const dim = (x1, y1, x2, y2, label, off = 0) => {   // dimension line with end ticks; label offset perpendicular to the line
+      const horiz = y1 === y2; const tx = (x1 + x2) / 2 + (horiz ? 0 : off), ty = (y1 + y2) / 2 + (horiz ? off : 0);
+      const tick = (x, y) => horiz ? `<line class="dim" x1="${x}" y1="${y - 5}" x2="${x}" y2="${y + 5}"/>` : `<line class="dim" x1="${x - 5}" y1="${y}" x2="${x + 5}" y2="${y}"/>`;
+      return `<line class="dim" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>${tick(x1, y1)}${tick(x2, y2)}<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="middle" ${mask}>${label}</text>`;
+    };
+    const f = P.FLAT / 2, R = X(P.W / 2), Lx = X(-P.W / 2), rx = P.RAIL_X, ZG = P.Z_GROUND, ZS = P.Z_SKIRT, XS = P.X_SKIRT;
+    const svg = `<svg class="section-svg" viewBox="0 0 980 ${oy + (P.Z_RIM - ZG) * sc + 60}" role="img" aria-label="Cross-section of the v2 frame with dimensions">
+      <line class="ground" x1="${X(-75)}" y1="${Y(ZG)}" x2="${X(75)}" y2="${Y(ZG)}"/><text x="${X(66)}" y="${Y(ZG) - 6}">road</text>
+      <circle class="wheel" cx="${X(-rx)}" cy="${Y(ZG + 8)}" r="${8 * sc}"/><circle class="wheel" cx="${X(rx)}" cy="${Y(ZG + 8)}" r="${8 * sc}"/>
+      <polygon class="steel" points="${pts}" style="stroke-dasharray:0"/>
+      <line class="steel deck" x1="${Lx}" y1="${Y(0)}" x2="${R}" y2="${Y(0)}" style="stroke-width:4"/>
+      <rect x="${X(-rx) - 4}" y="${Y(0) - 4}" width="8" height="8" style="fill:var(--accent)"/><rect x="${X(rx) - 4}" y="${Y(0) - 4}" width="8" height="8" style="fill:var(--accent)"/><rect x="${X(0) - 4}" y="${Y(0) - 4}" width="8" height="8" style="fill:var(--accent)"/>
+      <line class="steel deck" x1="${Lx}" y1="${Y(P.Z_HI)}" x2="${R}" y2="${Y(P.Z_HI)}"/>
+      <line class="brace" x1="${X(-rx)}" y1="${Y(0)}" x2="${X(rx)}" y2="${Y(P.Z_HI)}"/><line class="brace" x1="${X(rx)}" y1="${Y(0)}" x2="${X(-rx)}" y2="${Y(P.Z_HI)}"/>
+      <line class="brace" x1="${X(-rx)}" y1="${Y(0)}" x2="${X(-rx)}" y2="${Y(ZS)}"/><line class="brace" x1="${X(rx)}" y1="${Y(0)}" x2="${X(rx)}" y2="${Y(ZS)}"/><line class="brace" x1="${X(0)}" y1="${Y(0)}" x2="${X(0)}" y2="${Y(ZS)}"/>
+      ${dim(X(-f), Y(P.Z_RIM) - 16, X(f), Y(P.Z_RIM) - 16, `${P.FLAT}" top opening (rim is a handrail)`, -10)}
+      ${dim(Lx, Y(P.Z_RIM) - 44, R, Y(P.Z_RIM) - 44, `${P.W}" wide at the deck rings`, -10)}
+      ${dim(R + 22, Y(P.Z_HI), R + 22, Y(0), `${P.Z_HI}" door opening`, 18)}
+      ${dim(R + 140, Y(P.Z_RIM), R + 140, Y(ZG), `${fmt(P.Z_RIM - ZG)}" road to rim`, 40)}
+      ${dim(Lx - 22, Y(0), Lx - 22, Y(ZS), `${fmt(-ZS)}" skirt`, -20)}
+      ${dim(Lx - 22, Y(P.Z_RIM), Lx - 22, Y(P.Z_HI), `${P.Z_RIM - P.Z_HI}"`, -20)}
+      ${dim(Lx - 64, Y(0), Lx - 64, Y(ZG), `${fmt(-ZG)}" road to chassis`, -40)}
+      ${dim(X(-rx), Y(ZG) + 18, X(rx), Y(ZG) + 18, `${2 * rx}" track · rails and casters`, 12)}
+      ${dim(X(-XS), Y(ZG) + 36, X(XS), Y(ZG) + 36, `${fmt(2 * XS, 1)}" belly, ${P.Z_SKIRT - ZG}" off the road`, 12)}
+      <text x="${X(0)}" y="${Y(0) - 8}" text-anchor="middle" ${mask}>chassis · lower deck · ${fmt(-ZG + 2)}" above road</text>
+      <text x="${X(0)}" y="${Y(P.Z_HI) - 7}" text-anchor="middle" ${mask}>upper deck frame · ${P.Z_HI}" above the chassis</text>
+      <text x="${X(0)}" y="${Y(P.Z_HI / 2) - 14}" text-anchor="middle" ${mask} style="fill:var(--ink-3);paint-order:stroke;stroke:var(--surface);stroke-width:5px">dashed: X-brace, nose and tail walls only</text>
+      <text x="${X(0)}" y="${Y(ZS / 2) + 4}" text-anchor="middle" ${mask} style="fill:var(--ink-3);paint-order:stroke;stroke:var(--surface);stroke-width:5px">skirt: skin framing on droppers</text>
+    </svg>`;
+    document.getElementById('pane-section').innerHTML = `<div><h2>Rib elevation, looking from the tail</h2><p class="muted" style="margin:4px 0 10px">Inches. Orange: chassis (heavy line, squares are the rails and spine) and the upper deck frame.</p>${svg}</div><div class="cols">
+      <div><h2>What changed from v1</h2>
+        <ul class="notes"><li>The 2½" chassis ladder is the lower deck frame and the caster mount in one. The float rides ${fmt(38 - (-ZG + 2))}" lower: deck at ${fmt(-ZG + 2)}" instead of 38", rim at ${fmt(P.Z_RIM - ZG)}" instead of 115".</li>
+          <li>Because the casters are 16" tall, the belly is clipped: the skirt stops ${P.Z_SKIRT - ZG}" off the road at ${fmt(2 * XS, 1)}" wide instead of the full 55" flat. 12" casters would give back 4" of belly.</li>
+          <li>Sides are posts only: three ${fmt(P.RIBS[1] - P.RIBS[0])}" × ${P.Z_HI}" bays per side for piano-hinged doors. No diagonals anywhere in the body except the X in the nose and tail walls.</li>
+          <li>Upper deck is a ${P.W}" × ${P.L}" frame with a ${fmt(2 * P.JOIST_X)}" × ${fmt(P.HATCH[1] - P.HATCH[0])}" hatch in the middle, so people sit all the way round.</li></ul>
+        <h3 style="margin-top:16px">The load path</h3>
+        <ul class="notes"><li>People → deck ply → chassis rails and spine (24" o.c.) → casters. Posts and upper deck hang off the cross-member ends.</li>
+          <li>Sideways racking → deck ply diaphragms → the X-braced nose and tail walls → chassis.</li>
+          <li>Front-to-back racking (tow snatch, stopping) → deck diaphragms → the nose and tail pyramids, which are rigid in every direction. Open side walls do nothing and need not.</li>
+          <li>Every 90° joint is a one-bolt pin and the model treats it that way. Nothing relies on a bolted corner carrying moment.</li></ul>
+      </div></div>`;
+  })();
+  (function assume() {
+    document.getElementById('pane-assume').innerHTML = `<div class="cols">
+      <div><h2>Loads</h2><ul class="notes">
+        <li>Steel self-weight from catalog lb/ft: 2½" ${P.sections['2.50x12'].wpf}, 2" ${P.sections['2.00x12'].wpf}, 1¾" ${P.sections['1.75x12'].wpf} lb/ft.</li>
+        <li>Skin + paint + decoration ${P.SKIN_PSF} psf on every face including both cones, top open. Deck ply ${P.DECK_PSF} psf (¾").</li>
+        <li>Parked: ${P.PEOPLE_LOWER} people standing below (${fmt(P.PERSON_LB)} lb each, spread) plus one ${fmt(P.EDGE_PERSON)} lb person sitting at the centre of each hatch edge. Six aboard.</li>
+        <li>Moving: one ${fmt(P.MOVING.lower_center)} lb person mid-deck below and one ${fmt(P.MOVING.hatch_edge)} lb person at a hatch edge (you said one; this is two). Road shock is ${P.SHOCK}× that.</li>
+        <li>Sway: ${P.SWAY_G} g sideways, parked crowd. Tow: ${P.TOW_FRACTION * 2} × moving weight snatched at two eyes on the front rail ends, rope 20° up, with matching inertia.</li>
+        <li>Lifted: right-rear caster off the ground, parked crowd.</li></ul></div>
+      <div><h2>Model</h2><ul class="notes">
+        <li>PyNite 3D frame, 1D beam elements. Two tubes crossing at 90° share one bolt, so every such joint is modelled as a pin: posts, chamfer stubs, skirt pieces, cone stringers at both ends; deck beams, rails, joists and X-braces at their ends. Moment exists only inside continuous sticks and in the chassis grillage (welded, or bolted and squared by the ply).</li>
+        <li>Deck plywood modelled as shear panels (effective G·t ${fmt(P.PLY_GT_EFF)} lb/in for ¾" screwed 6–8" o.c.; APA tables give 60–80k before fastener slip). The 3/8" skin on the two upper chamfer faces is counted at ${fmt(P.SKIN_GT_EFF || 4000)} lb/in; no other skin is counted. Remove those panels and the rim becomes a handrail that sways 2" under a tow snatch.</li>
+        <li>Casters modelled as pins. Perforated section properties from the Unistrut Telespar datasheet (net area at a hole), F<sub>y</sub> = ${fmt(P.FY / 1000)} ksi.</li>
+        <li>Capacity: yield (P/A + M/S) and AISC E3 column buckling with K = 1 over the node-to-node length. Static, Sway, Tow, Lifted are checked against ASD allowables (÷1.67); Shock already carries a 2× factor so it is checked against nominal strength.</li>
+        <li>Not modelled: local wall dimpling under a bolt, hole slop, skin on the sides, belly and cones (helps), wind on a skinned box.</li></ul></div>
+      <div><h2>Dimensions I assumed</h2><ul class="notes">
+        <li>Snout ${fmt(P.L_NOSE)}" long to a ${fmt(P.NOSE_W)}" × ${fmt(P.NOSE_H)}" panel centred on the octagon. Tail ${fmt(P.L_TAIL)}" long to a ${fmt(P.TAIL_W)}" × ${fmt(P.TAIL_H)}" panel, 6" high of centre. All four are one-line edits.</li>
+        <li>Ribs at Y = ${P.RIBS.join(', ')}". Hatch between ${P.HATCH[0]}" and ${P.HATCH[1]}", ${fmt(2 * P.JOIST_X)}" wide between the joists.</li>
+        <li>Casters under the rails at ${P.CASTER_Y.join('" and ')}", 16" wheels; swivel clears the skirt with the rails at ±${P.RAIL_X}".</li>
+        <li>Skirt bottom ${P.Z_SKIRT - P.Z_GROUND}" off the road.</li></ul>
+        <p class="muted" style="margin-top:10px">Not a stamped design. If people ride on it, have someone qualified look at the rider load case.</p></div>
+    </div>`;
+  })();
+
+  // ---------------- boot
+  function resize() { const w = canvas.clientWidth, h = canvas.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  new ResizeObserver(resize).observe(canvas.parentElement);
+  resize(); placeMembers(); recolor(); updateCamera();
+  (function loop() { renderer.render(scene, camera); requestAnimationFrame(loop); })();
+})();
+</script>
