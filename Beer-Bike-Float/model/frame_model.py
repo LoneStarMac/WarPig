@@ -40,19 +40,50 @@ PLY_GT_EFF = 15_000.0               # lb/in effective shear rigidity of a 3/4" p
 SKIN_GT_EFF = 4_000.0               # lb/in for the 3/8" skin on the upper chamfers, nutserts/bolts ~12" o.c. along every panel edge
 
 FY, FU, E, G = 50_000.0, 65_000.0, 29.0e6, 11.2e6
+# 12 ga (0.105") perforated: A, I, S, r, lb/ft from the Unistrut Telespar datasheet (net section at a hole).
 SECTIONS = {
-    '1.75x12': dict(A=0.485, I=0.231, S=0.264, r=0.690, J=0.35, wpf=2.060, size=1.75),
-    '2.00x12': dict(A=0.590, I=0.372, S=0.372, r=0.794, J=0.56, wpf=2.416, size=2.00),
-    '2.25x12': dict(A=0.695, I=0.561, S=0.499, r=0.898, J=0.84, wpf=2.773, size=2.25),
-    '2.50x12': dict(A=0.803, I=0.804, S=0.643, r=1.001, J=1.21, wpf=3.141, size=2.50),
+    '1.50x12': dict(A=0.380, I=0.129, S=0.172, r=0.582, J=0.19, wpf=1.702, size=1.50, t=0.105),
+    '1.75x12': dict(A=0.485, I=0.231, S=0.264, r=0.690, J=0.35, wpf=2.060, size=1.75, t=0.105),
+    '2.00x12': dict(A=0.590, I=0.372, S=0.372, r=0.794, J=0.56, wpf=2.416, size=2.00, t=0.105),
+    '2.25x12': dict(A=0.695, I=0.561, S=0.499, r=0.898, J=0.84, wpf=2.773, size=2.25, t=0.105),
+    '2.50x12': dict(A=0.803, I=0.804, S=0.643, r=1.001, J=1.21, wpf=3.141, size=2.50, t=0.105),
 }
+def _derive_14ga():
+    """14 ga (0.075") perforated tube is sold by the same suppliers but not in that datasheet. Scale each 12 ga entry by
+    the gross-section ratio (same holes, thinner wall), which keeps the datasheet's perforation knock-down."""
+    out = {}
+    for k, s12 in list(SECTIONS.items()):
+        b = s12['size']; t12, t14 = 0.105, 0.075
+        g = lambda t: (b*b - (b-2*t)**2, (b**4 - (b-2*t)**4)/12)
+        A12, I12 = g(t12); A14, I14 = g(t14)
+        A = s12['A']*A14/A12; I = s12['I']*I14/I12
+        out[f'{b:.2f}x14'] = dict(A=round(A, 3), I=round(I, 3), S=round(s12['S']*I14/I12, 3), r=round(math.sqrt(I/A), 3),
+                                 J=round(s12['J']*t14/t12, 2), wpf=round(s12['wpf']*A14/A12, 3), size=b, t=t14)
+    SECTIONS.update(out)
+_derive_14ga()
+SECTIONS_BY_WEIGHT = sorted(SECTIONS, key=lambda k: SECTIONS[k]['wpf'])
+# Member families share one tube size so there are few sizes to buy and few joint patterns. The auto-sizer
+# (python frame_model.py --optimize) picks the lightest allowed section per family that keeps every member under
+# U_TARGET in every load case (strength only: yield and buckling; deflection is reported, not limited).
+FAMILIES = {
+    'chassis':   dict(groups=['chassis_rail', 'chassis_spine', 'chassis_cross'], min='2.00x14'),
+    'upper':     dict(groups=['deck_hi_rail', 'deck_hi_end', 'deck_hi_cross'], min='1.75x14'),
+    'posts':     dict(groups=['post', 'deck_lo_edge'], min='1.75x14'),
+    'rim':       dict(groups=['chamfer_hi', 'rim_cross', 'rim_stringer'], min='1.50x14'),   # handrail: 1.5" minimum for feel
+    'joists':    dict(groups=['joist_hi'], min='1.50x14'),
+    'brace':     dict(groups=['xbrace_end'], min='1.50x14'),
+    'skirt':     dict(groups=['skirt_stub', 'skirt_bottom', 'skirt_drop', 'skirt_stringer'], min='1.50x14'),
+    'cones':     dict(groups=['nose_stringer', 'nose_rim', 'tail_stringer', 'tail_rim'], min='1.50x14'),
+}
+U_TARGET = 0.85
+# v3 sizes, from --optimize with U_TARGET = 0.85. (v2 was 2.5"/2"/1.75" x 12 ga everywhere: 1,016 lb.)
 GROUP_SEC = {
-    'chassis_rail': '2.50x12', 'chassis_spine': '2.50x12', 'chassis_cross': '2.50x12',
-    'deck_hi_rail': '2.50x12', 'deck_hi_end': '2.50x12', 'deck_hi_cross': '2.50x12', 'xbrace_end': '2.50x12',
-    'deck_lo_edge': '2.00x12', 'post': '2.00x12', 'chamfer_hi': '2.00x12', 'rim_cross': '2.00x12', 'rim_stringer': '2.00x12',
-    'joist_hi': '1.75x12',
-    'skirt_stub': '1.75x12', 'skirt_bottom': '1.75x12', 'skirt_drop': '1.75x12', 'skirt_stringer': '1.75x12',
-    'nose_stringer': '1.75x12', 'nose_rim': '1.75x12', 'tail_stringer': '1.75x12', 'tail_rim': '1.75x12',
+    'chassis_rail': '2.50x14', 'chassis_spine': '2.50x14', 'chassis_cross': '2.50x14',
+    'deck_hi_rail': '2.00x14', 'deck_hi_end': '2.00x14', 'deck_hi_cross': '2.00x14', 'xbrace_end': '1.50x14',
+    'deck_lo_edge': '1.75x14', 'post': '1.75x14', 'chamfer_hi': '1.50x14', 'rim_cross': '1.50x14', 'rim_stringer': '1.50x14',
+    'joist_hi': '1.50x14',
+    'skirt_stub': '1.50x14', 'skirt_bottom': '1.50x14', 'skirt_drop': '1.50x14', 'skirt_stringer': '1.50x14',
+    'nose_stringer': '1.50x14', 'nose_rim': '1.50x14', 'tail_stringer': '1.50x14', 'tail_rim': '1.50x14',
 }
 GROUP_LABEL = {
     'chassis_rail': 'Chassis rail (casters bolt under)', 'chassis_spine': 'Chassis spine', 'chassis_cross': 'Chassis cross-member',
@@ -161,10 +192,12 @@ def build(lift_caster=None):
         for sx in (-1, 1):
             F.chain([(sx*hw, y, 0.0), (sx*hw, y, Z_HI)], 'post')
         end = y in (RIBS[0], RIBS[-1])
-        F.chain([(x, y, Z_HI) for x in xs5], 'deck_hi_end' if end else 'deck_hi_cross')
-        if end:   # X-brace: rail crossing at the chassis up to the far side of the end beam (lands away from the corner clusters)
-            F.chain([(-rx, y, 0.0), (0.0, y, Z_HI/2), (rx, y, Z_HI)], 'xbrace_end')
-            F.chain([(rx, y, 0.0), (0.0, y, Z_HI/2), (-rx, y, Z_HI)], 'xbrace_end')
+        F.chain([(x, y, Z_HI) for x in (sorted(set(xs5 + [-(Z_HI - rx), Z_HI - rx])) if end else xs5)], 'deck_hi_end' if end else 'deck_hi_cross')
+        if end:   # 45-degree X-brace: rail crossing at the chassis up to the end beam, rise = run = Z_HI, so the braces cross at 90
+            xt = Z_HI - rx          # 31": where the brace lands on the end beam
+            zc = Z_HI * rx / Z_HI   # crossing height: both lines pass x = 0 at z = rx (24")
+            F.chain([(-rx, y, 0.0), (0.0, y, rx), (xt, y, Z_HI)], 'xbrace_end')
+            F.chain([(rx, y, 0.0), (0.0, y, rx), (-xt, y, Z_HI)], 'xbrace_end')
     for sx in (-1, 1):
         F.chain([(sx*hw, y, Z_HI) for y in RIBS], 'deck_hi_rail')
         F.chain([(sx*jx, y, Z_HI) for y in RIBS], 'joist_hi')
@@ -364,8 +397,43 @@ def write_cutlist(F, path):
     return tot_ft, tot_lb
 
 
+def run_all():
+    combos = ['Static', 'Shock', 'Sway', 'Tow']
+    F = build(); F.m.analyze(check_statics=False)
+    res = check(F, combos)
+    F2 = build(lift_caster=LIFT_CASTER); F2.m.analyze(check_statics=False)
+    res2 = check(F2, ['Static'])
+    for mm in F.members: res[mm['name']]['Lifted'] = res2[mm['name']]['Static']
+    return F, F2, res
+
+def optimize(max_rounds=8):
+    """Lightest allowed section per family with every member of the family under U_TARGET in every case.
+    Start light, upsize whatever fails, repeat (self-weight and load sharing shift a little each round)."""
+    for fam in FAMILIES.values():
+        for g in fam['groups']: GROUP_SEC[g] = fam['min']
+    for rnd in range(max_rounds):
+        F, F2, res = run_all()
+        changed = False
+        for name, fam in FAMILIES.items():
+            u = max(res[m['name']][c]['u'] for m in F.members if m['group'] in fam['groups'] for c in ['Static', 'Shock', 'Sway', 'Tow', 'Lifted'])
+            cur = GROUP_SEC[fam['groups'][0]]
+            if u > U_TARGET:
+                heavier = [k for k in SECTIONS_BY_WEIGHT if SECTIONS[k]['wpf'] > SECTIONS[cur]['wpf']]
+                if not heavier: continue
+                nxt = heavier[0]
+                for g in fam['groups']: GROUP_SEC[g] = nxt
+                changed = True
+                print(f"  round {rnd}: {name:8s} {cur} u={u:.2f} -> {nxt}")
+        if not changed:
+            print(f"  converged after {rnd+1} rounds"); break
+    return GROUP_SEC
+
 if __name__ == '__main__':
-    out_dir = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'exports')
+    args = [a for a in sys.argv[1:] if not a.startswith('--')]
+    out_dir = args[0] if args else os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'docs', 'exports')
+    if '--optimize' in sys.argv:
+        print('Auto-sizing (strength only, U_TARGET=%.2f):' % U_TARGET); optimize()
+        print('GROUP_SEC = ' + json.dumps(GROUP_SEC, indent=4))
     os.makedirs(out_dir, exist_ok=True); os.chdir(out_dir)
     combos = ['Static', 'Shock', 'Sway', 'Tow']
     F = build(); F.m.analyze(check_statics=True)
@@ -376,6 +444,19 @@ if __name__ == '__main__':
     for n in disp: disp[n]['Lifted'] = disp2[n]['Static']
     for n in rx: rx[n]['Lifted'] = rx2.get(n, {}).get('Static', dict(FX=0, FY=0, FZ=0))
     combos_all = combos + ['Lifted']
+    # sensitivity: the same frame with T-90 brackets at post tops and bottoms (post ends carry moment)
+    def racking(disp_, cb):
+        return max(abs(v[cb][1]) for n, v in disp_.items() if abs(F.nodes[n][2] - Z_HI) < 1e-6)
+    PIN_BOTH.discard('post')
+    FB = build(); FB.m.analyze(check_statics=False); dispB = node_disp(FB, combos)
+    FB2 = build(lift_caster=LIFT_CASTER); FB2.m.analyze(check_statics=False); dispB2 = node_disp(FB2, ['Static'])
+    PIN_BOTH.add('post')
+    stiffness = dict(
+        tow_rack_pinned=round(racking(disp, 'Tow'), 2), tow_rack_bracketed=round(racking(dispB, 'Tow'), 2),
+        lifted_twist_pinned=round(max(math.hypot(*v['Lifted']) for v in disp.values()), 2),
+        lifted_twist_bracketed=round(max(math.hypot(*v['Static']) for v in dispB2.values()), 2),
+        hatch_sag_static=round(-disp[F.node(0.0, HATCH[0], Z_HI)]['Static'][2], 2))
+    print('\nStiffness: ' + json.dumps(stiffness))
     tot_ft, tot_lb = write_cutlist(F, 'cutlist.csv'); write_dxf(F, 'frame.dxf'); write_fcmacro(F, 'frame.FCMacro')
     # joint schedule: how many sticks meet at each node, and which
     joints = {}
@@ -389,7 +470,8 @@ if __name__ == '__main__':
                            PEOPLE_LOWER=PEOPLE_LOWER_PARKED, EDGE_PERSON=EDGE_PERSON, MOVING=MOVING, PERSON_LB=PERSON_LB, SKIN_PSF=SKIN_PSF, DECK_PSF=DECK_PSF,
                            SHOCK=SHOCK, SWAY_G=SWAY_G, TOW_FRACTION=TOW_FRACTION, PLY_GT_EFF=PLY_GT_EFF, SKIN_GT_EFF=SKIN_GT_EFF, FY=FY,
                            total_weight_lb=round(F.total_weight), total_moving_lb=round(F.total_moving), steel_ft=round(tot_ft), steel_lb=round(tot_lb),
-                           sections=SECTIONS, group_sec=GROUP_SEC),
+                           sections=SECTIONS, group_sec=GROUP_SEC, families={k: v['groups'] for k, v in FAMILIES.items()}, u_target=U_TARGET, stiffness=stiffness,
+                           weight_by_role={r: round(sum(m['L']/12*SECTIONS[m['sec']]['wpf'] for m in F.members if ROLE[m['group']] == r)) for r in ROLE_ORDER}),
                labels=GROUP_LABEL, roles=ROLE, role_order=ROLE_ORDER,
                nodes=F.nodes, members=F.members, proxies=F.proxies, results=res, reactions=rx, disp=disp, combos=combos_all)
     json.dump(out, open('results.json', 'w'))

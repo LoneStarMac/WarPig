@@ -65,11 +65,52 @@ stick_of = {m['name']: find(m['name']) for m in d['members']}
 node_sticks = defaultdict(set)
 for m in d['members']:
     for n in (m['i'], m['j']): node_sticks[n].add((stick_of[m['name']], m['group']))
+# per stick: which nodes it passes through vs ends at
+stick_nodes = defaultdict(lambda: defaultdict(int))
+stick_dir = {}
+for m in d['members']:
+    sid = stick_of[m['name']]
+    stick_nodes[sid][m['i']] += 1; stick_nodes[sid][m['j']] += 1
+    (x1, y1, z1), (x2, y2, z2) = d['nodes'][m['i']], d['nodes'][m['j']]
+    v = (x2-x1, y2-y1, z2-z1); L = math.sqrt(sum(c*c for c in v)); stick_dir[sid] = tuple(c/L for c in v)
+def angle(u, v):
+    c = abs(sum(a*b for a, b in zip(u, v))); c = min(1.0, c)
+    return math.degrees(math.acos(c))
+CONE = lambda g: g in ('nose_stringer', 'tail_stringer')
 joints = []
 for n, st in node_sticks.items():
+    through = [sid for sid, g in st if stick_nodes[sid][n] >= 2]
+    ends = [(sid, g) for sid, g in st if stick_nodes[sid][n] < 2]
+    body_ends = [(sid, g) for sid, g in ends if not CONE(g)]
+    cone_ends = [(sid, g) for sid, g in ends if CONE(g)]
     groups = sorted(g for _, g in st)
-    joints.append(dict(node=n, xyz=d['nodes'][n], n=len(st), groups=groups))
+    needs = []                      # one bracket per ending body stick, typed by its angle to its host
+    for i, (sid, g) in enumerate(body_ends):
+        if through: host, hosted = stick_dir[through[0]], True
+        elif len(body_ends) > 1: host, hosted = stick_dir[body_ends[(i + 1) % len(body_ends)][0]], False
+        else: continue
+        v, u = stick_dir[sid], host
+        a = round(angle(v, u) / 5) * 5
+        # roll: does the ending member lie flush on a face of the host (its perpendicular component is along one global
+        # axis) or on an edge (45 degrees between two axes, e.g. the chamfer stub on the deck rail)?
+        dot = sum(p*q for p, q in zip(v, u)); w = [p - dot*q for p, q in zip(v, u)]; wl = math.sqrt(sum(c*c for c in w)) or 1
+        w = [abs(c)/wl for c in w]; flush = max(w) > 0.95
+        if a == 90: needs.append(('T90' if flush else 'T90e') if hosted else ('C90' if flush else 'C90e'))
+        elif a == 45: needs.append('T45' if hosted else 'C45')
+        else: needs.append(f'odd{a}')
+    needs += ['pin'] * len(cone_ends)
+    if len(through) >= 2: needs.append('X90')
+    joints.append(dict(node=n, xyz=d['nodes'][n], n=len(st), groups=groups, through=len(through), ends=len(ends), needs=sorted(needs)))
 joints.sort(key=lambda r: (-r['n'], r['xyz'][1], r['xyz'][0]))
+kinds = defaultdict(int)
+for r in joints:
+    for k in r['needs']: kinds[k] += 1
+patterns = defaultdict(lambda: dict(count=0, examples=set()))
+for r in joints:
+    if not r['needs']: continue
+    key = ' + '.join(f"{r['needs'].count(k)}×{k}" if r['needs'].count(k) > 1 else k for k in dict.fromkeys(r['needs']))
+    p = patterns[key]; p['count'] += 1; p['examples'].add(', '.join(dict.fromkeys(r['groups'])))
+patterns = sorted((dict(sig=k, count=v['count'], examples=sorted(v['examples'])[:2]) for k, v in patterns.items()), key=lambda r: -r['count'])
 valence_hist = defaultdict(int)
 for r in joints: valence_hist[r['n']] += 1
 
@@ -83,7 +124,7 @@ for c in d['combos']:
     summary[c] = dict(u=r['u'], member=worst['name'], group=worst['group'], sig=r['sig_ksi'], defl=round(mxd[0], 2), caster=round(cast))
 
 payload = dict(params=P, labels=d['labels'], roles=d['roles'], role_order=d['role_order'], nodes=d['nodes'], members=d['members'], results=d['results'], reactions=d['reactions'],
-               disp=d['disp'], combos=d['combos'], sticks=stick_list, stock=stock, summary=summary, joints=joints, valence_hist=dict(valence_hist))
+               disp=d['disp'], combos=d['combos'], sticks=stick_list, stock=stock, summary=summary, joints=joints, valence_hist=dict(valence_hist), patterns=patterns, kinds=dict(kinds))
 
 html = open(os.path.join(HERE, 'viewer_template.html')).read()
 html = html.replace('/*__DATA__*/', json.dumps(payload))

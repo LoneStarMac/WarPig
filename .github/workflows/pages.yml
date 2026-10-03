@@ -1,0 +1,87 @@
+name: Run models and publish site
+
+# Every push to main re-runs every design's structural model (any */model/frame_model.py), rebuilds its
+# docs/index.html and export files, assembles the site and deploys it to GitHub Pages. Change a parameter,
+# push, and the page updates in about two minutes. Pull requests run the models and attach the exports to
+# the run without deploying.
+#
+# One-time setup: Settings -> Pages -> Build and deployment -> Source: "GitHub Actions".
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r Beer-Bike-Float/requirements.txt
+      - name: Run every design's model and build its page
+        run: |
+          set -e
+          mkdir -p _site
+          echo '## Worst members' >> "$GITHUB_STEP_SUMMARY"
+          for model in */model/frame_model.py; do
+            design=$(dirname "$(dirname "$model")")
+            echo "::group::$design"
+            python "$model"
+            python "$design/model/build_viewer.py" --standalone
+            mkdir -p "_site/$design"; cp -r "$design/docs/." "_site/$design/"
+            echo "::endgroup::"
+            echo "### $design" >> "$GITHUB_STEP_SUMMARY"
+            python - "$design" <<'EOF2' >> "$GITHUB_STEP_SUMMARY"
+          import json, sys
+          design = sys.argv[1]; d = json.load(open(f'{design}/docs/exports/results.json'))
+          print('| case | worst member | use | stress ksi |'); print('|---|---|---|---|')
+          for c in d['combos']:
+              m = max(d['members'], key=lambda m: d['results'][m['name']][c]['u']); r = d['results'][m['name']][c]
+              print(f"| {c} | {d['labels'][m['group']]} ({m['sec']}) | {r['u']*100:.0f}% | {r['sig_ksi']:.1f} |")
+          p = d['params']; print(f"\nSteel {p['steel_ft']} ft / {p['steel_lb']} lb. Parked {p['total_weight_lb']} lb, moving {p['total_moving_lb']} lb.\n")
+          EOF2
+          done
+      - name: Site index
+        run: |
+          {
+            echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WarPig</title>'
+            echo '<style>body{font:16px/1.5 system-ui,sans-serif;max-width:48rem;margin:3rem auto;padding:0 1rem;color:#15181c;background:#eceef1}a{color:#c8650f}@media(prefers-color-scheme:dark){body{color:#eef0f3;background:#13161a}a{color:#ec8a3a}}</style></head><body>'
+            echo '<h1>WarPig</h1><p>Parade float frame designs. Each page is a structural check with a 3D viewer, cut list, joints and assumptions.</p><ul>'
+            for d in _site/*/; do n=$(basename "$d"); echo "<li><a href=\"$n/\">$n</a></li>"; done
+            echo '</ul><p><a href="https://github.com/'"$GITHUB_REPOSITORY"'">Source and model files on GitHub</a></p></body></html>'
+          } > _site/index.html
+          touch _site/.nojekyll
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exports
+          path: "*/docs/exports"
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request'
+        with:
+          path: _site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -125,7 +125,7 @@ p { margin: 0; max-width: 70ch; }
 
 <header class="top">
   <div>
-    <div class="eyebrow">v2 · chassis at deck level, open sides · perforated square tube · PyNite / inches · lb</div>
+    <div class="eyebrow">v3 · sized for strength, not stiffness · 14 ga perforated square tube · PyNite / inches · lb</div>
     <h1>Octagon Float Frame</h1>
   </div>
   <p class="sub" id="subline"></p>
@@ -214,10 +214,10 @@ p { margin: 0; max-width: 70ch; }
   const worstCombo = D.combos.find(c => S[c].u === worstU);
   document.getElementById('subline').textContent = `${fmt(P.W)} × ${fmt(P.H)} × ${fmt(P.L)} in octagon body + ${fmt(P.L_NOSE)} in snout + ${fmt(P.L_TAIL)} in tail · ${D.members.length} tubes · ${D.combos.length} load cases`;
   document.getElementById('stats').innerHTML = `
-    <div class="stat"><div class="eyebrow">Weight, parked with 6 aboard</div><div class="v num">${fmt(P.total_weight_lb)}<small>lb</small></div><div class="d">${fmt(P.total_moving_lb)} lb moving with 2 · ${fmt(P.steel_lb)} lb steel · skin ${P.SKIN_PSF} psf</div></div>
-    <div class="stat"><div class="eyebrow">Steel</div><div class="v num">${fmt(P.steel_ft)}<small>ft</small></div><div class="d">${Object.entries(D.stock).map(([s, v]) => `${s.replace('x12', '" ×12ga')}: ${v.sticks10} ten-ft sticks`).join(' · ')}</div></div>
+    <div class="stat"><div class="eyebrow">Weight, parked with 6 aboard</div><div class="v num">${fmt(P.total_weight_lb)}<small>lb</small></div><div class="d">${fmt(P.total_moving_lb)} lb moving with 2 · <strong>${fmt(P.steel_lb)} lb steel</strong> (v2 was 1,016) · skin ${P.SKIN_PSF} psf</div></div>
+    <div class="stat"><div class="eyebrow">Steel</div><div class="v num">${fmt(P.steel_ft)}<small>ft</small></div><div class="d">${Object.entries(D.stock).map(([s, v]) => `${s.replace('x14', '" ×14ga').replace('x12', '" ×12ga')}: ${v.sticks10} sticks`).join(' · ')}</div></div>
     <div class="stat"><div class="eyebrow">Worst tube, any case</div><div class="v num">${fmt(worstU * 100)}<small>% of capacity</small></div><div class="d">${GROUP_LABEL[S[worstCombo].group]} under ${worstCombo} <span class="pill ${worstU <= 1 ? 'ok' : 'bad'}">${worstU <= 1 ? 'PASS' : 'OVER'}</span></div></div>
-    <div class="stat"><div class="eyebrow">Max deflection</div><div class="v num">${S.Static.defl.toFixed(2)}<small>in static</small></div><div class="d">${S.Shock.defl.toFixed(2)} in under road shock · hatch-edge beam ≈ L/${fmt(96 / S.Static.defl)}</div></div>
+    <div class="stat"><div class="eyebrow">Flex</div><div class="v num">${P.stiffness.hatch_sag_static.toFixed(2)}<small>in hatch-edge sag</small></div><div class="d">Front-to-back racking under a rope snatch: ${P.stiffness.tow_rack_pinned.toFixed(1)}" with pinned posts, ${P.stiffness.tow_rack_bracketed.toFixed(2)}" with post brackets</div></div>
     <div class="stat"><div class="eyebrow">Max caster load</div><div class="v num">${fmt(Math.max(S.Shock.caster, S.Lifted.caster))}<small>lb</small></div><div class="d">${fmt(S.Static.caster)} lb parked · spec 16" casters ≥ 1,200 lb each</div></div>`;
 
   // ---------------- three.js scene
@@ -322,7 +322,7 @@ p { margin: 0; max-width: 70ch; }
       const m = mesh.userData; let c;
       if (colorBy === 'u') c = uColor(D.results[m.name][combo].u);
       else if (colorBy === 'role') c = cat[ROLE_ORDER.indexOf(ROLE[m.group])];
-      else c = cat[Object.keys(P.sections).indexOf(m.sec) % cat.length];
+      else c = cat[Object.keys(P.sections).filter(s => D.members.some(x => x.sec === s)).indexOf(m.sec) % cat.length];
       mesh.material.color.set(c);
       mesh.material.emissive.set(selected === mesh ? (dark ? 0x555555 : 0x333333) : 0x000000);
     }
@@ -336,7 +336,8 @@ p { margin: 0; max-width: 70ch; }
     } else if (colorBy === 'role') {
       el.innerHTML = `<div class="eyebrow">Role</div>` + ROLE_ORDER.map((r, i) => `<div class="sw"><i style="background:${cat[i]}"></i>${r}</div>`).join('');
     } else {
-      el.innerHTML = `<div class="eyebrow">Tube size · 12 ga</div>` + Object.keys(P.sections).filter(s => D.members.some(m => m.sec === s)).map((s, i) => `<div class="sw"><i style="background:${cat[Object.keys(P.sections).indexOf(s)]}"></i>${s.replace('x12', '" square')}</div>`).join('');
+      const used = Object.keys(P.sections).filter(s => D.members.some(m => m.sec === s));
+      el.innerHTML = `<div class="eyebrow">Tube size</div>` + used.map((s, i) => `<div class="sw"><i style="background:${cat[i % cat.length]}"></i>${secName(s)}</div>`).join('');
     }
   }
 
@@ -385,7 +386,7 @@ p { margin: 0; max-width: 70ch; }
     const rows = D.combos.map(c => { const r = R[c]; return `<tr><td>${c}</td><td>${fmt(r.P)}</td><td>${fmt(r.M)}</td><td>${r.sig_ksi.toFixed(1)}</td><td class="u" style="color:${r.u > 1 ? CRIT : 'inherit'}">${(r.u * 100).toFixed(0)}%</td><td>${r.defl.toFixed(2)}</td><td>${fmt(r.joint_lb)}</td></tr>`; }).join('');
     el.innerHTML = `<div class="eyebrow">Selected tube</div>
       <h3 style="margin-top:4px">${GROUP_LABEL[m.group]}</h3>
-      <div class="name">${m.name} · ${m.sec.replace('x12', '" × 12 ga')} · ${m.L.toFixed(1)}" long · KL/r ${R.KL_r} · F<sub>cr</sub> ${R.Fcr_ksi} ksi</div>
+      <div class="name">${m.name} · ${secName(m.sec)} · ${m.L.toFixed(1)}" long · KL/r ${R.KL_r} · F<sub>cr</sub> ${R.Fcr_ksi} ksi</div>
       <div class="scroll"><table><thead><tr><th>case</th><th>P lb</th><th>M in·lb</th><th>σ ksi</th><th>use</th><th>Δ in</th><th>joint lb</th></tr></thead><tbody>${rows}</tbody></table></div>
       <p class="muted" style="font-size:11px;margin-top:6px">P: + tension, − compression. σ = P/A + M/S. Use = demand ÷ capacity (yield or AISC E3 buckling); Shock vs nominal, others vs ASD allowable. Joint = resultant end force the bolt group must carry.</p>`;
   }
@@ -407,19 +408,21 @@ p { margin: 0; max-width: 70ch; }
   try { new MutationObserver(recolor).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', recolor); } catch (e) { }
 
   // ---------------- schedules
-  const secName = s => s.replace('x12', '" sq × 12 ga');
+  const secName = s => s.replace('x12', '" sq × 12 ga').replace('x14', '" sq × 14 ga');
   (function cutList() {
     const rows = D.sticks.map(r => `<tr><td class="l">${GROUP_LABEL[r.group]}</td><td class="l">${secName(r.sec)}</td><td>${r.L.toFixed(1)}</td><td>${r.qty}</td><td>${(r.L * r.qty / 12).toFixed(1)}</td></tr>`).join('');
     const stock = Object.entries(D.stock).map(([s, v]) => `<tr><td class="l">${secName(s)}</td><td>${v.ft}</td><td>${fmt(v.lb)}</td><td>${v.sticks10}</td></tr>`).join('');
     document.getElementById('pane-cut').innerHTML = `
       <div class="cols">
-        <div><h2>Stock to buy</h2><p class="muted" style="margin:4px 0 10px">Ten-foot sticks by first-fit packing with ¼" kerf. 1¾" nests inside 2" and 2" inside 2¼"; the 2½" chassis and deck frame are lap-bolted, not sleeved.</p>
+        <div><h2>Stock to buy</h2><p class="muted" style="margin:4px 0 10px">Ten-foot sticks by first-fit packing with ¼" kerf. All 14 ga (0.075" wall). Each size telescopes into the next: 1½" in 1¾" in 2", so offcuts become sleeve stubs.</p>
           <table class="sched"><thead><tr><th class="l">Tube</th><th>ft</th><th>lb</th><th>10' sticks</th></tr></thead><tbody>${stock}
           <tr class="total"><td class="l">Total</td><td>${fmt(P.steel_ft)}</td><td>${fmt(P.steel_lb)}</td><td>${Object.values(D.stock).reduce((a, v) => a + v.sticks10, 0)}</td></tr></tbody></table>
+          <h3 style="margin-top:18px">Where the weight is</h3>
+          <table class="sched"><thead><tr><th class="l">Role</th><th>lb</th><th>share</th></tr></thead><tbody>${Object.entries(P.weight_by_role).map(([r, w]) => `<tr><td class="l">${r}</td><td>${fmt(w)}</td><td>${(w / P.steel_lb * 100).toFixed(0)}%</td></tr>`).join('')}</tbody></table>
           <h3 style="margin-top:18px">Hardware</h3>
-          <ul class="notes"><li>Crossings and T's: one ⅜" Grade 5 zinc bolt through both tubes (that is all a 90° crossing can take; the frame is designed so these are pins). ≈ 160 joints, flange nuts or nylocks. No gussets needed anywhere.</li>
+          <ul class="notes"><li>One ⅜" Grade 5 zinc bolt per crossing or T (through both tubes), flange nuts or nylocks. The frame is sized so that is enough; brackets add stiffness, not strength it needs.</li>
           <li>Straight splices: 12" stub of 1¾" inside the 2" ends, two bolts each side. Keep the 96" sticks whole where you can.</li>
-          <li>Chassis: have a shop weld the 2 rails, spine, 4 cross-members and 4 caster plates as one flat frame from plain 2½" × 12 ga, then paint. ~1 hr of welding. Bolting it instead works too, with the rails stacked on top of the cross-members and the deck ply holding it square.</li>
+          <li>Chassis: have a shop weld the 2 rails, spine, 4 cross-members and 4 caster plates as one flat frame from plain 2½" × 14 ga, then paint. ~1 hr of welding. Bolting it instead works too, with the rails stacked on top of the cross-members and the deck ply holding it square.</li>
           <li>Casters: four 16" rated ≥ 1,200 lb each, under the rails at 12" from each end.</li>
           <li>Deck ply: screw to the steel every 6–8" along every panel edge with #12 self-drillers. The decks are the sideways bracing; this is the one place fastener spacing matters.</li></ul>
         </div>
@@ -431,8 +434,9 @@ p { margin: 0; max-width: 70ch; }
     const cast = Object.entries(D.reactions).map(([n, r]) => { const [x, y] = D.nodes[n]; return `<tr><td class="l">${x < 0 ? 'left' : 'right'} ${y < 48 ? 'rear' : 'front'}</td>${D.combos.map(c => `<td>${fmt(r[c].FZ)}</td>`).join('')}</tr>`; }).join('');
     const groups = [...new Set(D.members.map(m => m.group))];
     const jrows = groups.map(g => { const ms = D.members.filter(m => m.group === g); const j = Math.max(...ms.map(m => Math.max(...D.combos.map(c => D.results[m.name][c].joint_lb)))); const u = Math.max(...ms.map(m => Math.max(...D.combos.map(c => D.results[m.name][c].u)))); return { g, j, u }; }).sort((a, b) => b.j - a.j)
-      .slice(0, 8).map(r => `<tr><td class="l">${GROUP_LABEL[r.g]}</td><td>${fmt(r.j)}</td><td>${(r.j / 5000 * 100).toFixed(0)}%</td><td>${(r.u * 100).toFixed(0)}%</td></tr>`).join('');
-    const where = { 1: 'points along one stick: caster mounts, mid-span load points', 5: 'lower corners of the end ribs: cross-member end, edge stringer, post, skirt stub, cone stringer', 4: 'lower corners at the middle ribs; chassis rail × cross-member crossings with a skirt dropper; upper deck rail × beam crossings with a post and chamfer stub', 3: 'joist and X-brace landings on the deck beams; skirt corners', 2: 'rim and tip-frame corners' };
+      .slice(0, 8).map(r => `<tr><td class="l">${GROUP_LABEL[r.g]}</td><td>${fmt(r.j)}</td><td>${(r.j / 3600 * 100).toFixed(0)}%</td><td>${(r.u * 100).toFixed(0)}%</td></tr>`).join('');
+    const K = D.kinds;
+    const where = { 1: 'points along one stick: caster mounts, mid-span load points', 5: 'lower and upper corners of the end ribs, with a cone stringer added', 4: 'corners at the middle ribs; rail × cross-member crossings with a skirt dropper; rail × beam crossings with a post and chamfer stub', 3: 'joist and X-brace landings on the deck beams; skirt corners', 2: 'rim and tip-frame corners' };
     const vrows = Object.keys(D.valence_hist).sort((a, b) => b - a).map(n => `<tr><td class="l">${n}</td><td>${D.valence_hist[n]}</td><td class="l">${where[n] || ''}</td></tr>`).join('');
     document.getElementById('pane-joints').innerHTML = `
       <div class="cols">
@@ -441,13 +445,22 @@ p { margin: 0; max-width: 70ch; }
           <h3 style="margin-top:18px">What it means</h3>
           <ul class="notes"><li>Buy casters for the Lifted/Shock number, not the parked one: ${fmt(Math.max(S.Shock.caster, S.Lifted.caster))} lb per wheel.</li>
           <li>Horizontal restraint is caster friction. The frame is braced so it does not depend on it.</li>
-          <li>Track is 48" (rails at ±24"). Tipping starts at about 0.35 g sideways with 6 aboard; fine at parade speed, and the 16" lower deck helps.</li></ul>
+          <li>Track is 48" (rails at ±24"). Tipping starts at about 0.35 g sideways with 6 aboard; fine at parade speed, and the low deck helps.</li>
+          <li>Brackets at the 16 post ends cut the pothole twist from ${P.stiffness.lifted_twist_pinned.toFixed(1)}" to ${P.stiffness.lifted_twist_bracketed.toFixed(1)}" and the rope-snatch racking from ${P.stiffness.tow_rack_pinned.toFixed(1)}" to ${P.stiffness.tow_rack_bracketed.toFixed(2)}", for no weight. That is the cheapest rigidity on the float.</li></ul>
         </div>
-        <div><h2>Sticks meeting at each joint</h2><p class="muted" style="margin:4px 0 10px">A continuous stick passing through counts once. Every joint is a one-bolt crossing, so sticks stack: stringer on cross-member end, post beside stringer, skirt stub under the cross-member, cone stringer on the stringer end.</p>
+        <div><h2>Bracket kit</h2><p class="muted" style="margin:4px 0 10px">Every diagonal in the body is 45°, so each ending member needs one of two bracket patterns, counted from the model. Cone stringers are flattened-end pins and need none.</p>
+          <div class="scroll"><table class="sched"><thead><tr><th class="l">Pattern</th><th>qty</th><th class="l">Used for</th></tr></thead><tbody>
+            <tr><td class="l"><strong>A · 90° saddle</strong></td><td>${fmt((K.T90 || 0) + (K.C90 || 0))}</td><td class="l">a tube ending square on another: posts to chassis and rail, joists and cross beams to rails, rim crosses, skirt pieces. U-channel that wraps the host tube, 2 bolts through it, tab along the ending tube with 2 bolts.</td></tr>
+            <tr><td class="l"><strong>B · 45° saddle</strong></td><td>${fmt((K.T45 || 0) + (K.C45 || 0) + (K.T90e || 0) + (K.C90e || 0))}</td><td class="l">X-brace ends, upper chamfer stubs, skirt stubs. Same channel, tab bent at 45°. (${fmt((K.T90e || 0) + (K.C90e || 0))} of these are chamfer stubs that could sit on a rail edge instead; host them on the post and they are pattern B.)</td></tr>
+            <tr><td class="l">C · crossing plate</td><td>${fmt(K.X90 || 0)}</td><td class="l">optional: flat plate with 4 holes where rails cross cross-members and joists cross beams. One bolt through the crossing is enough structurally; the plate squares it.</td></tr>
+            <tr><td class="l">pin, no bracket</td><td>${fmt(K.pin || 0)}</td><td class="l">nose and tail stringer ends: flatten 2" of the tube in a vise, one bolt.</td></tr>
+          </tbody></table></div>
+          <p class="muted" style="font-size:12px;margin-top:6px">Your cut-and-brake cap does the same job as pattern A (tabs wrapped round the host, two bolt axes). The kit is for consistency and speed; the model does not depend on either, it is sized with every one of these joints as a pin.</p>
+          <h3 style="margin-top:18px">Sticks meeting at each joint</h3>
           <div class="scroll"><table class="sched"><thead><tr><th class="l">Sticks</th><th>Joints</th><th class="l">Where</th></tr></thead><tbody>${vrows}</tbody></table></div>
           <h3 style="margin-top:18px">Largest joint forces</h3>
           <div class="scroll"><table class="sched"><thead><tr><th class="l">Member type</th><th>Joint lb</th><th>of 1-bolt</th><th>Member use</th></tr></thead><tbody>${jrows}</tbody></table></div>
-          <p class="muted" style="font-size:12px;margin-top:6px">One ⅜" bolt through two 12 ga walls ≈ 5,000 lb in bearing (2.0·d·t·F<sub>u</sub> ÷ 2, two walls). Nothing here is above 25% of that.</p>
+          <p class="muted" style="font-size:12px;margin-top:6px">One ⅜" bolt through two 14 ga walls ≈ 3,600 lb in bearing (2.0·d·t·F<sub>u</sub> ÷ 2, two walls). Nothing here is above a third of that.</p>
           <h3 style="margin-top:18px">Tightening</h3>
           <ul class="notes"><li>These are bearing joints: the bolt shank pushes on the hole edge. Clamp force adds almost nothing, so do not torque to spec.</li>
           <li>Snug-tight (hand wrench, wall just touching) plus a locking nut or thread locker. Where a bolt passes through a single tube with nothing inside it, a 1¾" sleeve stub inside the 2" tube lets you tighten harder without dimpling.</li>
@@ -491,8 +504,10 @@ p { margin: 0; max-width: 70ch; }
       <text x="${X(0)}" y="${Y(ZS / 2) + 4}" text-anchor="middle" ${mask} style="fill:var(--ink-3);paint-order:stroke;stroke:var(--surface);stroke-width:5px">skirt: skin framing on droppers</text>
     </svg>`;
     document.getElementById('pane-section').innerHTML = `<div><h2>Rib elevation, looking from the tail</h2><p class="muted" style="margin:4px 0 10px">Inches. Orange: chassis (heavy line, squares are the rails and spine) and the upper deck frame.</p>${svg}</div><div class="cols">
-      <div><h2>What changed from v1</h2>
-        <ul class="notes"><li>The 2½" chassis ladder is the lower deck frame and the caster mount in one. The float rides ${fmt(38 - (-ZG + 2))}" lower: deck at ${fmt(-ZG + 2)}" instead of 38", rim at ${fmt(P.Z_RIM - ZG)}" instead of 115".</li>
+      <div><h2>What changed in v3</h2>
+        <ul class="notes"><li>Sized for strength only. Every member family gets the lightest tube that stays under ${fmt(P.u_target * 100)}% of capacity in every load case; deflection is reported, not limited. Steel went from 1,016 lb to ${fmt(P.steel_lb)} lb: chassis 2½", upper deck 2", posts 1¾", everything else 1½", all 14 ga.</li>
+          <li>Every diagonal is 45°: the X-braces now rise 55" over 55", so they cross at 90° and share the chamfer stubs' bracket pattern.</li>
+          <li>The 2½" chassis ladder is the lower deck frame and the caster mount in one. The float rides ${fmt(38 - (-ZG + 2))}" lower: deck at ${fmt(-ZG + 2)}" instead of 38", rim at ${fmt(P.Z_RIM - ZG)}" instead of 115".</li>
           <li>Because the casters are 16" tall, the belly is clipped: the skirt stops ${P.Z_SKIRT - ZG}" off the road at ${fmt(2 * XS, 1)}" wide instead of the full 55" flat. 12" casters would give back 4" of belly.</li>
           <li>Sides are posts only: three ${fmt(P.RIBS[1] - P.RIBS[0])}" × ${P.Z_HI}" bays per side for piano-hinged doors. No diagonals anywhere in the body except the X in the nose and tail walls.</li>
           <li>Upper deck is a ${P.W}" × ${P.L}" frame with a ${fmt(2 * P.JOIST_X)}" × ${fmt(P.HATCH[1] - P.HATCH[0])}" hatch in the middle, so people sit all the way round.</li></ul>
@@ -500,13 +515,13 @@ p { margin: 0; max-width: 70ch; }
         <ul class="notes"><li>People → deck ply → chassis rails and spine (24" o.c.) → casters. Posts and upper deck hang off the cross-member ends.</li>
           <li>Sideways racking → deck ply diaphragms → the X-braced nose and tail walls → chassis.</li>
           <li>Front-to-back racking (tow snatch, stopping) → deck diaphragms → the nose and tail pyramids, which are rigid in every direction. Open side walls do nothing and need not.</li>
-          <li>Every 90° joint is a one-bolt pin and the model treats it that way. Nothing relies on a bolted corner carrying moment.</li></ul>
+          <li>Every joint is modelled as a pin, so nothing relies on a bracket. Add the brackets anyway: they are what turns "strong enough" into "stiff".</li></ul>
       </div></div>`;
   })();
   (function assume() {
     document.getElementById('pane-assume').innerHTML = `<div class="cols">
       <div><h2>Loads</h2><ul class="notes">
-        <li>Steel self-weight from catalog lb/ft: 2½" ${P.sections['2.50x12'].wpf}, 2" ${P.sections['2.00x12'].wpf}, 1¾" ${P.sections['1.75x12'].wpf} lb/ft.</li>
+        <li>Steel self-weight: 2½" ${P.sections['2.50x14'].wpf}, 2" ${P.sections['2.00x14'].wpf}, 1¾" ${P.sections['1.75x14'].wpf}, 1½" ${P.sections['1.50x14'].wpf} lb/ft (14 ga).</li>
         <li>Skin + paint + decoration ${P.SKIN_PSF} psf on every face including both cones, top open. Deck ply ${P.DECK_PSF} psf (¾").</li>
         <li>Parked: ${P.PEOPLE_LOWER} people standing below (${fmt(P.PERSON_LB)} lb each, spread) plus one ${fmt(P.EDGE_PERSON)} lb person sitting at the centre of each hatch edge. Six aboard.</li>
         <li>Moving: one ${fmt(P.MOVING.lower_center)} lb person mid-deck below and one ${fmt(P.MOVING.hatch_edge)} lb person at a hatch edge (you said one; this is two). Road shock is ${P.SHOCK}× that.</li>
@@ -515,7 +530,7 @@ p { margin: 0; max-width: 70ch; }
       <div><h2>Model</h2><ul class="notes">
         <li>PyNite 3D frame, 1D beam elements. Two tubes crossing at 90° share one bolt, so every such joint is modelled as a pin: posts, chamfer stubs, skirt pieces, cone stringers at both ends; deck beams, rails, joists and X-braces at their ends. Moment exists only inside continuous sticks and in the chassis grillage (welded, or bolted and squared by the ply).</li>
         <li>Deck plywood modelled as shear panels (effective G·t ${fmt(P.PLY_GT_EFF)} lb/in for ¾" screwed 6–8" o.c.; APA tables give 60–80k before fastener slip). The 3/8" skin on the two upper chamfer faces is counted at ${fmt(P.SKIN_GT_EFF || 4000)} lb/in; no other skin is counted. Remove those panels and the rim becomes a handrail that sways 2" under a tow snatch.</li>
-        <li>Casters modelled as pins. Perforated section properties from the Unistrut Telespar datasheet (net area at a hole), F<sub>y</sub> = ${fmt(P.FY / 1000)} ksi.</li>
+        <li>Casters modelled as pins. 12 ga section properties from the Unistrut Telespar datasheet (net area at a hole); 14 ga derived from them by the gross-section ratio, so the datasheet's hole knock-down carries over. F<sub>y</sub> = ${fmt(P.FY / 1000)} ksi; confirm the grade on the 14 ga you actually buy, some generic perforated tube is 33–36 ksi, which would push the chassis back to 12 ga.</li>
         <li>Capacity: yield (P/A + M/S) and AISC E3 column buckling with K = 1 over the node-to-node length. Static, Sway, Tow, Lifted are checked against ASD allowables (÷1.67); Shock already carries a 2× factor so it is checked against nominal strength.</li>
         <li>Not modelled: local wall dimpling under a bolt, hole slop, skin on the sides, belly and cones (helps), wind on a skinned box.</li></ul></div>
       <div><h2>Dimensions I assumed</h2><ul class="notes">
