@@ -21,15 +21,18 @@ Z_RIM  = H_OCT - C                  # 75.5: top rim
 CASTER_H, CHASSIS_SZ = 16.0, 2.5    # caster height, chassis tube
 GROUND_CLEAR = 6.0                  # skirt bottom above the road (UNDERBODY='skirt')
 BELLY_CLEAR  = 10.0                 # belly above the road (UNDERBODY='chamfer'); every inch of belly is an inch less leg showing
-UNDERBODY = 'chamfer'               # 'skirt'  : octagon chamfer skirt hanging to GROUND_CLEAR, casters inside it (v2/v3)
+UNDERBODY = 'octagon'               # 'skirt'  : octagon chamfer skirt hanging to GROUND_CLEAR, casters inside it (v2/v3)
                                     # 'legs'   : belly flat at the chassis, each caster in a steel-framed leg box (v4)
                                     # 'chamfer': octagon taper back on the belly down to BELLY_CLEAR; casters in coroplast legs, no steel (v5)
+                                    # 'octagon': the full octagon. Chassis on the bottom flat, casters entirely below it, lower deck on
+                                    #            short columns 20.5" above the chassis (v6; this is the existing float's geometry)
 ENTRY     = 'tail'                  # 'side': open side bays for doors, X-braced end walls (v3)
                                     # 'tail': door through the tail, side walls diagonal-braced and hard-skinned
-Z_GROUND = -(CASTER_H + CHASSIS_SZ/2)          # -17.25
-Z_SKIRT  = {'skirt': Z_GROUND + GROUND_CLEAR, 'chamfer': Z_GROUND + BELLY_CLEAR, 'legs': 0.0}[UNDERBODY]   # belly height; full octagon bottom would be -20.5
+CHASSIS_Z = -C if UNDERBODY == 'octagon' else 0.0   # chassis centreline: the octagon's bottom flat (-20.5) or the lower deck ring (0)
+Z_GROUND = CHASSIS_Z - (CASTER_H + CHASSIS_SZ/2)   # -17.25, or -37.75 with the chassis on the bottom flat
+Z_SKIRT  = {'skirt': Z_GROUND + GROUND_CLEAR, 'chamfer': Z_GROUND + BELLY_CLEAR, 'legs': 0.0, 'octagon': -C}[UNDERBODY]   # belly height
 X_SKIRT  = W/2 - (0 - Z_SKIRT)                 # 36.75 : chamfer line hits the skirt bottom here; 48 with legs
-RAIL_X   = 24.0                     # chassis rails (casters bolt under these)
+RAIL_X   = 26.0 if UNDERBODY == 'octagon' else 24.0   # chassis rails (casters bolt under these); 26 keeps them inside the 55" bottom flat
 CASTER_Y = (12.0, 84.0) if UNDERBODY == 'skirt' else (11.0, 83.0)   # caster stations along the rails
 LEG_CLEAR = 4.0                     # leg box bottom above the road
 Z_LEG    = Z_GROUND + LEG_CLEAR     # -13.25
@@ -86,7 +89,8 @@ FAMILIES = {
     'posts':     dict(groups=['post', 'deck_lo_edge', 'door_jamb'], min='1.75x14'),
     'rim':       dict(groups=['chamfer_hi', 'rim_cross', 'rim_stringer'], min='1.50x14'),   # handrail: 1.5" minimum for feel
     'joists':    dict(groups=['joist_hi'], min='1.50x14'),
-    'brace':     dict(groups=['xbrace_end', 'side_diag'], min='1.50x14'),
+    'brace':     dict(groups=['xbrace_end', 'side_diag', 'vbrace_lo'], min='1.50x14'),
+    'lowerdeck': dict(groups=['deck_lo_beam', 'joist_lo', 'column'], min='1.50x14'),
     'legs':      dict(groups=['leg_top', 'leg_drop', 'leg_ring'], min='1.50x14'),
     'skirt':     dict(groups=['skirt_stub', 'skirt_bottom', 'skirt_drop', 'skirt_stringer'], min='1.50x14'),
     'cones':     dict(groups=['nose_stringer', 'nose_rim', 'tail_stringer', 'tail_rim'], min='1.50x14'),
@@ -100,6 +104,7 @@ GROUP_SEC = {
     'joist_hi': '1.50x14',
     'skirt_stub': '1.50x14', 'skirt_bottom': '1.50x14', 'skirt_drop': '1.50x14', 'skirt_stringer': '1.50x14',
     'leg_top': '1.50x14', 'leg_drop': '1.50x14', 'leg_ring': '1.50x14', 'side_diag': '1.50x14', 'door_jamb': '1.75x14',
+    'deck_lo_beam': '1.50x14', 'joist_lo': '1.50x14', 'column': '1.50x14', 'vbrace_lo': '1.50x14',
     'nose_stringer': '1.50x14', 'nose_rim': '1.50x14', 'tail_stringer': '1.50x14', 'tail_rim': '1.50x14',
 }
 GROUP_LABEL = {
@@ -111,6 +116,7 @@ GROUP_LABEL = {
     'skirt_drop': 'Skirt dropper', 'skirt_stringer': 'Skirt stringer', 'nose_stringer': 'Nose stringer', 'nose_rim': 'Snout frame',
     'leg_top': 'Leg box, top ring', 'leg_drop': 'Leg box, corner post', 'leg_ring': 'Leg box, bottom ring',
     'side_diag': 'Side wall diagonal (under skin)', 'door_jamb': 'Tail door jamb',
+    'deck_lo_beam': 'Lower deck beam (96")', 'joist_lo': 'Lower deck joist', 'column': 'Lower deck column', 'vbrace_lo': 'V-brace below the deck, nose & tail',
     'tail_stringer': 'Tail stringer', 'tail_rim': 'Tail frame',
 }
 ROLE = {
@@ -120,16 +126,18 @@ ROLE = {
     'xbrace_end': 'Bracing',
     'skirt_stub': 'Skirt', 'skirt_bottom': 'Skirt', 'skirt_drop': 'Skirt', 'skirt_stringer': 'Skirt',
     'leg_top': 'Legs', 'leg_drop': 'Legs', 'leg_ring': 'Legs', 'side_diag': 'Bracing', 'door_jamb': 'Posts & rim',
+    'deck_lo_beam': 'Lower deck', 'joist_lo': 'Lower deck', 'column': 'Lower deck', 'vbrace_lo': 'Bracing',
     'nose_stringer': 'Nose & tail', 'nose_rim': 'Nose & tail', 'tail_stringer': 'Nose & tail', 'tail_rim': 'Nose & tail',
 }
-ROLE_ORDER = ['Chassis', 'Posts & rim', 'Upper deck', 'Bracing', 'Legs' if UNDERBODY == 'legs' else 'Skirt', 'Nose & tail']
+if UNDERBODY == 'octagon': ROLE['skirt_stub'] = 'Lower deck'
+ROLE_ORDER = ['Chassis', 'Lower deck' if UNDERBODY == 'octagon' else ('Legs' if UNDERBODY == 'legs' else 'Skirt'), 'Posts & rim', 'Upper deck', 'Bracing', 'Nose & tail']
 # Joint model, matched to what perforated tube can actually do: two members crossing at 90 degrees share ONE bolt, so every
 # such joint is a pin. Moment exists only inside continuous sticks (and their sleeve splices) and in the chassis grillage,
 # which is either welded or squared by the deck ply. Posts are pinned top and bottom; the deck diaphragms and the nose/tail
 # pyramids do the racking work. The X-braces are continuous through their crossing (one stick + two halves). Nose/tail
 # tip frames are left rigid (4 short pieces, bracketed); everything else, skirt included, is pinned.
-PIN_BOTH       = {'post', 'chamfer_hi', 'nose_stringer', 'tail_stringer', 'skirt_stub', 'skirt_drop', 'side_diag', 'door_jamb'}   # leg corner posts stay rigid: the leg box is skinned on 4 sides
-PIN_CHAIN_ENDS = {'deck_hi_cross', 'deck_hi_end', 'deck_hi_rail', 'joist_hi', 'rim_stringer', 'rim_cross', 'skirt_stringer', 'skirt_bottom', 'deck_lo_edge', 'xbrace_end', 'leg_top'}
+PIN_BOTH       = {'post', 'chamfer_hi', 'nose_stringer', 'tail_stringer', 'skirt_stub', 'skirt_drop', 'side_diag', 'door_jamb', 'column', 'vbrace_lo'}   # leg corner posts stay rigid: the leg box is skinned on 4 sides
+PIN_CHAIN_ENDS = {'deck_hi_cross', 'deck_hi_end', 'deck_hi_rail', 'joist_hi', 'rim_stringer', 'rim_cross', 'skirt_stringer', 'skirt_bottom', 'deck_lo_edge', 'xbrace_end', 'leg_top', 'deck_lo_beam', 'joist_lo'}
 
 
 class Frame:
@@ -194,21 +202,36 @@ class Frame:
 
 def build(lift_caster=None):
     F = Frame()
-    f = FLAT/2; hw = W/2; rx = RAIL_X; jx = JOIST_X
+    f = FLAT/2; hw = W/2; rx = RAIL_X; jx = JOIST_X; CZ = CHASSIS_Z; OCT = UNDERBODY == 'octagon'
     xs5 = [-hw, -rx, 0.0, rx, hw]
     cham_hi_len = math.hypot(hw - f, Z_RIM - Z_HI)
     tail_rib, nose_rib = RIBS[0], RIBS[-1]
     rail_ys = sorted(set(RIBS) | set(CASTER_Y) | {L/2})
 
-    # ----- CHASSIS (z = 0): rails, spine, cross-members, deck-edge stringers
+    # ----- CHASSIS (z = CZ): rails, spine, cross-members; deck-edge stringers at the deck ring
     for sx in (-1, 1):
-        F.chain([(sx*rx, y, 0.0) for y in rail_ys], 'chassis_rail')
+        F.chain([(sx*rx, y, CZ) for y in rail_ys], 'chassis_rail')
         F.chain([(sx*hw, y, 0.0) for y in RIBS], 'deck_lo_edge')
-    F.chain([(0.0, y, 0.0) for y in rail_ys], 'chassis_spine')
+    F.chain([(0.0, y, CZ) for y in rail_ys], 'chassis_spine')
     for y in RIBS:
         extra = [x for leg in LEGS.values() if UNDERBODY == 'legs' and y in (leg['y0'], leg['y1']) for sx in (-1, 1) for x in (sx*rx - leg['halfw'], sx*rx + leg['halfw'])]
-        if ENTRY == 'tail' and y == tail_rib: extra += [-DOOR_HALF, DOOR_HALF]
-        F.chain([(x, y, 0.0) for x in sorted(set(xs5 + extra))], 'chassis_cross')
+        if ENTRY == 'tail' and y == tail_rib and not OCT: extra += [-DOOR_HALF, DOOR_HALF]
+        xs = [-rx, 0.0, rx] if OCT else xs5          # on the bottom flat the cross-member is only 52" wide
+        F.chain([(x, y, CZ) for x in sorted(set(xs + extra))], 'chassis_cross')
+
+    # ----- LOWER DECK FRAME (octagon mode): beams at the ribs, joists over the rails, columns down to the chassis, chamfer stubs to the corners
+    if OCT:
+        for y in RIBS:
+            xs = [-hw, -rx, 0.0, rx, hw] + ([-DOOR_HALF, DOOR_HALF] if ENTRY == 'tail' and y == tail_rib else [])
+            F.chain([(x, y, 0.0) for x in sorted(set(xs))], 'deck_lo_beam')
+            for x in (-rx, 0.0, rx):
+                F.chain([(x, y, CZ), (x, y, 0.0)], 'column')
+            for sx in (-1, 1):
+                F.chain([(sx*rx, y, CZ), (sx*hw, y, 0.0)], 'skirt_stub')
+            if y in (tail_rib, nose_rib):   # V-brace in the lower box of the end walls, rail crossings up to the deck centre
+                F.chain([(-rx, y, CZ), (0.0, y, 0.0)], 'vbrace_lo'); F.chain([(rx, y, CZ), (0.0, y, 0.0)], 'vbrace_lo')
+        for x in (-rx, 0.0, rx):
+            F.chain([(x, y, 0.0) for y in sorted(set(RIBS) | {L/2})], 'joist_lo')
 
     # ----- POSTS, UPPER DECK FRAME, HATCH JOISTS
     for y in RIBS:
@@ -249,7 +272,7 @@ def build(lift_caster=None):
         F.chain([(sx*f, y, Z_RIM) for y in RIBS], 'rim_stringer')
 
     # ----- UNDERBODY: skirt (skin framing hanging below the chassis) or legs (a box round each caster)
-    if UNDERBODY in ('skirt', 'chamfer'):
+    if UNDERBODY in ('skirt', 'chamfer'):   # (octagon mode: the chamfer stubs are in the lower deck frame above)
         full = UNDERBODY == 'skirt'          # skirt: droppers + centre stringer; chamfer: belly ply spans rib to rib on the crosses alone
         xsk = [-X_SKIRT, -rx, 0.0, rx, X_SKIRT] if full else [-X_SKIRT, X_SKIRT]
         for y in RIBS:
@@ -264,6 +287,9 @@ def build(lift_caster=None):
         if not full:   # coroplast legs: no steel, just their weight on the rail at the caster
             for y in CASTER_Y:
                 for sx in (-1, 1): F.pt(F.node(sx*rx, y, 0.0), LEG_SKIN_LB, 'D')
+    elif OCT:          # optional coroplast sleeves round the exposed casters
+        for y in CASTER_Y:
+            for sx in (-1, 1): F.pt(F.node(sx*rx, y, CZ), LEG_SKIN_LB, 'D')
     else:
         for leg in LEGS.values():
             for sx in (-1, 1):
@@ -279,7 +305,7 @@ def build(lift_caster=None):
         nw, nh = wid/2, hgt/2
         T = [(-nw, ytip, zc-nh), (nw, ytip, zc-nh), (nw, ytip, zc+nh), (-nw, ytip, zc+nh)]
         F.chain(T + [T[0]], grp + '_rim')
-        lo = [((-X_SKIRT, Z_SKIRT), 0), ((X_SKIRT, Z_SKIRT), 1)] if UNDERBODY != 'legs' else [((-rx, 0.0), 0), ((rx, 0.0), 1)]
+        lo = [((-rx, CZ), 0), ((rx, CZ), 1)] if UNDERBODY in ('legs', 'octagon') else [((-X_SKIRT, Z_SKIRT), 0), ((X_SKIRT, Z_SKIRT), 1)]
         base = lo + [((hw, 0.0), 1), ((hw, Z_HI), 2), ((f, Z_RIM), 2), ((-f, Z_RIM), 3), ((-hw, Z_HI), 3), ((-hw, 0.0), 0)]
         for (x, z), ti in base:
             F.chain([(x, y0, z), T[ti]], grp + '_stringer')
@@ -300,6 +326,12 @@ def build(lift_caster=None):
     for y1, y2 in zip(RIBS[:-1], RIBS[1:]):
         for sx in (-1, 1):
             F.diaphragm((sx*hw, y1, Z_HI), (sx*f, y1, Z_RIM), (sx*f, y2, Z_RIM), (sx*hw, y2, Z_HI), y2-y1, cham_hi_len, Gt=SKIN_GT_EFF)
+    if OCT:   # lower chamfer skin panels and the belly ply on the chassis, same treatment
+        lo_ch = math.hypot(hw - rx, -CZ)
+        for y1, y2 in zip(RIBS[:-1], RIBS[1:]):
+            for sx in (-1, 1):
+                F.diaphragm((sx*rx, y1, CZ), (sx*hw, y1, 0.0), (sx*hw, y2, 0.0), (sx*rx, y2, CZ), y2-y1, lo_ch, Gt=SKIN_GT_EFF)
+            F.diaphragm((-rx, y1, CZ), (rx, y1, CZ), (rx, y2, CZ), (-rx, y2, CZ), y2-y1, 2*rx, Gt=SKIN_GT_EFF)
 
     if ENTRY == 'tail':
         for sx in (-1, 1):
@@ -309,7 +341,7 @@ def build(lift_caster=None):
     for y in CASTER_Y:
         for sx in (-1, 1):
             if lift_caster and abs(sx*rx - lift_caster[0]) < 1e-6 and abs(y - lift_caster[1]) < 1e-6: continue
-            F.m.def_support(F.node(sx*rx, y, 0.0), True, True, True, False, False, False)
+            F.m.def_support(F.node(sx*rx, y, CZ), True, True, True, False, False, False)
 
     # ----- LOADS
     def by_group_name(group):
@@ -323,7 +355,7 @@ def build(lift_caster=None):
                 if ybays is None or any(min(y1, y2) >= a-1e-6 and max(y1, y2) <= b+1e-6 for a, b in ybays): out.append(mm['name'])
         return out
     # skin on the body: tributary strip widths per lengthwise stringer (true face widths)
-    skirt_ch = math.hypot(hw - X_SKIRT, -Z_SKIRT); cham_hi = math.hypot(hw - f, Z_RIM - Z_HI)
+    skirt_ch = math.hypot(hw - (rx if OCT else X_SKIRT), -Z_SKIRT); cham_hi = math.hypot(hw - f, Z_RIM - Z_HI)
     trib = [('deck_lo_edge', -hw, 0.0, skirt_ch/2 + Z_HI/2), ('deck_lo_edge', hw, 0.0, skirt_ch/2 + Z_HI/2),
             ('deck_hi_rail', -hw, Z_HI, Z_HI/2 + cham_hi/2), ('deck_hi_rail', hw, Z_HI, Z_HI/2 + cham_hi/2),
             ('rim_stringer', -f, Z_RIM, cham_hi/2), ('rim_stringer', f, Z_RIM, cham_hi/2)]
@@ -333,6 +365,8 @@ def build(lift_caster=None):
         trib += [('skirt_stringer', -X_SKIRT, Z_SKIRT, skirt_ch/2), ('skirt_stringer', X_SKIRT, Z_SKIRT, skirt_ch/2)]
         for mm in by_group_name('skirt_bottom'):
             F.dist(mm, SKIN_PSF * (RIBS[1]-RIBS[0]) / 144 * (0.5 if F.nodes[F.members[[m['name'] for m in F.members].index(mm)]['i']][1] in (RIBS[0], RIBS[-1]) else 1.0), 'D')
+    elif OCT:   # belly ply on the chassis; the chamfer skin's lower edge lands on the rails
+        trib += [('chassis_rail', -rx, CZ, rx/2 + skirt_ch/2), ('chassis_rail', rx, CZ, rx/2 + skirt_ch/2), ('chassis_spine', 0.0, CZ, rx)]
     else:   # belly skin on the chassis underside, plus the leg boxes' sides hung from their corner posts
         trib += [('chassis_rail', -rx, 0.0, rx), ('chassis_rail', rx, 0.0, rx), ('chassis_spine', 0.0, 0.0, rx)]
         for leg in LEGS.values():
@@ -347,14 +381,15 @@ def build(lift_caster=None):
     for (Lc, wd, ht, zc, T, y0) in ((L_NOSE, NOSE_W, NOSE_H, NOSE_ZC, NOSE, RIBS[-1]), (L_TAIL, TAIL_W, TAIL_H, TAIL_ZC, TAIL, RIBS[0])):
         slant = math.hypot(Lc, (hw - wd/2 + Z_HI/2 - ht/2) / 2)
         area = (base_per + 2*(wd+ht)) / 2 * slant / 144
-        lo = ((-X_SKIRT, Z_SKIRT), (X_SKIRT, Z_SKIRT)) if UNDERBODY != 'legs' else ((-rx, 0), (rx, 0))
+        lo = ((-rx, CZ), (rx, CZ)) if UNDERBODY in ('legs', 'octagon') else ((-X_SKIRT, Z_SKIRT), (X_SKIRT, Z_SKIRT))
         for (x, z) in lo + ((hw, 0), (hw, Z_HI), (f, Z_RIM), (-f, Z_RIM), (-hw, Z_HI), (-hw, 0)):
             F.pt(F.node(x, y0, z), SKIN_PSF*area*2/3/8, 'D')
         for p in T: F.pt(F.node(*p), SKIN_PSF*area/3/4, 'D')
     # decks: ply + people
     jt = rx
     lo_area = W*L/144; lo_live = PEOPLE_LOWER_PARKED*PERSON_LB/lo_area
-    for g, x in (('chassis_rail', -rx), ('chassis_rail', rx), ('chassis_spine', 0.0)):
+    deck_lines = (('joist_lo', -rx), ('joist_lo', rx), ('joist_lo', 0.0)) if OCT else (('chassis_rail', -rx), ('chassis_rail', rx), ('chassis_spine', 0.0))
+    for g, x in deck_lines:
         for nm in along(g, x, 0.0): F.dist(nm, DECK_PSF*jt/144, 'D'); F.dist(nm, lo_live*jt/144, 'L')
     for x in (-hw, hw):
         for nm in along('deck_lo_edge', x, 0.0): F.dist(nm, DECK_PSF*(jt/2)/144, 'D'); F.dist(nm, lo_live*(jt/2)/144, 'L')
@@ -370,7 +405,7 @@ def build(lift_caster=None):
     tot_w = total_gravity(F, ('D', 'L')); tot_move = total_gravity(F, ('D', 'LM'))
     T = TOW_FRACTION * tot_move
     for sx in (-1, 1):
-        n = F.node(sx*rx, RIBS[-1], 0.0)
+        n = F.node(sx*rx, RIBS[-1], CZ)
         F.m.add_node_load(n, 'FY', T*math.cos(math.radians(20)), case='T'); F.m.add_node_load(n, 'FZ', T*math.sin(math.radians(20)), case='T')
 
     F.m.add_load_combo('Static', {'D': 1, 'L': 1})
@@ -536,7 +571,7 @@ if __name__ == '__main__':
     out = dict(version=2, joints=joint_rows,
                params=dict(W=W, H=H_OCT, L=L, FLAT=FLAT, RIBS=RIBS, L_NOSE=L_NOSE, NOSE_W=NOSE_W, NOSE_H=NOSE_H, NOSE_ZC=NOSE_ZC,
                            L_TAIL=L_TAIL, TAIL_W=TAIL_W, TAIL_H=TAIL_H, TAIL_ZC=TAIL_ZC, Z_LO=0.0, Z_HI=Z_HI, Z_RIM=Z_RIM, Z_SKIRT=Z_SKIRT, X_SKIRT=X_SKIRT,
-                           UNDERBODY=UNDERBODY, ENTRY=ENTRY, LEGS=LEGS, Z_LEG=Z_LEG, LEG_CLEAR=LEG_CLEAR, BELLY_CLEAR=BELLY_CLEAR, DOOR_HALF=DOOR_HALF,
+                           UNDERBODY=UNDERBODY, ENTRY=ENTRY, LEGS=LEGS, Z_LEG=Z_LEG, LEG_CLEAR=LEG_CLEAR, BELLY_CLEAR=BELLY_CLEAR, DOOR_HALF=DOOR_HALF, CHASSIS_Z=CHASSIS_Z,
                            Z_GROUND=Z_GROUND, RAIL_X=RAIL_X, CASTER_Y=CASTER_Y, HATCH=HATCH, JOIST_X=JOIST_X, C=C,
                            PEOPLE_LOWER=PEOPLE_LOWER_PARKED, EDGE_PERSON=EDGE_PERSON, MOVING=MOVING, PERSON_LB=PERSON_LB, SKIN_PSF=SKIN_PSF, DECK_PSF=DECK_PSF,
                            SHOCK=SHOCK, SWAY_G=SWAY_G, TOW_FRACTION=TOW_FRACTION, PLY_GT_EFF=PLY_GT_EFF, SKIN_GT_EFF=SKIN_GT_EFF, FY=FY,

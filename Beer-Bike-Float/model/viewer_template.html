@@ -125,7 +125,7 @@ p { margin: 0; max-width: 70ch; }
 
 <header class="top">
   <div>
-    <div class="eyebrow">v5 · tapered belly, coroplast legs, tail door, braced sides · 14 ga perforated square tube · PyNite / inches · lb</div>
+    <div class="eyebrow">v6 · full octagon on its feet · tail door, braced sides · 14 ga perforated square tube · PyNite / inches · lb</div>
     <h1>Octagon Float Frame</h1>
   </div>
   <p class="sub" id="subline"></p>
@@ -496,13 +496,14 @@ p { margin: 0; max-width: 70ch; }
       const tick = (x, y) => horiz ? `<line class="dim" x1="${x}" y1="${y - 5}" x2="${x}" y2="${y + 5}"/>` : `<line class="dim" x1="${x - 5}" y1="${y}" x2="${x + 5}" y2="${y}"/>`;
       return `<line class="dim" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>${tick(x1, y1)}${tick(x2, y2)}<text x="${tx}" y="${ty}" text-anchor="middle" dominant-baseline="middle" ${mask}>${label}</text>`;
     };
-    const f = P.FLAT / 2, R = X(P.W / 2), Lx = X(-P.W / 2), rx = P.RAIL_X, ZG = P.Z_GROUND, ZS = P.Z_SKIRT, XS = P.X_SKIRT;
+    const f = P.FLAT / 2, R = X(P.W / 2), Lx = X(-P.W / 2), rx = P.RAIL_X, ZG = P.Z_GROUND, ZS = P.Z_SKIRT, XS = P.X_SKIRT, CZ = P.CHASSIS_Z || 0;
     const svg = `<svg class="section-svg" viewBox="0 0 980 ${oy + (P.Z_RIM - ZG) * sc + 60}" role="img" aria-label="Cross-section of the v2 frame with dimensions">
       <line class="ground" x1="${X(-75)}" y1="${Y(ZG)}" x2="${X(75)}" y2="${Y(ZG)}"/><text x="${X(66)}" y="${Y(ZG) - 6}">road</text>
       <circle class="wheel" cx="${X(-rx)}" cy="${Y(ZG + 8)}" r="${8 * sc}"/><circle class="wheel" cx="${X(rx)}" cy="${Y(ZG + 8)}" r="${8 * sc}"/>
       <polygon class="steel" points="${pts}" style="stroke-dasharray:0"/>
-      <line class="steel deck" x1="${Lx}" y1="${Y(0)}" x2="${R}" y2="${Y(0)}" style="stroke-width:4"/>
-      <rect x="${X(-rx) - 4}" y="${Y(0) - 4}" width="8" height="8" style="fill:var(--accent)"/><rect x="${X(rx) - 4}" y="${Y(0) - 4}" width="8" height="8" style="fill:var(--accent)"/><rect x="${X(0) - 4}" y="${Y(0) - 4}" width="8" height="8" style="fill:var(--accent)"/>
+      <line class="steel deck" x1="${Lx}" y1="${Y(0)}" x2="${R}" y2="${Y(0)}" style="stroke-width:${CZ < 0 ? 2.2 : 4}"/>
+      ${CZ < 0 ? `<line class="steel deck" x1="${X(-rx)}" y1="${Y(CZ)}" x2="${X(rx)}" y2="${Y(CZ)}" style="stroke-width:4"/>` + [-rx, 0, rx].map(x => `<line class="brace" x1="${X(x)}" y1="${Y(CZ)}" x2="${X(x)}" y2="${Y(0)}"/>`).join('') + `<line class="brace" x1="${X(-rx)}" y1="${Y(CZ)}" x2="${X(0)}" y2="${Y(0)}"/><line class="brace" x1="${X(rx)}" y1="${Y(CZ)}" x2="${X(0)}" y2="${Y(0)}"/>` : ''}
+      <rect x="${X(-rx) - 4}" y="${Y(CZ) - 4}" width="8" height="8" style="fill:var(--accent)"/><rect x="${X(rx) - 4}" y="${Y(CZ) - 4}" width="8" height="8" style="fill:var(--accent)"/><rect x="${X(0) - 4}" y="${Y(CZ) - 4}" width="8" height="8" style="fill:var(--accent)"/>
       <line class="steel deck" x1="${Lx}" y1="${Y(P.Z_HI)}" x2="${R}" y2="${Y(P.Z_HI)}"/>
       <line class="brace" x1="${X(-rx)}" y1="${Y(0)}" x2="${X(rx)}" y2="${Y(P.Z_HI)}"/><line class="brace" x1="${X(rx)}" y1="${Y(0)}" x2="${X(-rx)}" y2="${Y(P.Z_HI)}"/>
       ${P.UNDERBODY === 'skirt' ? `<line class="brace" x1="${X(-rx)}" y1="${Y(0)}" x2="${X(-rx)}" y2="${Y(ZS)}"/><line class="brace" x1="${X(rx)}" y1="${Y(0)}" x2="${X(rx)}" y2="${Y(ZS)}"/><line class="brace" x1="${X(0)}" y1="${Y(0)}" x2="${X(0)}" y2="${Y(ZS)}"/>` : ''}
@@ -512,22 +513,29 @@ p { margin: 0; max-width: 70ch; }
       ${dim(R + 140, Y(P.Z_RIM), R + 140, Y(ZG), `${fmt(P.Z_RIM - ZG)}" road to rim`, 40)}
       ${P.UNDERBODY === 'legs' ? Object.values(P.LEGS).map(l => [-1, 1].map(sx => `<rect class="brace" x="${X(sx * rx - l.halfw)}" y="${Y(0)}" width="${2 * l.halfw * sc}" height="${(0 - P.Z_LEG) * sc}" style="fill:none"/>`).join('')).join('') + dim(Lx - 22, Y(0), Lx - 22, Y(P.Z_LEG), `${fmt(-P.Z_LEG)}" legs`, -20)
         : P.UNDERBODY === 'chamfer' ? [-1, 1].map(sx => `<rect class="brace" x="${X(sx * rx - P.LEGS.front.r)}" y="${Y(ZS)}" width="${2 * P.LEGS.front.r * sc}" height="${(ZS - P.Z_LEG) * sc}" rx="6" style="fill:none"/><line x1="${X(sx * rx - P.LEGS.front.r)}" y1="${Y(P.Z_LEG)}" x2="${X(sx * rx + P.LEGS.front.r)}" y2="${Y(P.Z_LEG)}" style="stroke:var(--ink);stroke-width:4"/>`).join('') + dim(Lx - 22, Y(0), Lx - 22, Y(ZS), `${fmt(-ZS)}" taper`, -20)
+        : CZ < 0 ? dim(Lx - 22, Y(0), Lx - 22, Y(CZ), `${fmt(-CZ)}" lower box`, -20)
         : dim(Lx - 22, Y(0), Lx - 22, Y(ZS), `${fmt(-ZS)}" skirt`, -20)}
       ${dim(Lx - 22, Y(P.Z_RIM), Lx - 22, Y(P.Z_HI), `${P.Z_RIM - P.Z_HI}"`, -20)}
-      ${dim(Lx - 64, Y(0), Lx - 64, Y(ZG), `${fmt(-ZG)}" road to chassis`, -40)}
+      ${dim(Lx - 64, Y(0), Lx - 64, Y(ZG), `${fmt(-ZG)}" road to deck ring`, -40)}
       ${dim(X(-rx), Y(ZG) + 18, X(rx), Y(ZG) + 18, `${2 * rx}" track · rails and casters`, 12)}
       ${P.UNDERBODY === 'legs' ? dim(X(-rx - P.LEGS.front.halfw), Y(ZG) + 36, X(rx + P.LEGS.front.halfw), Y(ZG) + 36, `front legs ${fmt(2 * P.LEGS.front.halfw)}" square, ${P.LEG_CLEAR}" off the road · belly ${fmt(-ZG - 1.25)}" clear`, 12)
         : P.UNDERBODY === 'chamfer' ? dim(X(-XS), Y(ZG) + 36, X(XS), Y(ZG) + 36, `${fmt(2 * XS, 1)}" belly ${fmt(P.Z_SKIRT - ZG)}" off the road · coroplast legs ${fmt(2 * P.LEGS.front.r)}" / ${fmt(2 * P.LEGS.rear.r)}" round, hooves ${P.LEG_CLEAR}" up`, 12)
+        : CZ < 0 ? dim(X(-XS), Y(ZG) + 36, X(XS), Y(ZG) + 36, `${fmt(2 * XS)}" bottom flat on the chassis, ${fmt(P.Z_SKIRT - ZG)}" off the road · 16" casters below it are the feet`, 12)
         : dim(X(-XS), Y(ZG) + 36, X(XS), Y(ZG) + 36, `${fmt(2 * XS, 1)}" belly, ${P.Z_SKIRT - ZG}" off the road`, 12)}
-      <text x="${X(0)}" y="${Y(0) - 8}" text-anchor="middle" ${mask}>chassis · lower deck · ${fmt(-ZG + 2)}" above road</text>
-      <text x="${X(0)}" y="${Y(P.Z_HI) - 7}" text-anchor="middle" ${mask}>upper deck frame · ${P.Z_HI}" above the chassis</text>
+      <text x="${X(0)}" y="${Y(0) - 8}" text-anchor="middle" ${mask}>${CZ < 0 ? 'lower deck' : 'chassis · lower deck'} · ${fmt(-ZG + 2)}" above road</text>
+      ${CZ < 0 ? `<text x="${X(0)}" y="${Y(CZ) + 14}" text-anchor="middle" ${mask}>chassis on the bottom flat · ${fmt(CZ - ZG)}" above road</text>` : ''}
+      <text x="${X(0)}" y="${Y(P.Z_HI) - 7}" text-anchor="middle" ${mask}>upper deck frame · ${P.Z_HI}" above the lower deck</text>
       <text x="${X(0)}" y="${Y(P.Z_HI / 2) - 14}" text-anchor="middle" ${mask} style="fill:var(--ink-3);paint-order:stroke;stroke:var(--surface);stroke-width:5px">dashed: X-brace in the nose wall; tail wall has the door</text>
       ${P.UNDERBODY === 'skirt' ? `<text x="${X(0)}" y="${Y(ZS / 2) + 4}" text-anchor="middle" ${mask} style="fill:var(--ink-3);paint-order:stroke;stroke:var(--surface);stroke-width:5px">skirt: skin framing on droppers</text>` : ''}
     </svg>`;
     document.getElementById('pane-section').innerHTML = `<div><h2>Rib elevation, looking from the tail</h2><p class="muted" style="margin:4px 0 10px">Inches. Orange: chassis (heavy line, squares are the rails and spine) and the upper deck frame.</p>${svg}</div><div class="cols">
-      <div><h2>What changed in v5</h2>
-        <ul class="notes"><li>The belly tapers again: the octagon's lower chamfer comes back as skin framing (eight 45° stubs, four bottom crosses, two edge stringers, 62 lb) down to a ${fmt(2 * XS, 1)}" belly ${fmt(P.Z_SKIRT - ZG)}" off the road. The casters' 16" wheels fix the chassis at ${fmt(-ZG)}" above the road, so <span class="num">BELLY_CLEAR</span> is the trade: every inch of belly is an inch less of leg showing. The full 20.5" chamfer would need 24" wheels.</li>
-          <li>Legs are coroplast cylinders hung from the belly ply round each caster cut-out, with a rubber garage-door seal as the hoof ${P.LEG_CLEAR}" off the road: no steel, flex on impact, ${fmt(2 * P.LEGS.front.r)}" round at the front for the swivels, ${fmt(2 * P.LEGS.rear.r)}" at the rear for rigid casters.</li>
+      <div><h2>What changed in v6</h2>
+        <ul class="notes"><li>Full octagon. The 2½" chassis ladder sits on the bottom flat (rails at ±${P.RAIL_X}", inside the 55"), the 16" casters hang entirely below it as the feet, and the lower deck is a 1½" frame (beams at the ribs, joists over the rails, 20.5" columns, 45° chamfer stubs to the corners) on top of a 20.5"-deep braced box. Deck ${fmt(-ZG + 2)}" above the road, rim ${fmt(P.Z_RIM - ZG)}": your current float's numbers.</li>
+          <li>The lower box is stiff for free: the lower chamfer skin and belly ply count as shear panels, V-braces in the nose and tail walls below the deck, and the whole thing is 20.5" deep. Pothole twist ${P.stiffness.lifted_twist_pinned.toFixed(2)}", rope-snatch racking ${P.stiffness.tow_rack_pinned.toFixed(2)}".</li>
+          <li>Entry through the tail is a ${fmt(-ZG + 2)}" step up now, so the tail needs two or three steps, as today.</li></ul>
+        <h3 style="margin-top:16px">Earlier versions</h3>
+        <ul class="notes"><li>v5 belly taper to ${fmt(P.BELLY_CLEAR)}" clearance: the octagon's lower chamfer comes back as skin framing (eight 45° stubs, four bottom crosses, two edge stringers, 62 lb) down to a ${fmt(2 * XS, 1)}" belly ${fmt(P.Z_SKIRT - ZG)}" off the road. The casters' 16" wheels fix the chassis at ${fmt(-ZG)}" above the road, so <span class="num">BELLY_CLEAR</span> is the trade: every inch of belly is an inch less of leg showing. The full 20.5" chamfer would need 24" wheels.</li>
+          <li>Coroplast leg sleeves with a rubber garage-door seal hoof still work here if you want to hide the casters; they weigh nothing and the model carries 4 lb each for them. Rigid casters at the rear, swivels at the front.</li>
           <li>You get in through the tail: a ${fmt(2 * P.DOOR_HALF)}" × ${P.Z_HI}" door between jambs in the tail wall, and the tail cone is a short flat-floored tunnel to a ${fmt(P.TAIL_W)}" × ${fmt(P.TAIL_H)}" flap. The side walls are braced with one diagonal per bay and hard-skinned. Rope-snatch racking: ${P.stiffness.tow_rack_pinned.toFixed(2)}" with every joint a pin (v3 was 2.1"). Brackets are now optional.</li>
           <li>Sized for strength only. Every member family gets the lightest tube that stays under ${fmt(P.u_target * 100)}% of capacity in every load case; deflection is reported, not limited. Steel went from 1,016 lb to ${fmt(P.steel_lb)} lb: chassis 2½", upper deck 2", posts 1¾", everything else 1½", all 14 ga.</li>
           <li>Every diagonal is 45°: the X-braces now rise 55" over 55", so they cross at 90° and share the chamfer stubs' bracket pattern.</li>
@@ -536,7 +544,7 @@ p { margin: 0; max-width: 70ch; }
           <li>Sides are posts only: three ${fmt(P.RIBS[1] - P.RIBS[0])}" × ${P.Z_HI}" bays per side for piano-hinged doors. No diagonals anywhere in the body except the X in the nose and tail walls.</li>
           <li>Upper deck is a ${P.W}" × ${P.L}" frame with a ${fmt(2 * P.JOIST_X)}" × ${fmt(P.HATCH[1] - P.HATCH[0])}" hatch in the middle, so people sit all the way round.</li></ul>
         <h3 style="margin-top:16px">The load path</h3>
-        <ul class="notes"><li>People → deck ply → chassis rails and spine (24" o.c.) → casters. Posts and upper deck hang off the cross-member ends.</li>
+        <ul class="notes"><li>People → deck ply → lower deck joists (26" o.c.) → columns at every rib → chassis rails → casters. Posts and the upper deck come down the side posts into the deck beams, then the chamfer stubs carry them to the chassis corners.</li>
           <li>Sideways racking → deck ply diaphragms → the X-braced nose wall and the skinned tail-wall panels beside the door → chassis.</li>
           <li>Front-to-back racking (tow snatch, stopping) → the diagonals in the side walls, straight down to the chassis. The nose and tail pyramids help; the body is a closed braced tube now.</li>
           <li>Every joint is modelled as a pin, so nothing relies on a bracket. Add the brackets anyway: they are what turns "strong enough" into "stiff".</li></ul>
@@ -561,7 +569,7 @@ p { margin: 0; max-width: 70ch; }
         <li>Snout ${fmt(P.L_NOSE)}" long to a ${fmt(P.NOSE_W)}" × ${fmt(P.NOSE_H)}" panel centred on the octagon. Tail ${fmt(P.L_TAIL)}" long to a ${fmt(P.TAIL_W)}" × ${fmt(P.TAIL_H)}" panel, 6" high of centre. All four are one-line edits.</li>
         <li>Ribs at Y = ${P.RIBS.join(', ')}". Hatch between ${P.HATCH[0]}" and ${P.HATCH[1]}", ${fmt(2 * P.JOIST_X)}" wide between the joists.</li>
         <li>Casters under the rails at ±${P.RAIL_X}", 16" wheels.</li>
-        <li>Belly ${fmt(P.BELLY_CLEAR)}" off the road, legs ${P.LEG_CLEAR}". Coroplast legs weigh ${fmt(4)} lb each in the model. Casters at Y = ${P.CASTER_Y.join('" and ')}"; the belly ply needs a ${fmt(2 * P.LEGS.front.r)}" cut-out round each front caster.</li>
+        <li>Casters under the rails at Y = ${P.CASTER_Y.join('" and ')}", 16" wheels, ${fmt(2 * P.RAIL_X)}" track. Chassis ${fmt(-(P.CHASSIS_Z || 0))}" below the deck ring (<span class="num">UNDERBODY='octagon'</span>); the v5 taper, v4 steel legs and v3 skirt layouts are still in the model.</li>
         <li>Tail door ${fmt(2 * P.DOOR_HALF)}" wide; the tail-wall skin beside it is counted as a shear panel like the chamfer skin.</li></ul>
         <p class="muted" style="margin-top:10px">Not a stamped design. If people ride on it, have someone qualified look at the rider load case.</p></div>
     </div>`;

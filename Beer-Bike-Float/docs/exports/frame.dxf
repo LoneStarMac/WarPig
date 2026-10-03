@@ -489,7 +489,7 @@ $SKPOLY
   9
 $TDCREATE
  40
-2461317.598310185
+2461317.602488426
   9
 $TDUCREATE
  40
@@ -497,7 +497,7 @@ $TDUCREATE
   9
 $TDUPDATE
  40
-2461317.598310185
+2461317.602488426
   9
 $TDUUPDATE
  40
@@ -549,7 +549,7 @@ $SPLINESEGS
   9
 $HANDSEED
   5
-E4
+100
   9
 $SURFTAB1
  70
@@ -929,11 +929,11 @@ $PSTYLEMODE
   9
 $FINGERPRINTGUID
   2
-{B36A8848-4BDA-453F-88FE-A1019D91A70F}
+{07055F89-89BE-4A4C-9399-70A60155A344}
   9
 $VERSIONGUID
   2
-{EE72D6BD-76BB-4E07-AB63-53FC54CA9AA5}
+{2CC0034C-6A19-40BD-B20A-5E19FE1C942A}
   9
 $EXTNAMES
 290
@@ -1323,9 +1323,9 @@ ISM
   0
 CLASS
   1
-LAYOUT
+ACDBPLACEHOLDER
   2
-AcDbLayout
+AcDbPlaceHolder
   3
 ObjectDBX Classes
  90
@@ -1339,9 +1339,9 @@ ObjectDBX Classes
   0
 CLASS
   1
-ACDBPLACEHOLDER
+LAYOUT
   2
-AcDbPlaceHolder
+AcDbLayout
   3
 ObjectDBX Classes
  90
@@ -1549,7 +1549,7 @@ LAYER
 100
 AcDbSymbolTable
  70
-24
+26
   0
 LAYER
   5
@@ -1707,7 +1707,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-deck_hi_cross
+column
  70
 0
  62
@@ -1731,7 +1731,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-deck_hi_end
+deck_hi_cross
  70
 0
  62
@@ -1755,7 +1755,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-deck_hi_rail
+deck_hi_end
  70
 0
  62
@@ -1779,7 +1779,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-deck_lo_edge
+deck_hi_rail
  70
 0
  62
@@ -1803,7 +1803,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-door_jamb
+deck_lo_beam
  70
 0
  62
@@ -1827,7 +1827,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-joist_hi
+deck_lo_edge
  70
 0
  62
@@ -1851,7 +1851,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-nose_rim
+door_jamb
  70
 0
  62
@@ -1875,7 +1875,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-nose_stringer
+joist_hi
  70
 0
  62
@@ -1899,7 +1899,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-post
+joist_lo
  70
 0
  62
@@ -1923,7 +1923,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-rim_cross
+nose_rim
  70
 0
  62
@@ -1947,7 +1947,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-rim_stringer
+nose_stringer
  70
 0
  62
@@ -1971,7 +1971,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-side_diag
+post
  70
 0
  62
@@ -1995,7 +1995,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-skirt_bottom
+rim_cross
  70
 0
  62
@@ -2019,7 +2019,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-skirt_stringer
+rim_stringer
  70
 0
  62
@@ -2043,7 +2043,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-skirt_stub
+side_diag
  70
 0
  62
@@ -2067,7 +2067,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-tail_rim
+skirt_stub
  70
 0
  62
@@ -2091,7 +2091,7 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-tail_stringer
+tail_rim
  70
 0
  62
@@ -2115,11 +2115,59 @@ AcDbSymbolTableRecord
 100
 AcDbLayerTableRecord
   2
-xbrace_end
+tail_stringer
  70
 0
  62
 1
+  6
+Continuous
+370
+-3
+390
+13
+347
+21
+  0
+LAYER
+  5
+45
+330
+1
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+vbrace_lo
+ 70
+0
+ 62
+2
+  6
+Continuous
+370
+-3
+390
+13
+347
+21
+  0
+LAYER
+  5
+46
+330
+1
+100
+AcDbSymbolTableRecord
+100
+AcDbLayerTableRecord
+  2
+xbrace_end
+ 70
+0
+ 62
+3
   6
 Continuous
 370
@@ -2229,7 +2277,7 @@ ACAD
   0
 APPID
   5
-E1
+FD
 330
 3
 100
@@ -2243,7 +2291,7 @@ HATCHBACKGROUNDCOLOR
   0
 APPID
   5
-E2
+FE
 330
 3
 100
@@ -2553,54 +2601,6 @@ ENTITIES
   0
 LINE
   5
-45
-330
-17
-100
-AcDbEntity
-  8
-chassis_rail
-100
-AcDbLine
- 10
--24.0
- 20
-0.0
- 30
-0.0
- 11
--24.0
- 21
-11.0
- 31
-0.0
-  0
-LINE
-  5
-46
-330
-17
-100
-AcDbEntity
-  8
-chassis_rail
-100
-AcDbLine
- 10
--24.0
- 20
-11.0
- 30
-0.0
- 11
--24.0
- 21
-32.0
- 31
-0.0
-  0
-LINE
-  5
 47
 330
 17
@@ -2611,17 +2611,17 @@ chassis_rail
 100
 AcDbLine
  10
--24.0
+-26.0
  20
-32.0
+0.0
  30
-0.0
+-20.5
  11
--24.0
+-26.0
  21
-48.0
+11.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2635,17 +2635,17 @@ chassis_rail
 100
 AcDbLine
  10
--24.0
+-26.0
  20
-48.0
+11.0
  30
-0.0
+-20.5
  11
--24.0
+-26.0
  21
-64.0
+32.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2659,17 +2659,17 @@ chassis_rail
 100
 AcDbLine
  10
--24.0
+-26.0
  20
-64.0
+32.0
  30
-0.0
+-20.5
  11
--24.0
+-26.0
  21
-83.0
+48.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2683,17 +2683,17 @@ chassis_rail
 100
 AcDbLine
  10
--24.0
+-26.0
  20
-83.0
+48.0
  30
-0.0
+-20.5
  11
--24.0
+-26.0
  21
-96.0
+64.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2703,21 +2703,21 @@ LINE
 100
 AcDbEntity
   8
-deck_lo_edge
+chassis_rail
 100
 AcDbLine
  10
--48.0
+-26.0
  20
-0.0
+64.0
  30
-0.0
+-20.5
  11
--48.0
+-26.0
  21
-32.0
+83.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2727,21 +2727,21 @@ LINE
 100
 AcDbEntity
   8
-deck_lo_edge
+chassis_rail
 100
 AcDbLine
  10
--48.0
+-26.0
  20
-32.0
+83.0
  30
-0.0
+-20.5
  11
--48.0
+-26.0
  21
-64.0
+96.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2757,13 +2757,13 @@ AcDbLine
  10
 -48.0
  20
-64.0
+0.0
  30
 0.0
  11
 -48.0
  21
-96.0
+32.0
  31
 0.0
   0
@@ -2775,19 +2775,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_rail
+deck_lo_edge
 100
 AcDbLine
  10
-24.0
+-48.0
  20
-0.0
+32.0
  30
 0.0
  11
-24.0
+-48.0
  21
-11.0
+64.0
  31
 0.0
   0
@@ -2799,19 +2799,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_rail
+deck_lo_edge
 100
 AcDbLine
  10
-24.0
+-48.0
  20
-11.0
+64.0
  30
 0.0
  11
-24.0
+-48.0
  21
-32.0
+96.0
  31
 0.0
   0
@@ -2827,17 +2827,17 @@ chassis_rail
 100
 AcDbLine
  10
-24.0
+26.0
  20
-32.0
+0.0
  30
-0.0
+-20.5
  11
-24.0
+26.0
  21
-48.0
+11.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2851,17 +2851,17 @@ chassis_rail
 100
 AcDbLine
  10
-24.0
+26.0
  20
-48.0
+11.0
  30
-0.0
+-20.5
  11
-24.0
+26.0
  21
-64.0
+32.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2875,17 +2875,17 @@ chassis_rail
 100
 AcDbLine
  10
-24.0
+26.0
  20
-64.0
+32.0
  30
-0.0
+-20.5
  11
-24.0
+26.0
  21
-83.0
+48.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2899,17 +2899,17 @@ chassis_rail
 100
 AcDbLine
  10
-24.0
+26.0
  20
-83.0
+48.0
  30
-0.0
+-20.5
  11
-24.0
+26.0
  21
-96.0
+64.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2919,21 +2919,21 @@ LINE
 100
 AcDbEntity
   8
-deck_lo_edge
+chassis_rail
 100
 AcDbLine
  10
-48.0
+26.0
  20
-0.0
+64.0
  30
-0.0
+-20.5
  11
-48.0
+26.0
  21
-32.0
+83.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2943,21 +2943,21 @@ LINE
 100
 AcDbEntity
   8
-deck_lo_edge
+chassis_rail
 100
 AcDbLine
  10
-48.0
+26.0
  20
-32.0
+83.0
  30
-0.0
+-20.5
  11
-48.0
+26.0
  21
-64.0
+96.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -2973,13 +2973,13 @@ AcDbLine
  10
 48.0
  20
-64.0
+0.0
  30
 0.0
  11
 48.0
  21
-96.0
+32.0
  31
 0.0
   0
@@ -2991,19 +2991,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_spine
+deck_lo_edge
 100
 AcDbLine
  10
-0.0
+48.0
  20
-0.0
+32.0
  30
 0.0
  11
-0.0
+48.0
  21
-11.0
+64.0
  31
 0.0
   0
@@ -3015,19 +3015,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_spine
+deck_lo_edge
 100
 AcDbLine
  10
-0.0
+48.0
  20
-11.0
+64.0
  30
 0.0
  11
-0.0
+48.0
  21
-32.0
+96.0
  31
 0.0
   0
@@ -3045,15 +3045,15 @@ AcDbLine
  10
 0.0
  20
-32.0
- 30
 0.0
+ 30
+-20.5
  11
 0.0
  21
-48.0
+11.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3069,15 +3069,15 @@ AcDbLine
  10
 0.0
  20
-48.0
+11.0
  30
-0.0
+-20.5
  11
 0.0
  21
-64.0
+32.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3093,15 +3093,15 @@ AcDbLine
  10
 0.0
  20
-64.0
+32.0
  30
-0.0
+-20.5
  11
 0.0
  21
-83.0
+48.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3117,15 +3117,15 @@ AcDbLine
  10
 0.0
  20
-83.0
+48.0
  30
-0.0
+-20.5
  11
 0.0
  21
-96.0
+64.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3135,21 +3135,21 @@ LINE
 100
 AcDbEntity
   8
-chassis_cross
+chassis_spine
 100
 AcDbLine
  10
--48.0
+0.0
  20
-0.0
+64.0
  30
-0.0
+-20.5
  11
--24.0
+0.0
  21
-0.0
+83.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3159,21 +3159,21 @@ LINE
 100
 AcDbEntity
   8
-chassis_cross
+chassis_spine
 100
 AcDbLine
  10
--24.0
+0.0
  20
-0.0
+83.0
  30
-0.0
+-20.5
  11
--15.0
+0.0
  21
-0.0
+96.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3187,17 +3187,17 @@ chassis_cross
 100
 AcDbLine
  10
--15.0
+-26.0
  20
 0.0
  30
-0.0
+-20.5
  11
 0.0
  21
 0.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3215,13 +3215,13 @@ AcDbLine
  20
 0.0
  30
-0.0
+-20.5
  11
-15.0
+26.0
  21
 0.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3235,17 +3235,17 @@ chassis_cross
 100
 AcDbLine
  10
-15.0
+-26.0
  20
-0.0
+32.0
  30
-0.0
+-20.5
  11
-24.0
+0.0
  21
-0.0
+32.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3259,17 +3259,17 @@ chassis_cross
 100
 AcDbLine
  10
-24.0
+0.0
  20
-0.0
+32.0
  30
-0.0
+-20.5
  11
-48.0
+26.0
  21
-0.0
+32.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3283,17 +3283,17 @@ chassis_cross
 100
 AcDbLine
  10
--48.0
+-26.0
  20
-32.0
+64.0
  30
-0.0
+-20.5
  11
--24.0
- 21
-32.0
- 31
 0.0
+ 21
+64.0
+ 31
+-20.5
   0
 LINE
   5
@@ -3307,17 +3307,17 @@ chassis_cross
 100
 AcDbLine
  10
--24.0
+0.0
  20
-32.0
+64.0
  30
-0.0
+-20.5
  11
-0.0
+26.0
  21
-32.0
+64.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3331,17 +3331,17 @@ chassis_cross
 100
 AcDbLine
  10
-0.0
+-26.0
  20
-32.0
+96.0
  30
-0.0
+-20.5
  11
-24.0
- 21
-32.0
- 31
 0.0
+ 21
+96.0
+ 31
+-20.5
   0
 LINE
   5
@@ -3355,17 +3355,17 @@ chassis_cross
 100
 AcDbLine
  10
-24.0
+0.0
  20
-32.0
+96.0
  30
-0.0
+-20.5
  11
-48.0
+26.0
  21
-32.0
+96.0
  31
-0.0
+-20.5
   0
 LINE
   5
@@ -3375,19 +3375,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_cross
+deck_lo_beam
 100
 AcDbLine
  10
 -48.0
  20
-64.0
+0.0
  30
 0.0
  11
--24.0
+-26.0
  21
-64.0
+0.0
  31
 0.0
   0
@@ -3399,19 +3399,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_cross
+deck_lo_beam
 100
 AcDbLine
  10
--24.0
+-26.0
  20
-64.0
+0.0
  30
 0.0
  11
-0.0
+-15.0
  21
-64.0
+0.0
  31
 0.0
   0
@@ -3423,19 +3423,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_cross
+deck_lo_beam
 100
 AcDbLine
  10
-0.0
+-15.0
  20
-64.0
+0.0
  30
 0.0
  11
-24.0
+0.0
  21
-64.0
+0.0
  31
 0.0
   0
@@ -3447,19 +3447,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_cross
+deck_lo_beam
 100
 AcDbLine
  10
-24.0
+0.0
  20
-64.0
+0.0
  30
 0.0
  11
-48.0
+15.0
  21
-64.0
+0.0
  31
 0.0
   0
@@ -3471,19 +3471,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_cross
+deck_lo_beam
 100
 AcDbLine
  10
--48.0
+15.0
  20
-96.0
+0.0
  30
 0.0
  11
--24.0
+26.0
  21
-96.0
+0.0
  31
 0.0
   0
@@ -3495,19 +3495,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_cross
+deck_lo_beam
 100
 AcDbLine
  10
--24.0
+26.0
  20
-96.0
+0.0
  30
 0.0
  11
-0.0
+48.0
  21
-96.0
+0.0
  31
 0.0
   0
@@ -3519,19 +3519,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_cross
+column
 100
 AcDbLine
  10
-0.0
+-26.0
  20
-96.0
- 30
 0.0
+ 30
+-20.5
  11
-24.0
+-26.0
  21
-96.0
+0.0
  31
 0.0
   0
@@ -3543,19 +3543,19 @@ LINE
 100
 AcDbEntity
   8
-chassis_cross
+column
 100
 AcDbLine
  10
-24.0
- 20
-96.0
- 30
 0.0
+ 20
+0.0
+ 30
+-20.5
  11
-48.0
+0.0
  21
-96.0
+0.0
  31
 0.0
   0
@@ -3567,21 +3567,21 @@ LINE
 100
 AcDbEntity
   8
-post
+column
 100
 AcDbLine
  10
--48.0
+26.0
  20
 0.0
  30
-0.0
+-20.5
  11
--48.0
+26.0
  21
 0.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3591,21 +3591,21 @@ LINE
 100
 AcDbEntity
   8
-post
+skirt_stub
 100
 AcDbLine
  10
-48.0
+-26.0
  20
 0.0
  30
-0.0
+-20.5
  11
-48.0
+-48.0
  21
 0.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3615,21 +3615,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+skirt_stub
 100
 AcDbLine
  10
--48.0
+26.0
  20
 0.0
  30
-55.0
+-20.5
  11
--24.0
+48.0
  21
 0.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3639,21 +3639,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+vbrace_lo
 100
 AcDbLine
  10
--24.0
+-26.0
  20
 0.0
  30
-55.0
+-20.5
  11
--15.0
+0.0
  21
 0.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3663,21 +3663,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+vbrace_lo
 100
 AcDbLine
  10
--15.0
+26.0
  20
 0.0
  30
-55.0
+-20.5
  11
 0.0
  21
 0.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3687,21 +3687,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+deck_lo_beam
 100
 AcDbLine
  10
-0.0
+-48.0
  20
-0.0
+32.0
  30
-55.0
- 11
-15.0
- 21
 0.0
+ 11
+-26.0
+ 21
+32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3711,21 +3711,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+deck_lo_beam
 100
 AcDbLine
  10
-15.0
+-26.0
  20
-0.0
+32.0
  30
-55.0
- 11
-24.0
- 21
 0.0
+ 11
+0.0
+ 21
+32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3735,21 +3735,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+deck_lo_beam
 100
 AcDbLine
  10
-24.0
+0.0
  20
-0.0
+32.0
  30
-55.0
- 11
-48.0
- 21
 0.0
+ 11
+26.0
+ 21
+32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3759,21 +3759,21 @@ LINE
 100
 AcDbEntity
   8
-door_jamb
+deck_lo_beam
 100
 AcDbLine
  10
--15.0
+26.0
  20
-0.0
+32.0
  30
 0.0
  11
--15.0
+48.0
  21
-0.0
+32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3783,21 +3783,21 @@ LINE
 100
 AcDbEntity
   8
-door_jamb
+column
 100
 AcDbLine
  10
-15.0
+-26.0
  20
-0.0
+32.0
  30
-0.0
+-20.5
  11
-15.0
+-26.0
  21
-0.0
+32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3807,21 +3807,21 @@ LINE
 100
 AcDbEntity
   8
-post
+column
 100
 AcDbLine
  10
--48.0
+0.0
  20
 32.0
  30
-0.0
+-20.5
  11
--48.0
+0.0
  21
 32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3831,21 +3831,21 @@ LINE
 100
 AcDbEntity
   8
-post
+column
 100
 AcDbLine
  10
-48.0
+26.0
  20
 32.0
  30
-0.0
+-20.5
  11
-48.0
+26.0
  21
 32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3855,21 +3855,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_cross
+skirt_stub
 100
 AcDbLine
  10
--48.0
+-26.0
  20
 32.0
  30
-55.0
+-20.5
  11
--24.0
+-48.0
  21
 32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3879,21 +3879,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_cross
+skirt_stub
 100
 AcDbLine
  10
--24.0
+26.0
  20
 32.0
  30
-55.0
+-20.5
  11
-0.0
+48.0
  21
 32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3903,21 +3903,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_cross
+deck_lo_beam
 100
 AcDbLine
  10
-0.0
+-48.0
  20
-32.0
+64.0
  30
-55.0
+0.0
  11
-24.0
+-26.0
  21
-32.0
+64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3927,21 +3927,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_cross
+deck_lo_beam
 100
 AcDbLine
  10
-24.0
+-26.0
  20
-32.0
+64.0
  30
-55.0
+0.0
  11
-48.0
+0.0
  21
-32.0
+64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3951,21 +3951,21 @@ LINE
 100
 AcDbEntity
   8
-post
+deck_lo_beam
 100
 AcDbLine
  10
--48.0
+0.0
  20
 64.0
  30
 0.0
  11
--48.0
+26.0
  21
 64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3975,11 +3975,11 @@ LINE
 100
 AcDbEntity
   8
-post
+deck_lo_beam
 100
 AcDbLine
  10
-48.0
+26.0
  20
 64.0
  30
@@ -3989,7 +3989,7 @@ AcDbLine
  21
 64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -3999,21 +3999,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_cross
+column
 100
 AcDbLine
  10
--48.0
+-26.0
  20
 64.0
  30
-55.0
+-20.5
  11
--24.0
+-26.0
  21
 64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4023,21 +4023,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_cross
+column
 100
 AcDbLine
  10
--24.0
+0.0
  20
 64.0
  30
-55.0
+-20.5
  11
 0.0
  21
 64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4047,21 +4047,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_cross
+column
 100
 AcDbLine
  10
-0.0
+26.0
  20
 64.0
  30
-55.0
+-20.5
  11
-24.0
+26.0
  21
 64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4071,21 +4071,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_cross
+skirt_stub
 100
 AcDbLine
  10
-24.0
+-26.0
  20
 64.0
  30
-55.0
+-20.5
  11
-48.0
+-48.0
  21
 64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4095,21 +4095,21 @@ LINE
 100
 AcDbEntity
   8
-post
+skirt_stub
 100
 AcDbLine
  10
--48.0
+26.0
  20
-96.0
+64.0
  30
-0.0
+-20.5
  11
--48.0
+48.0
  21
-96.0
+64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4119,21 +4119,21 @@ LINE
 100
 AcDbEntity
   8
-post
+deck_lo_beam
 100
 AcDbLine
  10
-48.0
+-48.0
  20
 96.0
  30
 0.0
  11
-48.0
+-26.0
  21
 96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4143,21 +4143,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+deck_lo_beam
 100
 AcDbLine
  10
--48.0
+-26.0
  20
 96.0
  30
-55.0
+0.0
  11
--31.0
+0.0
  21
 96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4167,21 +4167,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+deck_lo_beam
 100
 AcDbLine
  10
--31.0
+0.0
  20
 96.0
  30
-55.0
+0.0
  11
--24.0
+26.0
  21
 96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4191,21 +4191,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+deck_lo_beam
 100
 AcDbLine
  10
--24.0
+26.0
  20
 96.0
  30
-55.0
- 11
 0.0
+ 11
+48.0
  21
 96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4215,21 +4215,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+column
 100
 AcDbLine
  10
-0.0
+-26.0
  20
 96.0
  30
-55.0
+-20.5
  11
-24.0
+-26.0
  21
 96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4239,21 +4239,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+column
 100
 AcDbLine
  10
-24.0
+0.0
  20
 96.0
  30
-55.0
+-20.5
  11
-31.0
+0.0
  21
 96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4263,21 +4263,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_end
+column
 100
 AcDbLine
  10
-31.0
+26.0
  20
 96.0
  30
-55.0
+-20.5
  11
-48.0
+26.0
  21
 96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4287,21 +4287,21 @@ LINE
 100
 AcDbEntity
   8
-xbrace_end
+skirt_stub
 100
 AcDbLine
  10
--24.0
+-26.0
  20
 96.0
  30
-0.0
+-20.5
  11
-0.0
+-48.0
  21
 96.0
  31
-24.0
+0.0
   0
 LINE
   5
@@ -4311,21 +4311,21 @@ LINE
 100
 AcDbEntity
   8
-xbrace_end
+skirt_stub
 100
 AcDbLine
  10
-0.0
+26.0
  20
 96.0
  30
-24.0
+-20.5
  11
-31.0
+48.0
  21
 96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4335,21 +4335,21 @@ LINE
 100
 AcDbEntity
   8
-xbrace_end
+vbrace_lo
 100
 AcDbLine
  10
-24.0
+-26.0
  20
 96.0
  30
-0.0
+-20.5
  11
 0.0
  21
 96.0
  31
-24.0
+0.0
   0
 LINE
   5
@@ -4359,21 +4359,21 @@ LINE
 100
 AcDbEntity
   8
-xbrace_end
+vbrace_lo
 100
 AcDbLine
  10
-0.0
+26.0
  20
 96.0
  30
-24.0
+-20.5
  11
--31.0
+0.0
  21
 96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4383,21 +4383,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_rail
+joist_lo
 100
 AcDbLine
  10
--48.0
+-26.0
  20
 0.0
  30
-55.0
+0.0
  11
--48.0
+-26.0
  21
 32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4407,21 +4407,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_rail
+joist_lo
 100
 AcDbLine
  10
--48.0
+-26.0
  20
 32.0
  30
-55.0
+0.0
  11
--48.0
+-26.0
  21
-64.0
+48.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4431,21 +4431,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_rail
+joist_lo
 100
 AcDbLine
  10
--48.0
+-26.0
  20
-64.0
+48.0
  30
-55.0
+0.0
  11
--48.0
+-26.0
  21
-96.0
+64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4455,21 +4455,21 @@ LINE
 100
 AcDbEntity
   8
-joist_hi
+joist_lo
 100
 AcDbLine
  10
--24.0
+-26.0
  20
-0.0
+64.0
  30
-55.0
+0.0
  11
--24.0
+-26.0
  21
-32.0
+96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4479,21 +4479,21 @@ LINE
 100
 AcDbEntity
   8
-joist_hi
+joist_lo
 100
 AcDbLine
  10
--24.0
+0.0
  20
-32.0
+0.0
  30
-55.0
+0.0
  11
--24.0
+0.0
  21
-64.0
+32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4503,21 +4503,21 @@ LINE
 100
 AcDbEntity
   8
-joist_hi
+joist_lo
 100
 AcDbLine
  10
--24.0
+0.0
  20
-64.0
+32.0
  30
-55.0
+0.0
  11
--24.0
+0.0
  21
-96.0
+48.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4527,21 +4527,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_rail
+joist_lo
 100
 AcDbLine
  10
-48.0
- 20
 0.0
- 30
-55.0
- 11
+ 20
 48.0
+ 30
+0.0
+ 11
+0.0
  21
-32.0
+64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4551,21 +4551,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_rail
+joist_lo
 100
 AcDbLine
  10
-48.0
+0.0
  20
-32.0
- 30
-55.0
- 11
-48.0
- 21
 64.0
+ 30
+0.0
+ 11
+0.0
+ 21
+96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4575,21 +4575,21 @@ LINE
 100
 AcDbEntity
   8
-deck_hi_rail
+joist_lo
 100
 AcDbLine
  10
-48.0
+26.0
  20
-64.0
+0.0
  30
-55.0
+0.0
  11
-48.0
+26.0
  21
-96.0
+32.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4599,21 +4599,21 @@ LINE
 100
 AcDbEntity
   8
-joist_hi
+joist_lo
 100
 AcDbLine
  10
-24.0
+26.0
  20
-0.0
- 30
-55.0
- 11
-24.0
- 21
 32.0
+ 30
+0.0
+ 11
+26.0
+ 21
+48.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4623,21 +4623,21 @@ LINE
 100
 AcDbEntity
   8
-joist_hi
+joist_lo
 100
 AcDbLine
  10
-24.0
+26.0
  20
-32.0
+48.0
  30
-55.0
+0.0
  11
-24.0
+26.0
  21
 64.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4647,21 +4647,21 @@ LINE
 100
 AcDbEntity
   8
-joist_hi
+joist_lo
 100
 AcDbLine
  10
-24.0
+26.0
  20
 64.0
  30
-55.0
+0.0
  11
-24.0
+26.0
  21
 96.0
  31
-55.0
+0.0
   0
 LINE
   5
@@ -4671,19 +4671,19 @@ LINE
 100
 AcDbEntity
   8
-joist_hi
+post
 100
 AcDbLine
  10
-0.0
+-48.0
  20
 0.0
  30
-55.0
- 11
 0.0
+ 11
+-48.0
  21
-32.0
+0.0
  31
 55.0
   0
@@ -4695,19 +4695,19 @@ LINE
 100
 AcDbEntity
   8
-joist_hi
+post
 100
 AcDbLine
  10
-0.0
+48.0
  20
-64.0
- 30
-55.0
- 11
 0.0
+ 30
+0.0
+ 11
+48.0
  21
-96.0
+0.0
  31
 55.0
   0
@@ -4719,7 +4719,7 @@ LINE
 100
 AcDbEntity
   8
-side_diag
+deck_hi_end
 100
 AcDbLine
  10
@@ -4727,11 +4727,11 @@ AcDbLine
  20
 0.0
  30
-0.0
+55.0
  11
--48.0
+-26.0
  21
-32.0
+0.0
  31
 55.0
   0
@@ -4743,19 +4743,19 @@ A0
 100
 AcDbEntity
   8
-side_diag
+deck_hi_end
 100
 AcDbLine
  10
--48.0
+-26.0
  20
-64.0
- 30
 0.0
+ 30
+55.0
  11
--48.0
+-15.0
  21
-32.0
+0.0
  31
 55.0
   0
@@ -4767,19 +4767,19 @@ A1
 100
 AcDbEntity
   8
-side_diag
+deck_hi_end
 100
 AcDbLine
  10
--48.0
+-15.0
  20
-64.0
- 30
 0.0
+ 30
+55.0
  11
--48.0
+0.0
  21
-96.0
+0.0
  31
 55.0
   0
@@ -4791,17 +4791,17 @@ A2
 100
 AcDbEntity
   8
-side_diag
+deck_hi_end
 100
 AcDbLine
  10
-48.0
- 20
-32.0
- 30
 0.0
+ 20
+0.0
+ 30
+55.0
  11
-48.0
+15.0
  21
 0.0
  31
@@ -4815,19 +4815,19 @@ A3
 100
 AcDbEntity
   8
-side_diag
+deck_hi_end
 100
 AcDbLine
  10
-48.0
+15.0
  20
-32.0
- 30
 0.0
+ 30
+55.0
  11
-48.0
+26.0
  21
-64.0
+0.0
  31
 55.0
   0
@@ -4839,6 +4839,1110 @@ A4
 100
 AcDbEntity
   8
+deck_hi_end
+100
+AcDbLine
+ 10
+26.0
+ 20
+0.0
+ 30
+55.0
+ 11
+48.0
+ 21
+0.0
+ 31
+55.0
+  0
+LINE
+  5
+A5
+330
+17
+100
+AcDbEntity
+  8
+door_jamb
+100
+AcDbLine
+ 10
+-15.0
+ 20
+0.0
+ 30
+0.0
+ 11
+-15.0
+ 21
+0.0
+ 31
+55.0
+  0
+LINE
+  5
+A6
+330
+17
+100
+AcDbEntity
+  8
+door_jamb
+100
+AcDbLine
+ 10
+15.0
+ 20
+0.0
+ 30
+0.0
+ 11
+15.0
+ 21
+0.0
+ 31
+55.0
+  0
+LINE
+  5
+A7
+330
+17
+100
+AcDbEntity
+  8
+post
+100
+AcDbLine
+ 10
+-48.0
+ 20
+32.0
+ 30
+0.0
+ 11
+-48.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+A8
+330
+17
+100
+AcDbEntity
+  8
+post
+100
+AcDbLine
+ 10
+48.0
+ 20
+32.0
+ 30
+0.0
+ 11
+48.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+A9
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_cross
+100
+AcDbLine
+ 10
+-48.0
+ 20
+32.0
+ 30
+55.0
+ 11
+-26.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+AA
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_cross
+100
+AcDbLine
+ 10
+-26.0
+ 20
+32.0
+ 30
+55.0
+ 11
+0.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+AB
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_cross
+100
+AcDbLine
+ 10
+0.0
+ 20
+32.0
+ 30
+55.0
+ 11
+26.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+AC
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_cross
+100
+AcDbLine
+ 10
+26.0
+ 20
+32.0
+ 30
+55.0
+ 11
+48.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+AD
+330
+17
+100
+AcDbEntity
+  8
+post
+100
+AcDbLine
+ 10
+-48.0
+ 20
+64.0
+ 30
+0.0
+ 11
+-48.0
+ 21
+64.0
+ 31
+55.0
+  0
+LINE
+  5
+AE
+330
+17
+100
+AcDbEntity
+  8
+post
+100
+AcDbLine
+ 10
+48.0
+ 20
+64.0
+ 30
+0.0
+ 11
+48.0
+ 21
+64.0
+ 31
+55.0
+  0
+LINE
+  5
+AF
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_cross
+100
+AcDbLine
+ 10
+-48.0
+ 20
+64.0
+ 30
+55.0
+ 11
+-26.0
+ 21
+64.0
+ 31
+55.0
+  0
+LINE
+  5
+B0
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_cross
+100
+AcDbLine
+ 10
+-26.0
+ 20
+64.0
+ 30
+55.0
+ 11
+0.0
+ 21
+64.0
+ 31
+55.0
+  0
+LINE
+  5
+B1
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_cross
+100
+AcDbLine
+ 10
+0.0
+ 20
+64.0
+ 30
+55.0
+ 11
+26.0
+ 21
+64.0
+ 31
+55.0
+  0
+LINE
+  5
+B2
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_cross
+100
+AcDbLine
+ 10
+26.0
+ 20
+64.0
+ 30
+55.0
+ 11
+48.0
+ 21
+64.0
+ 31
+55.0
+  0
+LINE
+  5
+B3
+330
+17
+100
+AcDbEntity
+  8
+post
+100
+AcDbLine
+ 10
+-48.0
+ 20
+96.0
+ 30
+0.0
+ 11
+-48.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+B4
+330
+17
+100
+AcDbEntity
+  8
+post
+100
+AcDbLine
+ 10
+48.0
+ 20
+96.0
+ 30
+0.0
+ 11
+48.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+B5
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_end
+100
+AcDbLine
+ 10
+-48.0
+ 20
+96.0
+ 30
+55.0
+ 11
+-29.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+B6
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_end
+100
+AcDbLine
+ 10
+-29.0
+ 20
+96.0
+ 30
+55.0
+ 11
+-26.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+B7
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_end
+100
+AcDbLine
+ 10
+-26.0
+ 20
+96.0
+ 30
+55.0
+ 11
+0.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+B8
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_end
+100
+AcDbLine
+ 10
+0.0
+ 20
+96.0
+ 30
+55.0
+ 11
+26.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+B9
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_end
+100
+AcDbLine
+ 10
+26.0
+ 20
+96.0
+ 30
+55.0
+ 11
+29.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+BA
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_end
+100
+AcDbLine
+ 10
+29.0
+ 20
+96.0
+ 30
+55.0
+ 11
+48.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+BB
+330
+17
+100
+AcDbEntity
+  8
+xbrace_end
+100
+AcDbLine
+ 10
+-26.0
+ 20
+96.0
+ 30
+0.0
+ 11
+0.0
+ 21
+96.0
+ 31
+26.0
+  0
+LINE
+  5
+BC
+330
+17
+100
+AcDbEntity
+  8
+xbrace_end
+100
+AcDbLine
+ 10
+0.0
+ 20
+96.0
+ 30
+26.0
+ 11
+29.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+BD
+330
+17
+100
+AcDbEntity
+  8
+xbrace_end
+100
+AcDbLine
+ 10
+26.0
+ 20
+96.0
+ 30
+0.0
+ 11
+0.0
+ 21
+96.0
+ 31
+26.0
+  0
+LINE
+  5
+BE
+330
+17
+100
+AcDbEntity
+  8
+xbrace_end
+100
+AcDbLine
+ 10
+0.0
+ 20
+96.0
+ 30
+26.0
+ 11
+-29.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+BF
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_rail
+100
+AcDbLine
+ 10
+-48.0
+ 20
+0.0
+ 30
+55.0
+ 11
+-48.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+C0
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_rail
+100
+AcDbLine
+ 10
+-48.0
+ 20
+32.0
+ 30
+55.0
+ 11
+-48.0
+ 21
+64.0
+ 31
+55.0
+  0
+LINE
+  5
+C1
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_rail
+100
+AcDbLine
+ 10
+-48.0
+ 20
+64.0
+ 30
+55.0
+ 11
+-48.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+C2
+330
+17
+100
+AcDbEntity
+  8
+joist_hi
+100
+AcDbLine
+ 10
+-24.0
+ 20
+0.0
+ 30
+55.0
+ 11
+-24.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+C3
+330
+17
+100
+AcDbEntity
+  8
+joist_hi
+100
+AcDbLine
+ 10
+-24.0
+ 20
+32.0
+ 30
+55.0
+ 11
+-24.0
+ 21
+64.0
+ 31
+55.0
+  0
+LINE
+  5
+C4
+330
+17
+100
+AcDbEntity
+  8
+joist_hi
+100
+AcDbLine
+ 10
+-24.0
+ 20
+64.0
+ 30
+55.0
+ 11
+-24.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+C5
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_rail
+100
+AcDbLine
+ 10
+48.0
+ 20
+0.0
+ 30
+55.0
+ 11
+48.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+C6
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_rail
+100
+AcDbLine
+ 10
+48.0
+ 20
+32.0
+ 30
+55.0
+ 11
+48.0
+ 21
+64.0
+ 31
+55.0
+  0
+LINE
+  5
+C7
+330
+17
+100
+AcDbEntity
+  8
+deck_hi_rail
+100
+AcDbLine
+ 10
+48.0
+ 20
+64.0
+ 30
+55.0
+ 11
+48.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+C8
+330
+17
+100
+AcDbEntity
+  8
+joist_hi
+100
+AcDbLine
+ 10
+24.0
+ 20
+0.0
+ 30
+55.0
+ 11
+24.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+C9
+330
+17
+100
+AcDbEntity
+  8
+joist_hi
+100
+AcDbLine
+ 10
+24.0
+ 20
+32.0
+ 30
+55.0
+ 11
+24.0
+ 21
+64.0
+ 31
+55.0
+  0
+LINE
+  5
+CA
+330
+17
+100
+AcDbEntity
+  8
+joist_hi
+100
+AcDbLine
+ 10
+24.0
+ 20
+64.0
+ 30
+55.0
+ 11
+24.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+CB
+330
+17
+100
+AcDbEntity
+  8
+joist_hi
+100
+AcDbLine
+ 10
+0.0
+ 20
+0.0
+ 30
+55.0
+ 11
+0.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+CC
+330
+17
+100
+AcDbEntity
+  8
+joist_hi
+100
+AcDbLine
+ 10
+0.0
+ 20
+64.0
+ 30
+55.0
+ 11
+0.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+CD
+330
+17
+100
+AcDbEntity
+  8
+side_diag
+100
+AcDbLine
+ 10
+-48.0
+ 20
+0.0
+ 30
+0.0
+ 11
+-48.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+CE
+330
+17
+100
+AcDbEntity
+  8
+side_diag
+100
+AcDbLine
+ 10
+-48.0
+ 20
+64.0
+ 30
+0.0
+ 11
+-48.0
+ 21
+32.0
+ 31
+55.0
+  0
+LINE
+  5
+CF
+330
+17
+100
+AcDbEntity
+  8
+side_diag
+100
+AcDbLine
+ 10
+-48.0
+ 20
+64.0
+ 30
+0.0
+ 11
+-48.0
+ 21
+96.0
+ 31
+55.0
+  0
+LINE
+  5
+D0
+330
+17
+100
+AcDbEntity
+  8
+side_diag
+100
+AcDbLine
+ 10
+48.0
+ 20
+32.0
+ 30
+0.0
+ 11
+48.0
+ 21
+0.0
+ 31
+55.0
+  0
+LINE
+  5
+D1
+330
+17
+100
+AcDbEntity
+  8
+side_diag
+100
+AcDbLine
+ 10
+48.0
+ 20
+32.0
+ 30
+0.0
+ 11
+48.0
+ 21
+64.0
+ 31
+55.0
+  0
+LINE
+  5
+D2
+330
+17
+100
+AcDbEntity
+  8
 side_diag
 100
 AcDbLine
@@ -4857,1131 +5961,27 @@ AcDbLine
   0
 LINE
   5
-A5
-330
-17
-100
-AcDbEntity
-  8
-chamfer_hi
-100
-AcDbLine
- 10
--48.0
- 20
-0.0
- 30
-55.0
- 11
--27.5
- 21
-0.0
- 31
-75.5
-  0
-LINE
-  5
-A6
-330
-17
-100
-AcDbEntity
-  8
-chamfer_hi
-100
-AcDbLine
- 10
-48.0
- 20
-0.0
- 30
-55.0
- 11
-27.5
- 21
-0.0
- 31
-75.5
-  0
-LINE
-  5
-A7
-330
-17
-100
-AcDbEntity
-  8
-rim_cross
-100
-AcDbLine
- 10
--27.5
- 20
-0.0
- 30
-75.5
- 11
-27.5
- 21
-0.0
- 31
-75.5
-  0
-LINE
-  5
-A8
-330
-17
-100
-AcDbEntity
-  8
-chamfer_hi
-100
-AcDbLine
- 10
--48.0
- 20
-32.0
- 30
-55.0
- 11
--27.5
- 21
-32.0
- 31
-75.5
-  0
-LINE
-  5
-A9
-330
-17
-100
-AcDbEntity
-  8
-chamfer_hi
-100
-AcDbLine
- 10
-48.0
- 20
-32.0
- 30
-55.0
- 11
-27.5
- 21
-32.0
- 31
-75.5
-  0
-LINE
-  5
-AA
-330
-17
-100
-AcDbEntity
-  8
-rim_cross
-100
-AcDbLine
- 10
--27.5
- 20
-32.0
- 30
-75.5
- 11
-27.5
- 21
-32.0
- 31
-75.5
-  0
-LINE
-  5
-AB
-330
-17
-100
-AcDbEntity
-  8
-chamfer_hi
-100
-AcDbLine
- 10
--48.0
- 20
-64.0
- 30
-55.0
- 11
--27.5
- 21
-64.0
- 31
-75.5
-  0
-LINE
-  5
-AC
-330
-17
-100
-AcDbEntity
-  8
-chamfer_hi
-100
-AcDbLine
- 10
-48.0
- 20
-64.0
- 30
-55.0
- 11
-27.5
- 21
-64.0
- 31
-75.5
-  0
-LINE
-  5
-AD
-330
-17
-100
-AcDbEntity
-  8
-rim_cross
-100
-AcDbLine
- 10
--27.5
- 20
-64.0
- 30
-75.5
- 11
-27.5
- 21
-64.0
- 31
-75.5
-  0
-LINE
-  5
-AE
-330
-17
-100
-AcDbEntity
-  8
-chamfer_hi
-100
-AcDbLine
- 10
--48.0
- 20
-96.0
- 30
-55.0
- 11
--27.5
- 21
-96.0
- 31
-75.5
-  0
-LINE
-  5
-AF
-330
-17
-100
-AcDbEntity
-  8
-chamfer_hi
-100
-AcDbLine
- 10
-48.0
- 20
-96.0
- 30
-55.0
- 11
-27.5
- 21
-96.0
- 31
-75.5
-  0
-LINE
-  5
-B0
-330
-17
-100
-AcDbEntity
-  8
-rim_cross
-100
-AcDbLine
- 10
--27.5
- 20
-96.0
- 30
-75.5
- 11
-27.5
- 21
-96.0
- 31
-75.5
-  0
-LINE
-  5
-B1
-330
-17
-100
-AcDbEntity
-  8
-rim_stringer
-100
-AcDbLine
- 10
--27.5
- 20
-0.0
- 30
-75.5
- 11
--27.5
- 21
-32.0
- 31
-75.5
-  0
-LINE
-  5
-B2
-330
-17
-100
-AcDbEntity
-  8
-rim_stringer
-100
-AcDbLine
- 10
--27.5
- 20
-32.0
- 30
-75.5
- 11
--27.5
- 21
-64.0
- 31
-75.5
-  0
-LINE
-  5
-B3
-330
-17
-100
-AcDbEntity
-  8
-rim_stringer
-100
-AcDbLine
- 10
--27.5
- 20
-64.0
- 30
-75.5
- 11
--27.5
- 21
-96.0
- 31
-75.5
-  0
-LINE
-  5
-B4
-330
-17
-100
-AcDbEntity
-  8
-rim_stringer
-100
-AcDbLine
- 10
-27.5
- 20
-0.0
- 30
-75.5
- 11
-27.5
- 21
-32.0
- 31
-75.5
-  0
-LINE
-  5
-B5
-330
-17
-100
-AcDbEntity
-  8
-rim_stringer
-100
-AcDbLine
- 10
-27.5
- 20
-32.0
- 30
-75.5
- 11
-27.5
- 21
-64.0
- 31
-75.5
-  0
-LINE
-  5
-B6
-330
-17
-100
-AcDbEntity
-  8
-rim_stringer
-100
-AcDbLine
- 10
-27.5
- 20
-64.0
- 30
-75.5
- 11
-27.5
- 21
-96.0
- 31
-75.5
-  0
-LINE
-  5
-B7
-330
-17
-100
-AcDbEntity
-  8
-skirt_stub
-100
-AcDbLine
- 10
--48.0
- 20
-0.0
- 30
-0.0
- 11
--40.75
- 21
-0.0
- 31
--7.25
-  0
-LINE
-  5
-B8
-330
-17
-100
-AcDbEntity
-  8
-skirt_stub
-100
-AcDbLine
- 10
-48.0
- 20
-0.0
- 30
-0.0
- 11
-40.75
- 21
-0.0
- 31
--7.25
-  0
-LINE
-  5
-B9
-330
-17
-100
-AcDbEntity
-  8
-skirt_bottom
-100
-AcDbLine
- 10
--40.75
- 20
-0.0
- 30
--7.25
- 11
-40.75
- 21
-0.0
- 31
--7.25
-  0
-LINE
-  5
-BA
-330
-17
-100
-AcDbEntity
-  8
-skirt_stub
-100
-AcDbLine
- 10
--48.0
- 20
-32.0
- 30
-0.0
- 11
--40.75
- 21
-32.0
- 31
--7.25
-  0
-LINE
-  5
-BB
-330
-17
-100
-AcDbEntity
-  8
-skirt_stub
-100
-AcDbLine
- 10
-48.0
- 20
-32.0
- 30
-0.0
- 11
-40.75
- 21
-32.0
- 31
--7.25
-  0
-LINE
-  5
-BC
-330
-17
-100
-AcDbEntity
-  8
-skirt_bottom
-100
-AcDbLine
- 10
--40.75
- 20
-32.0
- 30
--7.25
- 11
-40.75
- 21
-32.0
- 31
--7.25
-  0
-LINE
-  5
-BD
-330
-17
-100
-AcDbEntity
-  8
-skirt_stub
-100
-AcDbLine
- 10
--48.0
- 20
-64.0
- 30
-0.0
- 11
--40.75
- 21
-64.0
- 31
--7.25
-  0
-LINE
-  5
-BE
-330
-17
-100
-AcDbEntity
-  8
-skirt_stub
-100
-AcDbLine
- 10
-48.0
- 20
-64.0
- 30
-0.0
- 11
-40.75
- 21
-64.0
- 31
--7.25
-  0
-LINE
-  5
-BF
-330
-17
-100
-AcDbEntity
-  8
-skirt_bottom
-100
-AcDbLine
- 10
--40.75
- 20
-64.0
- 30
--7.25
- 11
-40.75
- 21
-64.0
- 31
--7.25
-  0
-LINE
-  5
-C0
-330
-17
-100
-AcDbEntity
-  8
-skirt_stub
-100
-AcDbLine
- 10
--48.0
- 20
-96.0
- 30
-0.0
- 11
--40.75
- 21
-96.0
- 31
--7.25
-  0
-LINE
-  5
-C1
-330
-17
-100
-AcDbEntity
-  8
-skirt_stub
-100
-AcDbLine
- 10
-48.0
- 20
-96.0
- 30
-0.0
- 11
-40.75
- 21
-96.0
- 31
--7.25
-  0
-LINE
-  5
-C2
-330
-17
-100
-AcDbEntity
-  8
-skirt_bottom
-100
-AcDbLine
- 10
--40.75
- 20
-96.0
- 30
--7.25
- 11
-40.75
- 21
-96.0
- 31
--7.25
-  0
-LINE
-  5
-C3
-330
-17
-100
-AcDbEntity
-  8
-skirt_stringer
-100
-AcDbLine
- 10
--40.75
- 20
-0.0
- 30
--7.25
- 11
--40.75
- 21
-32.0
- 31
--7.25
-  0
-LINE
-  5
-C4
-330
-17
-100
-AcDbEntity
-  8
-skirt_stringer
-100
-AcDbLine
- 10
--40.75
- 20
-32.0
- 30
--7.25
- 11
--40.75
- 21
-64.0
- 31
--7.25
-  0
-LINE
-  5
-C5
-330
-17
-100
-AcDbEntity
-  8
-skirt_stringer
-100
-AcDbLine
- 10
--40.75
- 20
-64.0
- 30
--7.25
- 11
--40.75
- 21
-96.0
- 31
--7.25
-  0
-LINE
-  5
-C6
-330
-17
-100
-AcDbEntity
-  8
-skirt_stringer
-100
-AcDbLine
- 10
-40.75
- 20
-0.0
- 30
--7.25
- 11
-40.75
- 21
-32.0
- 31
--7.25
-  0
-LINE
-  5
-C7
-330
-17
-100
-AcDbEntity
-  8
-skirt_stringer
-100
-AcDbLine
- 10
-40.75
- 20
-32.0
- 30
--7.25
- 11
-40.75
- 21
-64.0
- 31
--7.25
-  0
-LINE
-  5
-C8
-330
-17
-100
-AcDbEntity
-  8
-skirt_stringer
-100
-AcDbLine
- 10
-40.75
- 20
-64.0
- 30
--7.25
- 11
-40.75
- 21
-96.0
- 31
--7.25
-  0
-LINE
-  5
-C9
-330
-17
-100
-AcDbEntity
-  8
-nose_rim
-100
-AcDbLine
- 10
--15.0
- 20
-132.0
- 30
-18.5
- 11
-15.0
- 21
-132.0
- 31
-18.5
-  0
-LINE
-  5
-CA
-330
-17
-100
-AcDbEntity
-  8
-nose_rim
-100
-AcDbLine
- 10
-15.0
- 20
-132.0
- 30
-18.5
- 11
-15.0
- 21
-132.0
- 31
-36.5
-  0
-LINE
-  5
-CB
-330
-17
-100
-AcDbEntity
-  8
-nose_rim
-100
-AcDbLine
- 10
-15.0
- 20
-132.0
- 30
-36.5
- 11
--15.0
- 21
-132.0
- 31
-36.5
-  0
-LINE
-  5
-CC
-330
-17
-100
-AcDbEntity
-  8
-nose_rim
-100
-AcDbLine
- 10
--15.0
- 20
-132.0
- 30
-36.5
- 11
--15.0
- 21
-132.0
- 31
-18.5
-  0
-LINE
-  5
-CD
-330
-17
-100
-AcDbEntity
-  8
-nose_stringer
-100
-AcDbLine
- 10
--40.75
- 20
-96.0
- 30
--7.25
- 11
--15.0
- 21
-132.0
- 31
-18.5
-  0
-LINE
-  5
-CE
-330
-17
-100
-AcDbEntity
-  8
-nose_stringer
-100
-AcDbLine
- 10
-40.75
- 20
-96.0
- 30
--7.25
- 11
-15.0
- 21
-132.0
- 31
-18.5
-  0
-LINE
-  5
-CF
-330
-17
-100
-AcDbEntity
-  8
-nose_stringer
-100
-AcDbLine
- 10
-48.0
- 20
-96.0
- 30
-0.0
- 11
-15.0
- 21
-132.0
- 31
-18.5
-  0
-LINE
-  5
-D0
-330
-17
-100
-AcDbEntity
-  8
-nose_stringer
-100
-AcDbLine
- 10
-48.0
- 20
-96.0
- 30
-55.0
- 11
-15.0
- 21
-132.0
- 31
-36.5
-  0
-LINE
-  5
-D1
-330
-17
-100
-AcDbEntity
-  8
-nose_stringer
-100
-AcDbLine
- 10
-27.5
- 20
-96.0
- 30
-75.5
- 11
-15.0
- 21
-132.0
- 31
-36.5
-  0
-LINE
-  5
-D2
-330
-17
-100
-AcDbEntity
-  8
-nose_stringer
-100
-AcDbLine
- 10
--27.5
- 20
-96.0
- 30
-75.5
- 11
--15.0
- 21
-132.0
- 31
-36.5
-  0
-LINE
-  5
 D3
 330
 17
 100
 AcDbEntity
   8
-nose_stringer
+chamfer_hi
 100
 AcDbLine
  10
 -48.0
  20
-96.0
+0.0
  30
 55.0
  11
--15.0
+-27.5
  21
-132.0
+0.0
  31
-36.5
+75.5
   0
 LINE
   5
@@ -5991,6 +5991,678 @@ D4
 100
 AcDbEntity
   8
+chamfer_hi
+100
+AcDbLine
+ 10
+48.0
+ 20
+0.0
+ 30
+55.0
+ 11
+27.5
+ 21
+0.0
+ 31
+75.5
+  0
+LINE
+  5
+D5
+330
+17
+100
+AcDbEntity
+  8
+rim_cross
+100
+AcDbLine
+ 10
+-27.5
+ 20
+0.0
+ 30
+75.5
+ 11
+27.5
+ 21
+0.0
+ 31
+75.5
+  0
+LINE
+  5
+D6
+330
+17
+100
+AcDbEntity
+  8
+chamfer_hi
+100
+AcDbLine
+ 10
+-48.0
+ 20
+32.0
+ 30
+55.0
+ 11
+-27.5
+ 21
+32.0
+ 31
+75.5
+  0
+LINE
+  5
+D7
+330
+17
+100
+AcDbEntity
+  8
+chamfer_hi
+100
+AcDbLine
+ 10
+48.0
+ 20
+32.0
+ 30
+55.0
+ 11
+27.5
+ 21
+32.0
+ 31
+75.5
+  0
+LINE
+  5
+D8
+330
+17
+100
+AcDbEntity
+  8
+rim_cross
+100
+AcDbLine
+ 10
+-27.5
+ 20
+32.0
+ 30
+75.5
+ 11
+27.5
+ 21
+32.0
+ 31
+75.5
+  0
+LINE
+  5
+D9
+330
+17
+100
+AcDbEntity
+  8
+chamfer_hi
+100
+AcDbLine
+ 10
+-48.0
+ 20
+64.0
+ 30
+55.0
+ 11
+-27.5
+ 21
+64.0
+ 31
+75.5
+  0
+LINE
+  5
+DA
+330
+17
+100
+AcDbEntity
+  8
+chamfer_hi
+100
+AcDbLine
+ 10
+48.0
+ 20
+64.0
+ 30
+55.0
+ 11
+27.5
+ 21
+64.0
+ 31
+75.5
+  0
+LINE
+  5
+DB
+330
+17
+100
+AcDbEntity
+  8
+rim_cross
+100
+AcDbLine
+ 10
+-27.5
+ 20
+64.0
+ 30
+75.5
+ 11
+27.5
+ 21
+64.0
+ 31
+75.5
+  0
+LINE
+  5
+DC
+330
+17
+100
+AcDbEntity
+  8
+chamfer_hi
+100
+AcDbLine
+ 10
+-48.0
+ 20
+96.0
+ 30
+55.0
+ 11
+-27.5
+ 21
+96.0
+ 31
+75.5
+  0
+LINE
+  5
+DD
+330
+17
+100
+AcDbEntity
+  8
+chamfer_hi
+100
+AcDbLine
+ 10
+48.0
+ 20
+96.0
+ 30
+55.0
+ 11
+27.5
+ 21
+96.0
+ 31
+75.5
+  0
+LINE
+  5
+DE
+330
+17
+100
+AcDbEntity
+  8
+rim_cross
+100
+AcDbLine
+ 10
+-27.5
+ 20
+96.0
+ 30
+75.5
+ 11
+27.5
+ 21
+96.0
+ 31
+75.5
+  0
+LINE
+  5
+DF
+330
+17
+100
+AcDbEntity
+  8
+rim_stringer
+100
+AcDbLine
+ 10
+-27.5
+ 20
+0.0
+ 30
+75.5
+ 11
+-27.5
+ 21
+32.0
+ 31
+75.5
+  0
+LINE
+  5
+E0
+330
+17
+100
+AcDbEntity
+  8
+rim_stringer
+100
+AcDbLine
+ 10
+-27.5
+ 20
+32.0
+ 30
+75.5
+ 11
+-27.5
+ 21
+64.0
+ 31
+75.5
+  0
+LINE
+  5
+E1
+330
+17
+100
+AcDbEntity
+  8
+rim_stringer
+100
+AcDbLine
+ 10
+-27.5
+ 20
+64.0
+ 30
+75.5
+ 11
+-27.5
+ 21
+96.0
+ 31
+75.5
+  0
+LINE
+  5
+E2
+330
+17
+100
+AcDbEntity
+  8
+rim_stringer
+100
+AcDbLine
+ 10
+27.5
+ 20
+0.0
+ 30
+75.5
+ 11
+27.5
+ 21
+32.0
+ 31
+75.5
+  0
+LINE
+  5
+E3
+330
+17
+100
+AcDbEntity
+  8
+rim_stringer
+100
+AcDbLine
+ 10
+27.5
+ 20
+32.0
+ 30
+75.5
+ 11
+27.5
+ 21
+64.0
+ 31
+75.5
+  0
+LINE
+  5
+E4
+330
+17
+100
+AcDbEntity
+  8
+rim_stringer
+100
+AcDbLine
+ 10
+27.5
+ 20
+64.0
+ 30
+75.5
+ 11
+27.5
+ 21
+96.0
+ 31
+75.5
+  0
+LINE
+  5
+E5
+330
+17
+100
+AcDbEntity
+  8
+nose_rim
+100
+AcDbLine
+ 10
+-15.0
+ 20
+132.0
+ 30
+18.5
+ 11
+15.0
+ 21
+132.0
+ 31
+18.5
+  0
+LINE
+  5
+E6
+330
+17
+100
+AcDbEntity
+  8
+nose_rim
+100
+AcDbLine
+ 10
+15.0
+ 20
+132.0
+ 30
+18.5
+ 11
+15.0
+ 21
+132.0
+ 31
+36.5
+  0
+LINE
+  5
+E7
+330
+17
+100
+AcDbEntity
+  8
+nose_rim
+100
+AcDbLine
+ 10
+15.0
+ 20
+132.0
+ 30
+36.5
+ 11
+-15.0
+ 21
+132.0
+ 31
+36.5
+  0
+LINE
+  5
+E8
+330
+17
+100
+AcDbEntity
+  8
+nose_rim
+100
+AcDbLine
+ 10
+-15.0
+ 20
+132.0
+ 30
+36.5
+ 11
+-15.0
+ 21
+132.0
+ 31
+18.5
+  0
+LINE
+  5
+E9
+330
+17
+100
+AcDbEntity
+  8
+nose_stringer
+100
+AcDbLine
+ 10
+-26.0
+ 20
+96.0
+ 30
+-20.5
+ 11
+-15.0
+ 21
+132.0
+ 31
+18.5
+  0
+LINE
+  5
+EA
+330
+17
+100
+AcDbEntity
+  8
+nose_stringer
+100
+AcDbLine
+ 10
+26.0
+ 20
+96.0
+ 30
+-20.5
+ 11
+15.0
+ 21
+132.0
+ 31
+18.5
+  0
+LINE
+  5
+EB
+330
+17
+100
+AcDbEntity
+  8
+nose_stringer
+100
+AcDbLine
+ 10
+48.0
+ 20
+96.0
+ 30
+0.0
+ 11
+15.0
+ 21
+132.0
+ 31
+18.5
+  0
+LINE
+  5
+EC
+330
+17
+100
+AcDbEntity
+  8
+nose_stringer
+100
+AcDbLine
+ 10
+48.0
+ 20
+96.0
+ 30
+55.0
+ 11
+15.0
+ 21
+132.0
+ 31
+36.5
+  0
+LINE
+  5
+ED
+330
+17
+100
+AcDbEntity
+  8
+nose_stringer
+100
+AcDbLine
+ 10
+27.5
+ 20
+96.0
+ 30
+75.5
+ 11
+15.0
+ 21
+132.0
+ 31
+36.5
+  0
+LINE
+  5
+EE
+330
+17
+100
+AcDbEntity
+  8
+nose_stringer
+100
+AcDbLine
+ 10
+-27.5
+ 20
+96.0
+ 30
+75.5
+ 11
+-15.0
+ 21
+132.0
+ 31
+36.5
+  0
+LINE
+  5
+EF
+330
+17
+100
+AcDbEntity
+  8
+nose_stringer
+100
+AcDbLine
+ 10
+-48.0
+ 20
+96.0
+ 30
+55.0
+ 11
+-15.0
+ 21
+132.0
+ 31
+36.5
+  0
+LINE
+  5
+F0
+330
+17
+100
+AcDbEntity
+  8
 nose_stringer
 100
 AcDbLine
@@ -6009,7 +6681,7 @@ AcDbLine
   0
 LINE
   5
-D5
+F1
 330
 17
 100
@@ -6033,7 +6705,7 @@ AcDbLine
   0
 LINE
   5
-D6
+F2
 330
 17
 100
@@ -6057,7 +6729,7 @@ AcDbLine
   0
 LINE
   5
-D7
+F3
 330
 17
 100
@@ -6081,7 +6753,7 @@ AcDbLine
   0
 LINE
   5
-D8
+F4
 330
 17
 100
@@ -6105,7 +6777,7 @@ AcDbLine
   0
 LINE
   5
-D9
+F5
 330
 17
 100
@@ -6115,11 +6787,11 @@ tail_stringer
 100
 AcDbLine
  10
--40.75
+-26.0
  20
 0.0
  30
--7.25
+-20.5
  11
 -20.0
  21
@@ -6129,7 +6801,7 @@ AcDbLine
   0
 LINE
   5
-DA
+F6
 330
 17
 100
@@ -6139,11 +6811,11 @@ tail_stringer
 100
 AcDbLine
  10
-40.75
+26.0
  20
 0.0
  30
--7.25
+-20.5
  11
 20.0
  21
@@ -6153,31 +6825,7 @@ AcDbLine
   0
 LINE
   5
-DB
-330
-17
-100
-AcDbEntity
-  8
-tail_stringer
-100
-AcDbLine
- 10
-48.0
- 20
-0.0
- 30
-0.0
- 11
-20.0
- 21
--24.0
- 31
-0.0
-  0
-LINE
-  5
-DC
+F7
 330
 17
 100
@@ -6191,6 +6839,30 @@ AcDbLine
  20
 0.0
  30
+0.0
+ 11
+20.0
+ 21
+-24.0
+ 31
+0.0
+  0
+LINE
+  5
+F8
+330
+17
+100
+AcDbEntity
+  8
+tail_stringer
+100
+AcDbLine
+ 10
+48.0
+ 20
+0.0
+ 30
 55.0
  11
 20.0
@@ -6201,7 +6873,7 @@ AcDbLine
   0
 LINE
   5
-DD
+F9
 330
 17
 100
@@ -6225,7 +6897,7 @@ AcDbLine
   0
 LINE
   5
-DE
+FA
 330
 17
 100
@@ -6249,7 +6921,7 @@ AcDbLine
   0
 LINE
   5
-DF
+FB
 330
 17
 100
@@ -6273,7 +6945,7 @@ AcDbLine
   0
 LINE
   5
-E0
+FC
 330
 17
 100
@@ -7285,7 +7957,7 @@ CREATED_BY_EZDXF
   3
 WRITTEN_BY_EZDXF
 350
-E3
+FF
   0
 DICTIONARYVAR
   5
@@ -7297,11 +7969,11 @@ DictionaryVariables
 280
 0
   1
-1.4.4 @ 2026-10-03T19:21:34.332942+00:00
+1.4.4 @ 2026-10-03T19:27:35.857585+00:00
   0
 DICTIONARYVAR
   5
-E3
+FF
 330
 2D
 100
@@ -7309,7 +7981,7 @@ DictionaryVariables
 280
 0
   1
-1.4.4 @ 2026-10-03T19:21:34.337689+00:00
+1.4.4 @ 2026-10-03T19:27:35.864110+00:00
   0
 ENDSEC
   0
