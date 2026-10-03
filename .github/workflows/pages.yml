@@ -42,6 +42,7 @@ jobs:
             design=$(dirname "$(dirname "$model")")
             echo "::group::$design"
             python "$model"
+            [ -f "$design/model/make_plates.py" ] && python "$design/model/make_plates.py" > /dev/null
             python "$design/model/build_viewer.py" --standalone
             mkdir -p "_site/$design"; cp -r "$design/docs/." "_site/$design/"
             echo "::endgroup::"

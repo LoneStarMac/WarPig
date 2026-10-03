@@ -113,6 +113,43 @@ for r in joints:
 patterns = sorted((dict(sig=k, count=v['count'], examples=sorted(v['examples'])[:2]) for k, v in patterns.items()), key=lambda r: -r['count'])
 valence_hist = defaultdict(int)
 for r in joints: valence_hist[r['n']] += 1
+# where each valence occurs: the distinct sets of member types, most common first
+where_by_n = defaultdict(lambda: defaultdict(int))
+for r in joints:
+    where_by_n[r['n']][', '.join(dict.fromkeys(d['labels'].get(g, g).split(' (')[0].lower() for g in r['groups']))] += 1
+valence_where = {n: [dict(desc=k, count=v) for k, v in sorted(ws.items(), key=lambda kv: -kv[1])] for n, ws in where_by_n.items()}
+
+# ---------- hardware schedule from the census
+SIZE = {k: v['size'] for k, v in P['sections'].items()}
+sec_of_group = P['group_sec']
+def bolt_len(grip):
+    return math.ceil((grip + 0.33 + 0.125) / 0.25) * 0.25
+plate_bolts = defaultdict(int); pin_bolts = defaultdict(int); cross_bolts = defaultdict(int)
+plate_count = defaultdict(int)
+T_PLATE = 0.135
+for r in joints:
+    sizes = [SIZE[sec_of_group[g]] for g in r['groups']]
+    host = max(sizes)
+    for k in r['needs']:
+        if k in ('T90', 'C90'):
+            plate_count['TP-90' if k == 'T90' else 'TL-90'] += 2
+            for sz in (host, min(sizes)): plate_bolts[bolt_len(sz + 2*T_PLATE)] += 2
+        elif k in ('T45', 'C45', 'T90e', 'C90e'):
+            plate_count['TP-45'] += 2
+            for sz in (host, min(sizes)): plate_bolts[bolt_len(sz + 2*T_PLATE)] += 2
+        elif k == 'pin':
+            pin_bolts[bolt_len(host + 0.15 + 0.16)] += 1
+        elif k == 'X90':
+            cross_bolts[bolt_len(sum(sorted(sizes)[-2:]))] += 1
+caster_bolts = 4 * len(d['reactions']); tow_bolts = 4
+rail_inside = SIZE['2.50x14'] - 2 * 0.075
+hardware = dict(plates=dict(plate_count), plate_bolts=dict(plate_bolts), pin_bolts=dict(pin_bolts), cross_bolts=dict(cross_bolts),
+                caster_bolts=caster_bolts, tow_bolts=tow_bolts, sleeve_len=round(rail_inside, 2), sleeves=caster_bolts + tow_bolts,
+                total_bolts=sum(plate_bolts.values()) + sum(pin_bolts.values()) + sum(cross_bolts.values()) + caster_bolts + tow_bolts)
+try:
+    plates_spec = json.load(open(os.path.join(EXPORTS, 'plates', 'plates.json')))
+except Exception:
+    plates_spec = []
 
 # ---------- summary
 summary = {}
@@ -124,9 +161,10 @@ for c in d['combos']:
     summary[c] = dict(u=r['u'], member=worst['name'], group=worst['group'], sig=r['sig_ksi'], defl=round(mxd[0], 2), caster=round(cast))
 
 payload = dict(params=P, labels=d['labels'], roles=d['roles'], role_order=d['role_order'], nodes=d['nodes'], members=d['members'], results=d['results'], reactions=d['reactions'],
-               disp=d['disp'], combos=d['combos'], sticks=stick_list, stock=stock, summary=summary, joints=joints, valence_hist=dict(valence_hist), patterns=patterns, kinds=dict(kinds))
+               disp=d['disp'], combos=d['combos'], sticks=stick_list, stock=stock, summary=summary, joints=joints, valence_hist=dict(valence_hist), valence_where=valence_where, patterns=patterns, kinds=dict(kinds), hardware=hardware, plates=plates_spec)
 
 html = open(os.path.join(HERE, 'viewer_template.html')).read()
+payload['standalone'] = '--standalone' in sys.argv
 html = html.replace('/*__DATA__*/', json.dumps(payload))
 if '--standalone' in sys.argv:
     downloads = '''

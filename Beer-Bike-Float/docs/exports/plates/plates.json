@@ -1,0 +1,38 @@
+[
+ {
+  "name": "TP-90",
+  "desc": "T plate, tube ending square on a continuous tube",
+  "w": 6.0,
+  "h": 5.25,
+  "bolts": 4,
+  "file": "TP-90.dxf",
+  "thickness": 0.135,
+  "material": "10 ga (0.135\") mild steel, zinc plated",
+  "slot": "0.406 x 1.30 in",
+  "leg_width": 1.25
+ },
+ {
+  "name": "TL-90",
+  "desc": "L plate, two tube ends meeting at a corner",
+  "w": 4.5,
+  "h": 4.5,
+  "bolts": 4,
+  "file": "TL-90.dxf",
+  "thickness": 0.135,
+  "material": "10 ga (0.135\") mild steel, zinc plated",
+  "slot": "0.406 x 1.30 in",
+  "leg_width": 1.25
+ },
+ {
+  "name": "TP-45",
+  "desc": "45-degree plate, chamfer stub / brace landing on a tube",
+  "w": 6.0,
+  "h": 4.873922253581056,
+  "bolts": 4,
+  "file": "TP-45.dxf",
+  "thickness": 0.135,
+  "material": "10 ga (0.135\") mild steel, zinc plated",
+  "slot": "0.406 x 1.30 in",
+  "leg_width": 1.25
+ }
+]

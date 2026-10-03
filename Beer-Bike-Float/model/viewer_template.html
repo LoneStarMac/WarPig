@@ -158,6 +158,7 @@ p { margin: 0; max-width: 70ch; }
         <label><input type="checkbox" id="ck-decks" checked> Decks</label>
         <label><input type="checkbox" id="ck-casters" checked> Casters</label>
         <label><input type="checkbox" id="ck-def"> Deflected ×<span id="defscale-v" class="num">25</span></label>
+        <label><input type="checkbox" id="ck-pig"> Painted pig</label>
       </div>
       <div class="ctl" id="defscale-wrap" hidden>
         <label for="defscale">Deflection exaggeration</label>
@@ -175,11 +176,13 @@ p { margin: 0; max-width: 70ch; }
       <button role="tab" id="tab-cut" aria-selected="true" aria-controls="pane-cut">Cut list</button>
       <button role="tab" id="tab-joints" aria-selected="false" aria-controls="pane-joints">Joints &amp; casters</button>
       <button role="tab" id="tab-section" aria-selected="false" aria-controls="pane-section">Cross-section</button>
+      <button role="tab" id="tab-build" aria-selected="false" aria-controls="pane-build">Build</button>
       <button role="tab" id="tab-assume" aria-selected="false" aria-controls="pane-assume">Assumptions</button>
     </div>
     <div class="tabpanel" role="tabpanel" id="pane-cut" aria-labelledby="tab-cut"></div>
     <div class="tabpanel" role="tabpanel" id="pane-joints" aria-labelledby="tab-joints" hidden></div>
     <div class="tabpanel" role="tabpanel" id="pane-section" aria-labelledby="tab-section" hidden></div>
+    <div class="tabpanel" role="tabpanel" id="pane-build" aria-labelledby="tab-build" hidden></div>
     <div class="tabpanel" role="tabpanel" id="pane-assume" aria-labelledby="tab-assume" hidden></div>
   </section>
 </main>
@@ -318,6 +321,48 @@ p { margin: 0; max-width: 70ch; }
   scene.add(decks);
 
   // casters: 16" wheels under the four base corners
+  // painted pig: opaque skin, face, door, ears, tail, hooves. Toggled with the checkbox; hides the frame.
+  const pig = new THREE.Group(); pig.visible = false;
+  const yellow = new THREE.MeshLambertMaterial({ color: 0xE3A400, side: THREE.DoubleSide });
+  const pink = new THREE.MeshLambertMaterial({ color: 0xE89A9A, side: THREE.DoubleSide });
+  const dark = new THREE.MeshLambertMaterial({ color: 0x2b2420, side: THREE.DoubleSide });
+  const white = new THREE.MeshLambertMaterial({ color: 0xf6f3ea, side: THREE.DoubleSide });
+  (function paint() {
+    const yt = P.L + P.L_NOSE, zc = P.NOSE_ZC, nw = P.NOSE_W / 2, nh = P.NOSE_H / 2;
+    // snout disc: pink panel slightly proud of the tip, two nostrils
+    pig.add(quad([[-nw, yt + 0.3, zc - nh], [nw, yt + 0.3, zc - nh], [nw, yt + 0.3, zc + nh], [-nw, yt + 0.3, zc + nh]], pink));
+    for (const sx of [-1, 1]) { const n = new THREE.Mesh(new THREE.CircleGeometry(2.6, 24), dark); n.position.copy(toT(sx * 6.5, yt + 0.6, zc - 1.5)); n.rotation.y = Math.PI; n.scale.set(1, 1.35, 1); pig.add(n); }
+    // eyes on the forehead: the nose's top face runs from the rim corners to the snout's top edge
+    const A = [-P.FLAT / 2, Y1, P.Z_RIM], B = [P.FLAT / 2, Y1, P.Z_RIM], Cc = [nw, yt, zc + nh], Dd = [-nw, yt, zc + nh];
+    const lerp = (p, q, t) => p.map((v, i) => v + (q[i] - v) * t);
+    const nrm = new THREE.Vector3().crossVectors(toT(...B).sub(toT(...A)), toT(...Dd).sub(toT(...A))).normalize();
+    if (nrm.z > 0) nrm.negate();   // outward (toward the snout side)
+    for (const u of [0.3, 0.7]) {
+      const p = lerp(lerp(A, B, u), lerp(Dd, Cc, u), 0.42);
+      const e = new THREE.Mesh(new THREE.CircleGeometry(5, 32), white); e.position.copy(toT(...p)).addScaledVector(nrm, 0.3); e.lookAt(e.position.clone().add(nrm)); pig.add(e);
+      const pu = new THREE.Mesh(new THREE.CircleGeometry(2.4, 24), dark); pu.position.copy(toT(...p)).addScaledVector(nrm, 0.6); pu.lookAt(pu.position.clone().add(nrm)); pig.add(pu);
+    }
+    // ears: two triangles standing up from the front rim corners, leaning outward
+    for (const sx of [-1, 1]) {
+      const bx = sx * P.FLAT / 2;
+      pig.add(tri3([[bx, Y1 - 14, P.Z_RIM], [bx, Y1 - 1, P.Z_RIM], [bx + sx * 9, Y1 - 9, P.Z_RIM + 22]], yellow));
+      pig.add(tri3([[bx + sx * 0.3, Y1 - 11, P.Z_RIM + 1.5], [bx + sx * 0.3, Y1 - 4, P.Z_RIM + 1.5], [bx + sx * 6, Y1 - 8, P.Z_RIM + 14]], pink));
+    }
+    // tail door: outline and a handle on the tail panel, plus a curly tail above it
+    const tz0 = P.TAIL_ZC - P.TAIL_H / 2, dw = P.DOOR_HALF, yb = -P.L_TAIL - 0.3;
+    const doorPts = [[-dw, yb, tz0 + 2], [dw, yb, tz0 + 2], [dw, yb, tz0 + P.Z_HI - 4], [-dw, yb, tz0 + P.Z_HI - 4], [-dw, yb, tz0 + 2]];
+    const g = new THREE.BufferGeometry().setFromPoints(doorPts.map(p => toT(...p)));
+    pig.add(new THREE.Line(g, new THREE.LineBasicMaterial({ color: 0x2b2420 })));
+    const handle = new THREE.Mesh(new THREE.CircleGeometry(1.6, 20), dark); handle.position.copy(toT(dw - 4, yb - 0.2, tz0 + P.Z_HI / 2)); pig.add(handle);
+    const curl = new THREE.Mesh(new THREE.TorusKnotGeometry(5, 1.4, 80, 10, 2, 3), pink); curl.position.copy(toT(0, -P.L_TAIL - 4, P.Z_HI + 8)); curl.rotation.y = Math.PI / 2; pig.add(curl);
+    // hooves: sleeves round the casters down to a dark band 4" off the road
+    if (P.UNDERBODY === 'octagon' || P.UNDERBODY === 'chamfer') for (const [name, leg] of Object.entries(P.LEGS)) for (const sx of [-1, 1]) {
+      const yc = P.CASTER_Y[name === 'rear' ? 0 : 1], top = P.Z_SKIRT, bot = P.Z_GROUND + P.LEG_CLEAR, h = top - bot;
+      const cyl = new THREE.Mesh(new THREE.CylinderGeometry(leg.r, leg.r, h, 32, 1, true), yellow); cyl.position.copy(toT(sx * P.RAIL_X, yc, bot + h / 2)); pig.add(cyl);
+      const band = new THREE.Mesh(new THREE.CylinderGeometry(leg.r + 0.2, leg.r + 0.2, 3, 32, 1, true), dark); band.position.copy(toT(sx * P.RAIL_X, yc, bot + 1.5)); pig.add(band);
+    }
+  })();
+  scene.add(pig);
   const casters = new THREE.Group();
   const wheelMat = new THREE.MeshLambertMaterial({ color: 0x3a3f46 });
   for (const n of Object.keys(D.reactions)) {
@@ -417,6 +462,14 @@ p { margin: 0; max-width: 70ch; }
   document.getElementById('ck-decks').addEventListener('change', e => decks.visible = e.target.checked);
   document.getElementById('ck-casters').addEventListener('change', e => casters.visible = e.target.checked);
   document.getElementById('ck-def').addEventListener('change', e => { document.getElementById('defscale-wrap').hidden = !e.target.checked; placeMembers(); });
+  document.getElementById('ck-pig').addEventListener('change', e => {
+    const on = e.target.checked; pig.visible = on;
+    skinMat.transparent = !on; skinMat.opacity = on ? 1 : 0.16; skinMat.depthWrite = on; skinMat.color.set(on ? 0xE3A400 : 0xc9a06a); skinMat.needsUpdate = true;
+    for (const m of memberMeshes) m.visible = !on;
+    decks.visible = on ? false : document.getElementById('ck-decks').checked;
+    skin.visible = on ? true : document.getElementById('ck-skin').checked;
+    document.getElementById('legend').hidden = on;
+  });
   document.getElementById('defscale').addEventListener('input', e => { document.getElementById('defscale-v').textContent = e.target.value; placeMembers(); });
   for (const t of document.querySelectorAll('[role=tab]')) t.addEventListener('click', () => {
     for (const x of document.querySelectorAll('[role=tab]')) { x.setAttribute('aria-selected', String(x === t)); document.getElementById(x.getAttribute('aria-controls')).hidden = x !== t; }
@@ -452,8 +505,7 @@ p { margin: 0; max-width: 70ch; }
     const jrows = groups.map(g => { const ms = D.members.filter(m => m.group === g); const j = Math.max(...ms.map(m => Math.max(...D.combos.map(c => D.results[m.name][c].joint_lb)))); const u = Math.max(...ms.map(m => Math.max(...D.combos.map(c => D.results[m.name][c].u)))); return { g, j, u }; }).sort((a, b) => b.j - a.j)
       .slice(0, 8).map(r => `<tr><td class="l">${GROUP_LABEL[r.g]}</td><td>${fmt(r.j)}</td><td>${(r.j / 3600 * 100).toFixed(0)}%</td><td>${(r.u * 100).toFixed(0)}%</td></tr>`).join('');
     const K = D.kinds;
-    const where = { 1: 'points along one stick: caster mounts, mid-span load points', 5: 'lower and upper corners of the end ribs, with a cone stringer added', 4: 'corners at the middle ribs; rail × cross-member crossings with a skirt dropper; rail × beam crossings with a post and chamfer stub', 3: 'joist and X-brace landings on the deck beams; skirt corners', 2: 'rim and tip-frame corners' };
-    const vrows = Object.keys(D.valence_hist).sort((a, b) => b - a).map(n => `<tr><td class="l">${n}</td><td>${D.valence_hist[n]}</td><td class="l">${where[n] || ''}</td></tr>`).join('');
+    const vrows = Object.keys(D.valence_hist).sort((a, b) => b - a).map(n => `<tr><td class="l">${n}</td><td>${D.valence_hist[n]}</td><td class="l">${n == 1 ? 'points along one stick: caster mounts, mid-span load points' : (D.valence_where[n] || []).slice(0, 3).map(w => `${w.count}× ${w.desc}`).join('; ')}</td></tr>`).join('');
     document.getElementById('pane-joints').innerHTML = `
       <div class="cols">
         <div><h2>Caster loads, lb</h2><p class="muted" style="margin:4px 0 10px">Vertical reaction at each wheel. "Lifted" removes the right-rear wheel, as on a crowned road or a pothole.</p>
@@ -555,6 +607,54 @@ p { margin: 0; max-width: 70ch; }
           <li>Someone sits on a hatch edge → hatch-edge beam → long braces → chassis, instead of the beam spanning 96" on its own.</li>
           <li>Every joint is modelled as a pin, so nothing relies on a bracket. Add the brackets anyway: they are what turns "strong enough" into "stiff".</li></ul>
       </div></div>`;
+  })();
+  (function build() {
+    const H = D.hardware, pl = D.plates || [];
+    const boltRows = (obj, note) => Object.entries(obj).sort((a, b) => a[0] - b[0]).map(([L, q]) => `<tr><td class="l">⅜"-16 × ${L}" Grade 5 zinc</td><td>${fmt(q)}</td><td class="l">${note}</td></tr>`).join('');
+    const sizes = Object.keys(P.sections).filter(k => D.members.some(m => m.sec === k)).map(k => `<tr><td class="l">${secName(k)}</td><td>${(P.sections[k].size - 2 * P.sections[k].t).toFixed(2)}"</td></tr>`).join('');
+    document.getElementById('pane-build').innerHTML = `
+      <div class="cols">
+        <div><h2>Build order</h2><p class="muted" style="margin:4px 0 10px">Four to six people, a flat floor, two sawhorses, a level. Nothing gets lifted that two people cannot carry; the heavy moment is setting the chassis on its wheels.</p>
+          <ol class="notes" style="padding-left:20px">
+            <li><strong>Plates and tube first.</strong> Cut every stick to the cut list and label it. Flatten the ends of the cone stringers, long braces, lower-box diagonals and V-braces (2" in a vise, drill ⅜"). Put threadlocker on every bolt as you go; nothing gets re-torqued later.</li>
+            <li><strong>Chassis, upside down on sawhorses.</strong> Two 2½" rails, four 2" cross-members: rails stacked on the cross-members, one bolt through each crossing, TL-90 plates at the four corners. Square it by diagonals before the plates go on. Bolt the four caster plates to the underside of the rails with the crush sleeves inside the rail. Fit the belly ply (two sheets, ${fmt(P.FLAT)}" × 96") to the underside now, while it is face up and easy.</li>
+            <li><strong>Flip it onto its wheels.</strong> Four people, lift and roll. Chock the wheels. Everything from here is built on the chassis at working height, ${fmt(-P.Z_GROUND)}" off the floor.</li>
+            <li><strong>Lower box.</strong> Columns at each rib on the rails (TP-90), joists on the columns, deck beams across the joists at the ribs, chamfer stubs out to the deck-ring corners (TP-45), the deck-edge stringers, then one diagonal per bay in each rail plane and the V-braces in the nose and tail walls. This is now a rigid box; check it is square and level before the ply.</li>
+            <li><strong>Long braces before the lower deck ply.</strong> Set the four long braces now (bottom ends on the cross-members) so the deck ply can be slotted round them, rather than threading them through later. Their top ends wait for the upper beams.</li>
+            <li><strong>Lower deck ply.</strong> Two 4 × 8 sheets dropped in from above, long way across the beams, slotted for the braces. Screw to every beam and stringer every 6–8". This is the first diaphragm; the body gets stiff when it goes down.</li>
+            <li><strong>Posts and upper frame.</strong> Six posts on the deck-edge stringers (TP-90 top and bottom), the two side rails, then the end beams and the two hatch-edge beams across (TP-90 to the rails), the hatch sides, the nose-wall X-brace, the tail-door jambs. Land the long braces' top ends on the hatch-edge beams.</li>
+            <li><strong>Upper deck ply through the top.</strong> The top opening is ${fmt(P.FLAT)}" wide, a 4 × 8 sheet is 48", so the sheets go in from above, long way across the beams, with the hatch cut out. Screw every 6–8".</li>
+            <li><strong>Rim.</strong> Chamfer stubs (TP-45) and the two rim stringers, cross pieces at the nose and tail only.</li>
+            <li><strong>Nose and tail frames.</strong> Snout and tail frames assembled flat on the floor (TL-90 corners), then the eight stringers each, pinned at both ends. Hang the tail door.</li>
+            <li><strong>Skin, outside in, bottom up.</strong> Lower chamfers, sides, upper chamfers, cones. Every panel fastened along all four edges; the side and chamfer panels are bracing, not decoration. Then paint, then decorations, then the hooves if you want the casters hidden.</li>
+          </ol>
+          <h3 style="margin-top:18px">The busiest joint</h3>
+          <p>The four chassis corners carry seven sticks: rail end, cross-member end, column, chamfer stub, V-brace, lower-box diagonal and a cone stringer. Build them in that order: TL-90 on the rail/cross-member corner, TP-90 for the column on top of it, TP-45 for the stub on the cross-member's outer face, then the three flattened-end pins staggered one hole apart along the rail. Everything else is five sticks or fewer.</p>
+        </div>
+        <div><h2>Plates</h2><p class="muted" style="margin:4px 0 10px">Flat, 10 ga (0.135") mild steel, zinc plated. Slots instead of holes so the plate lands on the tube's 1" hole pitch at any phase. Two plates per joint, one each face; one bolt passes plate–tube–plate at every slot. DXF files are in the repo at <span class="num">docs/exports/plates/</span>.</p>
+          <table class="sched"><thead><tr><th class="l">Plate</th><th>qty</th><th class="l">Use</th><th class="l">DXF</th></tr></thead><tbody>
+            ${pl.map(p => `<tr><td class="l"><strong>${p.name}</strong></td><td>${fmt(H.plates[p.name] || 0)}</td><td class="l">${p.desc}, ${p.w}" × ${p.h.toFixed(1)}"</td><td class="l">${D.standalone ? `<a href="exports/plates/${p.file}" download style="color:var(--accent)">${p.file}</a>` : p.file}</td></tr>`).join('')}
+          </tbody></table>
+          <h3 style="margin-top:18px">Bolts and nuts</h3>
+          <p class="muted" style="margin:4px 0 10px">All ⅜"-16 Grade 5 zinc hex bolts with serrated flange nuts, ${fmt(H.total_bolts)} in total; order the next box size up. Lengths assume 10 ga plates both sides and 14 ga tube.</p>
+          <div class="scroll"><table class="sched"><thead><tr><th class="l">Bolt</th><th>qty</th><th class="l">Where</th></tr></thead><tbody>
+            ${boltRows(H.plate_bolts, 'plate joints')}${boltRows(H.pin_bolts, 'flattened-end pins, with a 1" fender washer each side')}${boltRows(H.cross_bolts, 'rail × cross-member crossings')}
+            <tr><td class="l">⅜"-16 × 3¼" Grade 5 zinc</td><td>${fmt(H.caster_bolts + H.tow_bolts)}</td><td class="l">caster plates and tow eyes, through the 2½" rail with a crush sleeve</td></tr>
+            <tr><td class="l">Crush sleeve, ½" OD × 0.065" wall DOM tube, ${H.sleeve_len}" long</td><td>${fmt(H.sleeves)}</td><td class="l">inside the rail at each caster and tow bolt, slid in from the rail end</td></tr>
+            <tr><td class="l">⅜" fender washers, 1" OD</td><td>${fmt(2 * Object.values(H.pin_bolts).reduce((a, b) => a + b, 0) + 2 * Object.values(H.cross_bolts).reduce((a, b) => a + b, 0))}</td><td class="l">under heads and nuts wherever there is no plate</td></tr>
+            <tr><td class="l">Threadlocker, medium (blue, oil-tolerant)</td><td>2 × 50 ml</td><td class="l">every bolt</td></tr>
+          </tbody></table></div>
+          <h3 style="margin-top:18px">Torque</h3>
+          <p class="muted" style="margin:4px 0 10px">The rated torque for a ⅜" Grade 5 is about 31 ft·lb, which puts 4,500 lb of clamp on a 0.075" wall and dimples it. These are bearing joints with threadlocker, so the nut only has to stay put. Set a torque wrench and stop there.</p>
+          <table class="sched"><thead><tr><th class="l">Joint</th><th>ft·lb</th><th class="l">Why</th></tr></thead><tbody>
+            <tr><td class="l">Plate both sides</td><td>12</td><td class="l">the plates spread the clamp over the tube face; ~1,700 lb clamp, wall stays flat</td></tr>
+            <tr><td class="l">Pin or crossing, fender washers on bare tube</td><td>8</td><td class="l">washer on a single wall; snug, no dimple</td></tr>
+            <tr><td class="l">Caster and tow bolts, with crush sleeve</td><td>25</td><td class="l">the sleeve takes the clamp, so these can be properly tight</td></tr>
+          </tbody></table>
+          <h3 style="margin-top:18px">Tube inside widths (for sleeves and telescoping stubs)</h3>
+          <table class="sched"><thead><tr><th class="l">Tube</th><th>inside</th></tr></thead><tbody>${sizes}</tbody></table>
+        </div>
+      </div>`;
   })();
   (function assume() {
     document.getElementById('pane-assume').innerHTML = `<div class="cols">

@@ -69,6 +69,25 @@ Bolts: ⅜" Grade 5 zinc-plated, flange nuts or nylocks, snug-tight only. These 
 adds nothing and over-tightening dimples the 0.105" wall. Where a bolt passes through a single tube with nothing
 inside it, a 1¾" sleeve stub inside the 2" tube lets you tighten harder.
 
+## Building it
+
+The viewer's **Build** tab has the full sequence; the short version:
+
+1. Cut and label every stick; flatten the ends of the cone stringers, long braces, lower-box diagonals and V-braces.
+2. Chassis upside down on sawhorses: rails on cross-members, corner plates, caster plates with crush sleeves,
+   belly ply. Flip it onto its wheels.
+3. Lower box: columns, joists, deck beams, chamfer stubs, edge stringers, diagonals, V-braces. Square and level it.
+4. Long braces, *then* the lower deck ply slotted round them (two 4 × 8 sheets from above).
+5. Posts, side rails, end and hatch-edge beams, hatch sides, nose X-brace, tail-door jambs.
+6. Upper deck ply from above (a 48" sheet fits the 55" top opening), rim, nose and tail frames, door.
+7. Skin bottom up and outside in, every panel fastened along all four edges; paint; decorations; hooves.
+
+**Plates** (`docs/exports/plates/`, DXF for laser cutting, 10 ga zinc-plated steel, slotted so they land on the
+tube's 1" hole pitch): TP-90 T plate, TL-90 L plate, TP-45 45° plate. Two per joint, one each face; quantities
+and the bolt schedule (≈620 ⅜"-16 Grade 5 bolts by length, 20 crush sleeves, fender washers) are computed from
+the model on the Build tab. Torque with threadlocker throughout: 12 ft·lb where there are plates both sides,
+8 ft·lb on a bare tube with fender washers, 25 ft·lb at the caster and tow bolts, which have sleeves.
+
 ## Reviewing and changing the design
 
 Everything is driven by the `PARAMETERS` block at the top of [`model/frame_model.py`](model/frame_model.py):
@@ -82,6 +101,7 @@ To run locally, from this directory:
 ```bash
 pip install -r requirements.txt
 python model/frame_model.py            # prints worst members, writes docs/exports/*
+python model/make_plates.py            # plate DXFs
 python model/build_viewer.py --standalone   # writes docs/index.html
 ```
 
@@ -92,7 +112,8 @@ Open `docs/index.html` in a browser. It loads three.js and fonts from CDNs, so i
 | Path | What |
 |---|---|
 | `model/frame_model.py` | The model: geometry, loads, load cases, checks, exports. Edit this. |
-| `model/build_viewer.py` | Turns `results.json` into the viewer page. |
+| `model/build_viewer.py` | Turns `results.json` into the viewer page, including the joint census, plate counts and bolt schedule. |
+| `model/make_plates.py` | Writes the plate DXFs and their spec to `docs/exports/plates/`. |
 | `model/viewer_template.html` | The viewer (three.js scene, tabs, cross-section drawing). |
 | `model/v1/` | The first, fully-triangulated design, kept for reference. |
 | `docs/index.html` | Built viewer, served by GitHub Pages. |
