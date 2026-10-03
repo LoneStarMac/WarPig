@@ -8,23 +8,23 @@ with an interactive 3D viewer, cut list, joint schedule and caster loads.
 > Not a stamped design. It is a parametric model built so the team can change dimensions, loads and tube sizes and
 > see the consequences. If people ride on it, have an engineer review rider load cases.
 
-## Current design (v7)
+## Current design (v8)
 
 | | |
 |---|---|
-| Body | 96 × 96 × 96 in octagon, 55 in flats, top open. 36 in snout to a 30 × 18 in panel; 24 in flat-floored tail tunnel to a 40 × 55 in flap, which is the door. |
-| Chassis | 2½" × 14 ga ladder on the octagon's 55" bottom flat: two rails at ±26", a spine, four 52" cross-members at the ribs (Y = 0, 32, 64, 96). 16" casters under the rails at 11" from each end, entirely below the body: the feet. |
-| Lower deck | 1½" frame 20.5" above the chassis: beams at the ribs, three joists over the rails, columns down to the chassis, 45° chamfer stubs out to the deck-ring corners. ¾" ply, 40" above the road, i.e. where it is now. |
-| Sides | 1¾" posts, hard-skinned; the panels are the side bracing (fastened along every edge). Entry is through the tail. |
-| Upper deck | 1¾" perimeter and cross beams, two 1½" joists, 48 × 32 in hatch in the middle, 97" above the road. |
-| Rim | 1½" handrail ring 20.5" above the upper deck, on 1½" chamfer stubs. Top of frame 113" above the road. |
+| Body | 96 × 96 × 96 in octagon, 55 in flats, top open. 36 in snout to a 30 × 18 in panel; 20.5 in tail to a 55 × 55 in flap (the door is in it), so every tail face is a 45° cut. |
+| Chassis | Two 2½" × 14 ga rails at ±26" on the octagon's 55" bottom flat, four 2" × 52" cross-members at the ribs (Y = 0, 32, 64, 96), no spine. 16" casters under the rails at 11" from each end, entirely below the body: the feet. |
+| Lower deck | 1½" frame 20.5" above the chassis: beams at the ribs, a joist over each rail, and under each joist a truss (columns at the ribs, one diagonal per bay) down to the rail; 45° chamfer stubs out to the deck-ring corners. ¾" ply spanning 32" between the beams, 40" above the road, i.e. where it is now. |
+| Sides | Three 1¾" posts per side at Y = 16, 48, 80, staggered between the beam stations so each laps a continuous rail. Hard-skinned; the panels are the side bracing (fastened along every edge). Entry is through the tail. |
+| Upper deck | 1¾" side rails, end beams and two hatch-edge cross beams, 1½" hatch sides; ply spans 32" between the beams. 48 × 32 in hatch, 97" above the road. |
+| Rim | 1½" handrail stringers 20.5" above the upper deck on 1½" chamfer stubs, cross pieces at the nose and tail only (nothing to sit on across the opening). Top of frame 113" above the road. |
 | Bracing | 1½" 45° X in the nose wall; four 1½" long braces from the chassis ends up to the hatch-edge beams (a V at the front, a pair at the rear); V-braces below the deck in the nose and tail walls; skinned tail-wall panels beside the door; deck, belly, chamfer and side plywood. |
 | Underbody | The full octagon: 20.5" lower chamfer to the 55" bottom flat, 17" off the road, with the casters below it. Optional coroplast sleeves with a rubber-seal hoof round each caster, no steel. Rigid casters at the rear, swivels at the front. |
-| Steel | ≈ 457 ft, ≈ 638 lb, all 14 ga. (v2 at 12 ga was 1,016 lb.) |
-| Weight | ≈ 3,240 lb parked with 6 aboard; ≈ 2,320 lb moving with 2. |
+| Steel | ≈ 417 ft, ≈ 569 lb, all 14 ga: 30 ten-ft sticks of 1½", 12 of 1¾", 2 of 2", 2 of 2½". (v2 at 12 ga was 1,016 lb.) |
+| Weight | ≈ 3,020 lb parked with 6 aboard; ≈ 2,170 lb moving with 2. |
 | Casters | 850 lb each parked, 1,630 lb with one wheel in a pothole. Spec 16" wheels ≥ 1,200 lb. |
-| Worst member | Chassis rail, 81% of allowable, one wheel lifted. Target is 85%; nothing else over 71%. |
-| Flex | 0.08" sag at the hatch edge with someone sitting on it (the long braces prop it). Front-to-back racking under a rope snatch: 0.05" with every joint a pin, 0.18" if the side panels did nothing. Pothole twist 0.3". |
+| Worst member | Chassis rail, 75% of allowable, one wheel lifted. The rails were checked at 2": 121% at 14 ga, 92% at 12 ga, so they stay 2½". Target is 85%; nothing else over 70%. |
+| Flex | 0.11" sag at the hatch edge with someone sitting on it (the long braces prop it). Front-to-back racking under a rope snatch: 0.06" with every joint a pin. Pothole twist 0.24". |
 
 ### Sizing philosophy
 
@@ -48,13 +48,12 @@ only inside continuous sticks (sleeve-spliced with a 12" stub of the next size d
 which we recommend having a shop weld from plain 2½" tube and paint (about an hour of welding); bolting it with
 the rails stacked on the cross-members also works, the deck ply holds it square.
 
-Brackets standardise it. Every 45° diagonal shares one pattern, so the whole frame needs two bracket patterns,
-counted from the model on the viewer's Joints tab: **A, a 90° saddle** (~170: a U-channel wrapping the host tube,
-two bolts through it, a tab along the ending tube with two bolts) and **B, the same saddle with the tab bent to
-45°** (~25: X-brace ends, chamfer stubs). Nose and tail stringers and the 60° side diagonals need none: flatten 2"
-of the end in a vise and use one bolt. A cut-and-brake "cap" on the tube end does the same job as pattern A if you
-would rather make than order. Both patterns are simple enough to have laser-cut and bent (SendCutSend or similar)
-from 12 ga.
+Plates standardise it. Verticals lap past their horizontals instead of butting them, so the two tubes share a flat
+face and a laser-cut flat plate bolts across it, two bolts per leg, no bends. Every diagonal in the body is 45°, so
+there are two plate patterns, counted from the model on the viewer's Joints tab: **A, a flat T or L plate** (~90) and
+**B, a flat 45° plate** (~45: chamfer stubs, X-brace ends, tail stringers). Cone stringers, long braces, lower-box
+diagonals and V-braces are flattened-end one-bolt pins and need none. Both patterns are a SendCutSend order from
+12 ga.
 
 Racking is resisted by the ¾" deck plywood acting as shear diaphragms (screw it to the steel every 6–8" along
 every panel edge; this is the one place fastener spacing matters) and by the nose and tail pyramids, which are
@@ -116,8 +115,9 @@ chassis centreline. The road is at Z = −17.25 (16" caster + half a 2½" tube).
 * `--optimize` re-sizes every family from scratch; a plain run uses the sizes baked into `GROUP_SEC`.
 * Plywood decks modelled as shear panels at an effective G·t of 15,000 lb/in (APA gives 60–80k for ¾" sheathing
   before fastener slip). This is the assumption most worth an engineer's eye.
-* `UNDERBODY` ('octagon', 'chamfer', 'legs' or 'skirt'), `ENTRY` ('tail' or 'side'), `LONG_BRACES` and
-  `SIDE_BRACING` ('skin', 'diagonals', 'none') switch between the v7 to v3 layouts. 'octagon' puts the chassis on the bottom flat with the casters below it; the other three keep
+* `UNDERBODY` ('octagon', 'chamfer', 'legs' or 'skirt'), `ENTRY` ('tail' or 'side'), `LONG_BRACES`,
+  `SIDE_BRACING` ('skin', 'diagonals', 'none'), `POST_Y`, `UPPER_JOISTS`, `RIM_CROSS`, `LOWER_WEB` and `SPINE`
+  switch between the v8 to v3 layouts. 'octagon' puts the chassis on the bottom flat with the casters below it; the other three keep
   the chassis at the lower deck with the casters inside the body, which rides 20" lower.
 * Not modelled: local wall dimpling under a bolt, hole slop, skin on the sides, belly, legs and cones, wind.
 

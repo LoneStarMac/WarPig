@@ -46,12 +46,18 @@ LONG_BRACES = True                  # front V: chassis spine front end up to the
                                     # rear pair: tail cross-member at +/-18 up to the hatch-edge beam at Y=32, landing at +/-24.
                                     # Offsets keep every brace clear of the lower deck joists where it passes through the deck ply.
 LB_FRONT_X, LB_REAR_X0, LB_REAR_X1 = 12.0, 18.0, 24.0
+POST_Y      = [16.0, 48.0, 80.0]    # side posts, staggered between the rib stations (v8); [0, 32, 64, 96] puts them on the ribs
+UPPER_JOISTS = 'hatch'              # 'hatch': only the two hatch-side pieces at +/-24 in the middle bay; 'full': joists at +/-24 and 0 throughout
+RIM_CROSS   = 'ends'                # 'ends': rim cross pieces at the nose and tail ribs only (nothing to sit on across the opening); 'all'
+LOWER_WEB   = 'pratt'               # 'pratt': columns at the ribs + one diagonal per bay in the rail planes (a truss each side); 'columns'
+SPINE       = False                 # chassis spine and centre joist/columns; False drops them (the deck ply spans 32" between the deck beams)
 SIDE_BRACING = 'skin'               # 'diagonals': one 1.5" diagonal per side bay (v4-v6); 'skin': the hard side panels as shear panels; 'none'
 HATCH    = (32.0, 64.0)             # upper-deck hatch between these ribs, X between the joists at +/-24
 JOIST_X  = 24.0
 L_NOSE, NOSE_W, NOSE_H, NOSE_ZC = 36.0, 30.0, 18.0, (Z_RIM + (-C)) / 2    # snout panel, centred on the octagon (z = 27.5)
-L_TAIL, TAIL_W, TAIL_H, TAIL_ZC = (24.0, 48.0, 40.0, (Z_RIM + (-C)) / 2 + 6) if ENTRY == 'side' else (24.0, 40.0, Z_HI, Z_HI / 2)
-# tail panel: blunt and a little high with side entry; with tail entry it is a 40 x 55 flap from the chassis to the upper deck, i.e. the door
+L_TAIL, TAIL_W, TAIL_H, TAIL_ZC = (24.0, 48.0, 40.0, (Z_RIM + (-C)) / 2 + 6) if ENTRY == 'side' else (C, FLAT, Z_HI, Z_HI / 2)
+# tail panel: blunt and a little high with side entry. With tail entry it is a 55 x 55 flap (the door is in it), 20.5" behind the
+# body, so every tail face is a 45-degree cut: sides 45 in plan, top and bottom 45 in elevation, same as the octagon's chamfers.
 LIFT_CASTER = (RAIL_X, CASTER_Y[0])             # right-rear wheel off the ground in the Lifted case
 
 PEOPLE_LOWER_PARKED = 4;  PERSON_LB = 200.0    # parked: 4 standing below + one 250 lb person at each hatch edge
@@ -89,14 +95,15 @@ SECTIONS_BY_WEIGHT = sorted(SECTIONS, key=lambda k: SECTIONS[k]['wpf'])
 # (python frame_model.py --optimize) picks the lightest allowed section per family that keeps every member under
 # U_TARGET in every load case (strength only: yield and buckling; deflection is reported, not limited).
 FAMILIES = {
-    'chassis':   dict(groups=['chassis_rail', 'chassis_spine', 'chassis_cross'], min='2.00x14'),
+    'rails':     dict(groups=['chassis_rail'], min='2.00x14'),
+    'chassis':   dict(groups=['chassis_spine', 'chassis_cross'], min='1.75x14'),
     'upper':     dict(groups=['deck_hi_rail', 'deck_hi_end', 'deck_hi_cross'], min='1.75x14'),
     'posts':     dict(groups=['post', 'deck_lo_edge', 'door_jamb'], min='1.75x14'),
     'rim':       dict(groups=['chamfer_hi', 'rim_cross', 'rim_stringer'], min='1.50x14'),   # handrail: 1.5" minimum for feel
     'joists':    dict(groups=['joist_hi'], min='1.50x14'),
     'brace':     dict(groups=['xbrace_end', 'side_diag', 'vbrace_lo'], min='1.50x14'),
     'longbrace': dict(groups=['long_brace'], min='1.50x14'),
-    'lowerdeck': dict(groups=['deck_lo_beam', 'joist_lo', 'column'], min='1.50x14'),
+    'lowerdeck': dict(groups=['deck_lo_beam', 'joist_lo', 'column', 'web_diag'], min='1.50x14'),
     'legs':      dict(groups=['leg_top', 'leg_drop', 'leg_ring'], min='1.50x14'),
     'skirt':     dict(groups=['skirt_stub', 'skirt_bottom', 'skirt_drop', 'skirt_stringer'], min='1.50x14'),
     'cones':     dict(groups=['nose_stringer', 'nose_rim', 'tail_stringer', 'tail_rim'], min='1.50x14'),
@@ -104,13 +111,13 @@ FAMILIES = {
 U_TARGET = 0.85
 # v3 sizes, from --optimize with U_TARGET = 0.85. (v2 was 2.5"/2"/1.75" x 12 ga everywhere: 1,016 lb.)
 GROUP_SEC = {
-    'chassis_rail': '2.50x14', 'chassis_spine': '2.50x14', 'chassis_cross': '2.50x14',
+    'chassis_rail': '2.50x14', 'chassis_spine': '2.00x14', 'chassis_cross': '2.00x14',
     'deck_hi_rail': '1.75x14', 'deck_hi_end': '1.75x14', 'deck_hi_cross': '1.75x14', 'xbrace_end': '1.50x14',
     'deck_lo_edge': '1.75x14', 'post': '1.75x14', 'chamfer_hi': '1.50x14', 'rim_cross': '1.50x14', 'rim_stringer': '1.50x14',
     'joist_hi': '1.50x14',
     'skirt_stub': '1.50x14', 'skirt_bottom': '1.50x14', 'skirt_drop': '1.50x14', 'skirt_stringer': '1.50x14',
     'leg_top': '1.50x14', 'leg_drop': '1.50x14', 'leg_ring': '1.50x14', 'side_diag': '1.50x14', 'door_jamb': '1.75x14',
-    'deck_lo_beam': '1.50x14', 'joist_lo': '1.50x14', 'column': '1.50x14', 'vbrace_lo': '1.50x14', 'long_brace': '1.50x14',
+    'deck_lo_beam': '1.50x14', 'joist_lo': '1.50x14', 'column': '1.50x14', 'vbrace_lo': '1.50x14', 'long_brace': '1.50x14', 'web_diag': '1.50x14',
     'nose_stringer': '1.50x14', 'nose_rim': '1.50x14', 'tail_stringer': '1.50x14', 'tail_rim': '1.50x14',
 }
 GROUP_LABEL = {
@@ -123,7 +130,7 @@ GROUP_LABEL = {
     'leg_top': 'Leg box, top ring', 'leg_drop': 'Leg box, corner post', 'leg_ring': 'Leg box, bottom ring',
     'side_diag': 'Side wall diagonal (under skin)', 'door_jamb': 'Tail door jamb',
     'deck_lo_beam': 'Lower deck beam (96")', 'joist_lo': 'Lower deck joist', 'column': 'Lower deck column', 'vbrace_lo': 'V-brace below the deck, nose & tail',
-    'long_brace': 'Long brace, chassis end to hatch edge',
+    'long_brace': 'Long brace, chassis end to hatch edge', 'web_diag': 'Lower box diagonal (rail to joist)',
     'tail_stringer': 'Tail stringer', 'tail_rim': 'Tail frame',
 }
 ROLE = {
@@ -133,7 +140,7 @@ ROLE = {
     'xbrace_end': 'Bracing',
     'skirt_stub': 'Skirt', 'skirt_bottom': 'Skirt', 'skirt_drop': 'Skirt', 'skirt_stringer': 'Skirt',
     'leg_top': 'Legs', 'leg_drop': 'Legs', 'leg_ring': 'Legs', 'side_diag': 'Bracing', 'door_jamb': 'Posts & rim',
-    'deck_lo_beam': 'Lower deck', 'joist_lo': 'Lower deck', 'column': 'Lower deck', 'vbrace_lo': 'Bracing', 'long_brace': 'Bracing',
+    'deck_lo_beam': 'Lower deck', 'joist_lo': 'Lower deck', 'column': 'Lower deck', 'vbrace_lo': 'Bracing', 'long_brace': 'Bracing', 'web_diag': 'Lower deck',
     'nose_stringer': 'Nose & tail', 'nose_rim': 'Nose & tail', 'tail_stringer': 'Nose & tail', 'tail_rim': 'Nose & tail',
 }
 if UNDERBODY == 'octagon': ROLE['skirt_stub'] = 'Lower deck'
@@ -143,7 +150,7 @@ ROLE_ORDER = ['Chassis', 'Lower deck' if UNDERBODY == 'octagon' else ('Legs' if 
 # which is either welded or squared by the deck ply. Posts are pinned top and bottom; the deck diaphragms and the nose/tail
 # pyramids do the racking work. The X-braces are continuous through their crossing (one stick + two halves). Nose/tail
 # tip frames are left rigid (4 short pieces, bracketed); everything else, skirt included, is pinned.
-PIN_BOTH       = {'post', 'chamfer_hi', 'nose_stringer', 'tail_stringer', 'skirt_stub', 'skirt_drop', 'side_diag', 'door_jamb', 'column', 'vbrace_lo', 'long_brace'}   # leg corner posts stay rigid: the leg box is skinned on 4 sides
+PIN_BOTH       = {'post', 'chamfer_hi', 'nose_stringer', 'tail_stringer', 'skirt_stub', 'skirt_drop', 'side_diag', 'door_jamb', 'column', 'vbrace_lo', 'long_brace', 'web_diag'}   # leg corner posts stay rigid: the leg box is skinned on 4 sides
 PIN_CHAIN_ENDS = {'deck_hi_cross', 'deck_hi_end', 'deck_hi_rail', 'joist_hi', 'rim_stringer', 'rim_cross', 'skirt_stringer', 'skirt_bottom', 'deck_lo_edge', 'xbrace_end', 'leg_top', 'deck_lo_beam', 'joist_lo'}
 
 
@@ -215,11 +222,13 @@ def build(lift_caster=None):
     tail_rib, nose_rib = RIBS[0], RIBS[-1]
     rail_ys = sorted(set(RIBS) | set(CASTER_Y) | {L/2})
 
-    # ----- CHASSIS (z = CZ): rails, spine, cross-members; deck-edge stringers at the deck ring
+    # ----- CHASSIS (z = CZ): rails, spine, cross-members; deck-edge stringers at the deck ring (posts land on them too)
+    edge_ys = sorted(set(RIBS) | set(POST_Y))
     for sx in (-1, 1):
         F.chain([(sx*rx, y, CZ) for y in rail_ys], 'chassis_rail')
-        F.chain([(sx*hw, y, 0.0) for y in RIBS], 'deck_lo_edge')
-    F.chain([(0.0, y, CZ) for y in rail_ys], 'chassis_spine')
+        F.chain([(sx*hw, y, 0.0) for y in edge_ys], 'deck_lo_edge')
+    if SPINE or not OCT:
+        F.chain([(0.0, y, CZ) for y in rail_ys], 'chassis_spine')
     for y in RIBS:
         extra = [x for leg in LEGS.values() if UNDERBODY == 'legs' and y in (leg['y0'], leg['y1']) for sx in (-1, 1) for x in (sx*rx - leg['halfw'], sx*rx + leg['halfw'])]
         if ENTRY == 'tail' and y == tail_rib and not OCT: extra += [-DOOR_HALF, DOOR_HALF]
@@ -229,22 +238,29 @@ def build(lift_caster=None):
 
     # ----- LOWER DECK FRAME (octagon mode): beams at the ribs, joists over the rails, columns down to the chassis, chamfer stubs to the corners
     if OCT:
+        col_xs = (-rx, 0.0, rx) if SPINE else (-rx, rx)
         for y in RIBS:
             xs = [-hw, -rx, 0.0, rx, hw] + ([-DOOR_HALF, DOOR_HALF] if ENTRY == 'tail' and y == tail_rib else [])
             F.chain([(x, y, 0.0) for x in sorted(set(xs))], 'deck_lo_beam')
-            for x in (-rx, 0.0, rx):
+            for x in col_xs:
                 F.chain([(x, y, CZ), (x, y, 0.0)], 'column')
             for sx in (-1, 1):
                 F.chain([(sx*rx, y, CZ), (sx*hw, y, 0.0)], 'skirt_stub')
             if y in (tail_rib, nose_rib):   # V-brace in the lower box of the end walls, rail crossings up to the deck centre
                 F.chain([(-rx, y, CZ), (0.0, y, 0.0)], 'vbrace_lo'); F.chain([(rx, y, CZ), (0.0, y, 0.0)], 'vbrace_lo')
-        for x in (-rx, 0.0, rx):
+        for x in col_xs:
             F.chain([(x, y, 0.0) for y in sorted(set(RIBS) | {L/2})], 'joist_lo')
+        if LOWER_WEB == 'pratt':   # one diagonal per bay in each rail plane, alternating, so rail + joist + web is a truss
+            for sx in (-1, 1):
+                for bi, (y1, y2) in enumerate(zip(RIBS[:-1], RIBS[1:])):
+                    a, b = ((y1, CZ), (y2, 0.0)) if (bi + (sx > 0)) % 2 == 0 else ((y2, CZ), (y1, 0.0))
+                    F.chain([(sx*rx, a[0], a[1]), (sx*rx, b[0], b[1])], 'web_diag')
 
     # ----- POSTS, UPPER DECK FRAME, HATCH JOISTS
-    for y in RIBS:
+    for y in POST_Y:
         for sx in (-1, 1):
             F.chain([(sx*hw, y, 0.0), (sx*hw, y, Z_HI)], 'post')
+    for y in RIBS:
         end = y in (RIBS[0], RIBS[-1])
         xs_hi = list(xs5)
         if LONG_BRACES and y == HATCH[1]: xs_hi += [-LB_FRONT_X, LB_FRONT_X]
@@ -261,10 +277,12 @@ def build(lift_caster=None):
             for sx in (-1, 1):
                 F.chain([(sx*DOOR_HALF, y, 0.0), (sx*DOOR_HALF, y, Z_HI)], 'door_jamb')
     for sx in (-1, 1):
-        F.chain([(sx*hw, y, Z_HI) for y in RIBS], 'deck_hi_rail')
-        F.chain([(sx*jx, y, Z_HI) for y in RIBS], 'joist_hi')
-    F.chain([(0.0, y, Z_HI) for y in RIBS if y <= HATCH[0]], 'joist_hi')
-    F.chain([(0.0, y, Z_HI) for y in RIBS if y >= HATCH[1]], 'joist_hi')
+        F.chain([(sx*hw, y, Z_HI) for y in edge_ys], 'deck_hi_rail')
+        if UPPER_JOISTS == 'full': F.chain([(sx*jx, y, Z_HI) for y in RIBS], 'joist_hi')
+        else: F.chain([(sx*jx, HATCH[0], Z_HI), (sx*jx, HATCH[1], Z_HI)], 'joist_hi')     # hatch sides only
+    if UPPER_JOISTS == 'full':
+        F.chain([(0.0, y, Z_HI) for y in RIBS if y <= HATCH[0]], 'joist_hi')
+        F.chain([(0.0, y, Z_HI) for y in RIBS if y >= HATCH[1]], 'joist_hi')
 
     # ----- LONG BRACES in the attics under the upper decks
     if LONG_BRACES:
@@ -283,7 +301,8 @@ def build(lift_caster=None):
     for y in RIBS:
         for sx in (-1, 1):
             F.chain([(sx*hw, y, Z_HI), (sx*f, y, Z_RIM)], 'chamfer_hi')
-        F.chain([(-f, y, Z_RIM), (f, y, Z_RIM)], 'rim_cross')
+        if RIM_CROSS == 'all' or y in (tail_rib, nose_rib):
+            F.chain([(-f, y, Z_RIM), (f, y, Z_RIM)], 'rim_cross')
     for sx in (-1, 1):
         F.chain([(sx*f, y, Z_RIM) for y in RIBS], 'rim_stringer')
 
@@ -408,19 +427,33 @@ def build(lift_caster=None):
     # decks: ply + people
     jt = rx
     lo_area = W*L/144; lo_live = PEOPLE_LOWER_PARKED*PERSON_LB/lo_area
-    deck_lines = (('joist_lo', -rx), ('joist_lo', rx), ('joist_lo', 0.0)) if OCT else (('chassis_rail', -rx), ('chassis_rail', rx), ('chassis_spine', 0.0))
-    for g, x in deck_lines:
-        for nm in along(g, x, 0.0): F.dist(nm, DECK_PSF*jt/144, 'D'); F.dist(nm, lo_live*jt/144, 'L')
-    for x in (-hw, hw):
-        for nm in along('deck_lo_edge', x, 0.0): F.dist(nm, DECK_PSF*(jt/2)/144, 'D'); F.dist(nm, lo_live*(jt/2)/144, 'L')
-    for x in (-jx, jx):
-        for nm in along('joist_hi', x, Z_HI): F.dist(nm, DECK_PSF*jt/144, 'D')
-    for nm in along('joist_hi', 0.0, Z_HI): F.dist(nm, DECK_PSF*jt/144, 'D')
-    for x in (-hw, hw):
-        for nm in along('deck_hi_rail', x, Z_HI): F.dist(nm, DECK_PSF*(jt/2)/144, 'D')
+    if OCT and not SPINE:   # lower deck ply spans between the deck beams at the ribs: each beam takes half a bay each way
+        for mm in by_group_name('deck_lo_beam'):
+            y = F.nodes[F.members[[m['name'] for m in F.members].index(mm)]['i']][1]
+            bays = (1 if y in (RIBS[0], RIBS[-1]) else 2) * (RIBS[1]-RIBS[0]) / 2
+            F.dist(mm, DECK_PSF*bays/144, 'D'); F.dist(mm, lo_live*bays/144, 'L')
+    else:
+        deck_lines = (('joist_lo', -rx), ('joist_lo', rx), ('joist_lo', 0.0)) if OCT else (('chassis_rail', -rx), ('chassis_rail', rx), ('chassis_spine', 0.0))
+        for g, x in deck_lines:
+            for nm in along(g, x, 0.0): F.dist(nm, DECK_PSF*jt/144, 'D'); F.dist(nm, lo_live*jt/144, 'L')
+    if not (OCT and not SPINE):
+        for x in (-hw, hw):
+            for nm in along('deck_lo_edge', x, 0.0): F.dist(nm, DECK_PSF*(jt/2)/144, 'D'); F.dist(nm, lo_live*(jt/2)/144, 'L')
+    if UPPER_JOISTS == 'full':
+        for x in (-jx, jx):
+            for nm in along('joist_hi', x, Z_HI): F.dist(nm, DECK_PSF*jt/144, 'D')
+        for nm in along('joist_hi', 0.0, Z_HI): F.dist(nm, DECK_PSF*jt/144, 'D')
+        for x in (-hw, hw):
+            for nm in along('deck_hi_rail', x, Z_HI): F.dist(nm, DECK_PSF*(jt/2)/144, 'D')
+    else:   # ply spans between the side-to-side beams: half a bay each way onto the end and cross beams
+        for g in ('deck_hi_end', 'deck_hi_cross'):
+            for mm in by_group_name(g):
+                y = F.nodes[F.members[[m['name'] for m in F.members].index(mm)]['i']][1]
+                bays = (1 if y in (RIBS[0], RIBS[-1]) else 2) * (RIBS[1]-RIBS[0]) / 2
+                F.dist(mm, DECK_PSF*bays/144, 'D')
     # parked: one person sitting at the centre of each hatch edge; moving: one below at mid-deck + one at a hatch edge
     for y in HATCH: F.pt(F.node(0.0, y, Z_HI), EDGE_PERSON, 'L')
-    F.pt(F.node(0.0, L/2, 0.0), MOVING['lower_center'], 'LM'); F.pt(F.node(0.0, HATCH[0], Z_HI), MOVING['hatch_edge'], 'LM')
+    F.pt(F.node(0.0, L/2 if (SPINE or not OCT) else HATCH[0], 0.0), MOVING['lower_center'], 'LM'); F.pt(F.node(0.0, HATCH[0], Z_HI), MOVING['hatch_edge'], 'LM')
 
     tot_w = total_gravity(F, ('D', 'L')); tot_move = total_gravity(F, ('D', 'LM'))
     T = TOW_FRACTION * tot_move
@@ -592,7 +625,7 @@ if __name__ == '__main__':
                params=dict(W=W, H=H_OCT, L=L, FLAT=FLAT, RIBS=RIBS, L_NOSE=L_NOSE, NOSE_W=NOSE_W, NOSE_H=NOSE_H, NOSE_ZC=NOSE_ZC,
                            L_TAIL=L_TAIL, TAIL_W=TAIL_W, TAIL_H=TAIL_H, TAIL_ZC=TAIL_ZC, Z_LO=0.0, Z_HI=Z_HI, Z_RIM=Z_RIM, Z_SKIRT=Z_SKIRT, X_SKIRT=X_SKIRT,
                            UNDERBODY=UNDERBODY, ENTRY=ENTRY, LEGS=LEGS, Z_LEG=Z_LEG, LEG_CLEAR=LEG_CLEAR, BELLY_CLEAR=BELLY_CLEAR, DOOR_HALF=DOOR_HALF, CHASSIS_Z=CHASSIS_Z,
-                           LONG_BRACES=LONG_BRACES, SIDE_BRACING=SIDE_BRACING,
+                           LONG_BRACES=LONG_BRACES, SIDE_BRACING=SIDE_BRACING, POST_Y=POST_Y, UPPER_JOISTS=UPPER_JOISTS, RIM_CROSS=RIM_CROSS, LOWER_WEB=LOWER_WEB, SPINE=SPINE,
                            Z_GROUND=Z_GROUND, RAIL_X=RAIL_X, CASTER_Y=CASTER_Y, HATCH=HATCH, JOIST_X=JOIST_X, C=C,
                            PEOPLE_LOWER=PEOPLE_LOWER_PARKED, EDGE_PERSON=EDGE_PERSON, MOVING=MOVING, PERSON_LB=PERSON_LB, SKIN_PSF=SKIN_PSF, DECK_PSF=DECK_PSF,
                            SHOCK=SHOCK, SWAY_G=SWAY_G, TOW_FRACTION=TOW_FRACTION, PLY_GT_EFF=PLY_GT_EFF, SKIN_GT_EFF=SKIN_GT_EFF, FY=FY,
