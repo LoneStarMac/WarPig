@@ -4,21 +4,13 @@ There have been many war pigs since the mascot was logingly adopted, including a
 
 A warning lives in the nose of the current wooden pig:
 > Hello
->
 > If you 
->
 > decide to rebuild
->
 > this pig, do NOT
->
 > just copy each piece.
->
 > They are not equal..
->
 > It is a nightmare.
->
 > Good luck.
->
 > ♡ Loryn H. '21
 
 
