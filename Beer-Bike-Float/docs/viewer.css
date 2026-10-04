@@ -13,8 +13,8 @@
   --grid: #d8dce2;
   --ground: #e3e6eb;
   --good: #0ca30c; --warning: #fab219; --serious: #ec835a; --critical: #d03b3b;
-  --font-display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
-  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Cormorant Garamond", "Garamond", serif;
+  --font-body: "Lato", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --radius: 4px;
 }

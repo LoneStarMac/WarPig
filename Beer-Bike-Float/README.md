@@ -56,7 +56,7 @@ The 14 ga section properties are derived from the 12 ga Telespar datasheet by th
 
 Rigidity then comes from the four long braces (34 lb), the deck, belly, chamfer and side plywood screwed to the frame, and the nose and tail pyramids. The body is a closed tube and post brackets no longer matter for stiffness; they are still worth having for consistency of construction.
 
-### Joint philosophy, because that is what makes it buildable
+### Joint philosophy
 
 Two perforated tubes crossing at 90° share exactly one bolt, so every T and corner in this frame is modelled as a pin and the frame is sized so that is enough. Nothing relies on a bolted corner carrying moment. Moment exists only inside continuous sticks (sleeve-spliced with a 12" stub of the next size down) and in the chassis ladder, which we recommend having a shop weld from plain 2.5" tube and paint (about an hour of welding); bolting it with the rails stacked on the cross-members also works, the deck ply holds it square.
 
@@ -73,30 +73,22 @@ Bolts: ⅜" Grade 5 zinc-plated, flange nuts or nylocks, snug-tight only. These 
 The viewer's **Build** tab has the full sequence; the short version:
 
 1. Cut and label every stick; flatten the ends of the cone stringers, long braces, lower-box diagonals and V-braces.
-2. Chassis upside down on sawhorses: rails on cross-members, corner plates, caster plates with crush sleeves,
-   belly ply. Flip it onto its wheels.
-3. Lower box: at each rib a V from the rail ends to the deck centre, the deck beam across it, chamfer stubs to the
-   corners; then the deck spine and edge stringers. Square and level it.
+2. Chassis upside down on sawhorses: rails on cross-members, corner plates, caster plates with crush sleeves, belly ply. Flip it onto its wheels.
+3. Lower box: at each rib a V from the rail ends to the deck centre, the deck beam across it, chamfer stubs to the corners; then the deck spine and edge stringers. Square and level it.
 4. Lower deck ply (two 4 × 8 sheets from above).
-5. Posts, side rails, end and hatch-edge beams, hatch sides, nose X-brace, tail-door jambs; then the four long
-   braces, standing on the deck-ring corners of the end ribs and rising to the hatch-edge beams.
+5. Posts, side rails, end and hatch-edge beams, hatch sides, nose X-brace, tail-door jambs; then the four long braces, standing on the deck-ring corners of the end ribs and rising to the hatch-edge beams.
 6. Upper deck ply from above (a 48" sheet fits the 55" top opening), rim, nose and tail frames, door.
 7. Skin bottom up and outside in, every panel fastened along all four edges; paint; decorations; hooves.
 
 **Plates** (`docs/exports/plates/`, DXF for laser cutting, 10 ga zinc-plated steel, slotted so they land on the tube's 1" hole pitch): TP-90 T plate, TL-90 L plate, TP-45 45° plate. Two per joint, one each face; quantities and the bolt schedule (≈620 ⅜"-16 Grade 5 bolts by length, 20 crush sleeves, fender washers) are computed from the model on the Build tab. Torque with threadlocker throughout: 12 ft·lb where there are plates both sides, 8 ft·lb on a bare tube with fender washers, 25 ft·lb at the caster and tow bolts, which have sleeves.
+**Plates** (`docs/exports/plates/`, DXF for laser cutting, 10ga zinc-plated steel, slotted so they land on the tube's 1" hole pitch): TP-90 T plate, TL-90 L plate, TP-45 45° plate. Two per joint, one each face; quantities and the bolt schedule (≈620 .375"-16 Grade 5 bolts by length, 20 crush sleeves, fender washers) are computed from the model on the Build tab. Torque with threadlocker throughout: 12 ft·lb where there are plates both sides, 8 ft·lb on a bare tube with fender washers, 25 ft·lb at the caster and tow bolts, which have sleeves.
 
 ## Reviewing and changing the design
 
 Everything is driven by the `PARAMETERS` block at the top of [`model/frame_model.py`](model/frame_model.py): dimensions, rib stations, cone sizes, people counts, dynamic factors, tube size per member group, plywood stiffness. Change a value, push to `main`, and the GitHub Action re-runs the model, rebuilds the page and the export files, and redeploys. Open a pull request instead and the Action runs the model and attaches the exports to the run without deploying, so you can review a change before it goes live.
 
-The page itself is plain files you edit by hand, nothing is generated except the data:
-
-* `docs/index.html` is the page: title, headings, the prose in every tab, the build steps. Edit the words here.
-  A number that comes from the model is a `<span data-v="…">` whose attribute is a small expression over the
-  model data (`P` is the parameter block, `S` the per-case summary, `D` everything; `fmt()` formats). A table or
-  figure the script draws is a `<div data-fill="name">`.
-* `docs/viewer.css` is the style. `docs/viewer.js` is the script: the 3D scene, the table renderers (the `FILLS`
-  map) and the helpers the `data-v` expressions can use.
+* `docs/index.html` is the page: title, headings, the prose in every tab, the build steps. A number that comes from the model is a `<span data-v="…">` whose attribute is a small expression over the model data (`P` is the parameter block, `S` the per-case summary, `D` everything; `fmt()` formats). A table or figure the script draws is a `<div data-fill="name">`.
+* `docs/viewer.css` is the style. `docs/viewer.js` is the script: the 3D scene, the table renderers (the `FILLS` map) and the helpers the `data-v` expressions can use.
 * `docs/data.js` is written by `model/build_viewer.py` from the model run. Do not edit it; it is overwritten.
 * three.js and its OrbitControls load from jsDelivr, pinned to r128 (the last release with the plain-script build).
 
@@ -115,11 +107,11 @@ Open `docs/index.html` in a browser. It loads three.js and fonts from CDNs, so i
 
 | Path | What |
 |---|---|
-| `model/frame_model.py` | The model: geometry, loads, load cases, checks, exports. Edit this. |
+| `model/frame_model.py` | The model: geometry, loads, load cases, checks, exports. |
 | `model/build_viewer.py` | Turns `results.json` into `docs/data.js`: merged sticks, stock packing, joint census, plate counts, bolt schedule. |
 | `model/make_plates.py` | Writes the plate DXFs and their spec to `docs/exports/plates/`. |
-| `model/v1/` | The first, fully-triangulated design, kept for reference. |
-| `docs/index.html`, `viewer.css`, `viewer.js` | The page, its style and its script: hand-edited, served by GitHub Pages. |
+| `model/v1/` | Archived absurd first version. Never forget who you are. |
+| `docs/index.html`, `viewer.css`, `viewer.js` | The page, its style and its script. |
 | `docs/data.js` | Generated model data the page reads. |
 | `docs/exports/frame.FCMacro` | FreeCAD macro: Macro → Macros… → Execute. One Part object per member group, inches, plus a compound of all members. |
 | `docs/exports/frame.dxf` | Same wireframe as 3D lines, one layer per member group. |
@@ -128,27 +120,25 @@ Open `docs/index.html` in a browser. It loads three.js and fonts from CDNs, so i
 | `docs/exports/results.json` | Everything the viewer shows: member forces per load case, displacements, reactions, joint schedule. |
 
 Units: inches and pounds. X across, Y along the length (rear body rib = 0, snout forward), Z up; Z = 0 is the chassis centreline. The road is at Z = −17.25 (16" caster + half a 2.5" tube).
+Units: inches and pounds. X across, Y along the length (rear body rib = 0, snout forward), Z up; Z = 0 is the chassis centreline. The road is at Z = −17.25 (16" caster + half a 2.5" tube).
 
 ## What the model does and does not do
 
-* 1D beam elements, linear static. Six load cases: parked with 6 aboard; moving with 2 aboard × 2.0 road shock;
-  parked + 0.3 g sideways; moving + rope snatch at the front rail ends; parked with the right-rear wheel off the ground; moving + 0.3 g stop held at the rear wheels only. Casters are stiff legs from the rails to the road, pinned at the tire, so sideways and braking forces overturn about the road and the caster's lever loads the rail and cross-members.
+* 1D beam elements, linear static. Six load cases: parked with 6 aboard; moving with 2 aboard × 2.0 road shock; parked + 0.3 g sideways; moving + rope snatch at the front rail ends; parked with the right-rear wheel off the ground;moving + 0.3 g stop held at the rear wheels only. Casters are stiff legs from the rails to the road, pinned at the tire,so sideways and braking forces overturn about the road and the caster's lever loads the rail and cross-members.
 * Member checks: yield (P/A + M/S) and AISC E3 column buckling over the node-to-node length. Shock is checked against nominal strength (it already carries a 2× factor); the other cases against ASD allowables (÷1.67).
-* 12 ga section properties are the perforated net values from the Unistrut Telespar datasheet; 14 ga is scaled from them. F<sub>y</sub> = 50 ksi (ASTM A1011 Gr 50; Unistrut quotes 60 ksi average after forming).
+* 12ga section properties are the perforated net values from the Unistrut Telespar datasheet; 14ga is scaled from them. F<sub>y</sub> = 50 ksi (ASTM A1011 Gr 50; Unistrut quotes 60 ksi average after forming).
 * `--optimize` re-sizes every family from scratch; a plain run uses the sizes baked into `GROUP_SEC`.
-* Plywood decks modelled as shear panels at an effective G·t of 15,000 lb/in (APA gives 60–80k for .75" sheathing  before fastener slip). This is the assumption most worth an engineer's eye.
-* `UNDERBODY` ('octagon', 'chamfer', 'legs' or 'skirt'), `ENTRY` ('tail' or 'side'), `LONG_BRACES`,
-* `SIDE_BRACING` ('skin', 'diagonals', 'none'), `POST_Y`, `CHAMFER_Y`, `UPPER_JOISTS`, `RIM_CROSS`, `LOWER_WEB`
-  ('vee': V to a deck spine at every rib; 'vee_ends': V's at the end ribs only, needs a 2.5" spine; 'pratt': side
-  trusses with columns and diagonals), `CABLES` (tension-only cable X's: 'sides', 'nose'; `CABLE_D` picks ⅛", 3/16" or ¼" 7×19 cable, checked at breaking/5) and `SPINE` switch between the v8 to v3 layouts. 'octagon' puts the chassis on the bottom flat with the casters below it; the other three keep the chassis at the lower deck with the casters inside the body, which rides 20" lower.
+* Plywood decks modelled as shear panels at an effective G·t of 15,000 lb/in (APA gives 60–80k for .75" sheathing before fastener slip). This is the assumption most worth an engineer's eye.
+* `UNDERBODY` ('octagon', 'chamfer', 'legs' or 'skirt'), `ENTRY` ('tail' or 'side'), `LONG_BRACES`, `SIDE_BRACING` ('skin', 'diagonals', 'none'), `POST_Y`, `CHAMFER_Y`, `UPPER_JOISTS`, `RIM_CROSS`, `LOWER_WEB` ('vee': V to a deck spine at every rib; 'vee_ends': V's at the end ribs only, needs a 2.5" spine; 'pratt': side trusses with columns and diagonals), `CABLES` (tension-only cable X's: 'sides', 'nose'; `CABLE_D` picks ⅛", 3/16" or 1 4" 7×19 cable, checked at breaking/5) and `SPINE` switch between the v8 to v3 layouts. 'octagon' puts the chassis on the bottom flat with the casters below it; the other three keep the chassis at the lower deck with the casters inside the body, which rides 20" lower.
 * Not modelled: local wall dimpling under a bolt, hole slop, skin on the sides, belly, legs and cones, wind.
 
 ## To do
 
 * **Brake.** Not designed in. A rear-wheel-only tread-shoe brake, over-centre handbrake lever with a gas-strut assist and a ratchet, drop chocks as the no-operator backstop; the physics (rear lifts at ~0.54 g, a locked rear tire can only give ~0.22 g, so the brake cannot be too strong) and the mechanism are written up in [`notes/brake.md`](notes/brake.md) for when the design moves forward.
+* **Brake.** Not designed in. A rear-wheel-only tread-shoe brake, over-centre handbrake lever with a gas-strut assist and a ratchet, drop chocks as the no-operator backstop; the physics (rear lifts at ~0.54 g, a locked rear tire can only give ~0.22 g, so the brake cannot be too strong) and the mechanism are written up in [`notes/brake.md`](notes/brake.md) for when the design moves forward.
 
 ## Sources
 
 * [Telespar datasheet: section properties, material](https://unistrut.biz/content/Resources/General/Telespar-DataSheet.pdf)
-* [Telespar 2 × 2 × 12 ga 10 ft post, street price](https://squarefittings.com/store/telspar-2-x-2-square-sign-post-with-holes-10-tall-12-gauge-pre-galv-plus-g90.html)
+* [Telespar 2 × 2 × 12ga 10 ft post, street price](https://squarefittings.com/store/telspar-2-x-2-square-sign-post-with-holes-10-tall-12-gauge-pre-galv-plus-g90.html)
 * [PyNite](https://github.com/JWock82/Pynite), [ezdxf](https://github.com/mozman/ezdxf), [three.js](https://threejs.org/)

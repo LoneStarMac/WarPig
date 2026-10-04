@@ -62,7 +62,7 @@ jobs:
           {
             echo '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WarPig</title>'
             echo '<style>body{font:16px/1.5 system-ui,sans-serif;max-width:48rem;margin:3rem auto;padding:0 1rem;color:#15181c;background:#eceef1}a{color:#c8650f}@media(prefers-color-scheme:dark){body{color:#eef0f3;background:#13161a}a{color:#ec8a3a}}</style></head><body>'
-            echo '<h1>WarPig</h1><p>Parade float frame designs. Each page is a structural check with a 3D viewer, cut list, joints and assumptions.</p><ul>'
+            echo '<h1>WarPig</h1><p>Beer Bike float frame designs.</p><ul>'
             for d in _site/*/; do n=$(basename "$d"); echo "<li><a href=\"$n/\">$n</a></li>"; done
             echo '</ul><p><a href="https://github.com/'"$GITHUB_REPOSITORY"'">Source and model files on GitHub</a></p></body></html>'
           } > _site/index.html
