@@ -1,4 +1,4 @@
-# War Pig Beed Bike Float Frame
+# War Pig Beer Bike Float Frame
 
 Structural model of a perforated-square-steel-tube frame for an 8 × 8 × 8 ft octagonal War Pig, replacing a rotting 5-year-old wood frame. Space-frame analysis in [PyNite](https://github.com/JWock82/Pynite),with an interactive 3D viewer, cut list, joint schedule and caster loads.
 
