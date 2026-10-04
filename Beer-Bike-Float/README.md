@@ -3,15 +3,15 @@
 There have been many war pigs since the mascot was logingly adopted, including a couple iterations of the wooden Beer Bike float. The current woden float has suffered repeated buckling of the 4x4 frame, which is now split beyond repair and prompts us to reimagine the base of the pig again.
 
 A warning lives in the nose of the current wooden pig:
-> Hello
-> If you 
-> decide to rebuild
-> this pig, do NOT
-> just copy each piece.
-> They are not equal..
-> It is a nightmare.
-> Good luck.
-> ♡ Loryn H. '21
+> Hello    
+> If you   
+> decide to rebuild  
+> this pig, do NOT  
+> just copy each piece.  
+> They are not equal.  
+> It is a nightmare.  
+> Good luck.  
+> ♡ Loryn H. '21  
 
 
 Sounds like a good idea then.
