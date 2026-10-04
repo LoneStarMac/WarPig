@@ -44,7 +44,7 @@
     <div class="canvas-wrap">
       <canvas id="c" tabindex="0" aria-label="3D view of the frame. Drag to orbit, wheel to zoom, shift-drag to pan, click a member for its numbers."></canvas>
       <div class="legend" id="legend"></div>
-      <div class="hud">drag orbit · wheel zoom · shift-drag pan · click a tube</div>
+      <div class="hud">drag orbit, wheel zoom, shift-drag pan, click a tube for info</div>
     </div>
     <aside class="panel">
       <div class="ctl">
@@ -54,7 +54,7 @@
       <div class="ctl">
         <label id="colorby-label">Color tubes by</label>
         <div class="seg" role="group" aria-labelledby="colorby-label" id="colorby">
-          <button data-mode="u" aria-pressed="false">Utilization</button>
+          <button data-mode="u" aria-pressed="false">Use</button>
           <button data-mode="role" aria-pressed="false">Role</button>
           <button data-mode="sec" aria-pressed="true">Size</button>
         </div>
@@ -64,7 +64,7 @@
         <label><input type="checkbox" id="ck-decks" checked> Decks</label>
         <label><input type="checkbox" id="ck-casters" checked> Casters</label>
         <label><input type="checkbox" id="ck-def"> Deflected ×<span id="defscale-v" class="num">25</span></label>
-        <label><input type="checkbox" id="ck-pig"> Painted pig</label>
+        <label><input type="checkbox" id="ck-pig"> Crude skin example</label>
       </div>
       <div class="ctl" id="defscale-wrap" hidden>
         <label for="defscale">Deflection exaggeration</label>
@@ -91,7 +91,7 @@
       <div class="cols">
         <div>
           <h2>Stock to buy</h2>
-          <p class="muted lead">Sticks by first-fit / best-fit packing with ¼" kerf, in 10' or 20' lengths (20' only makes sense picked up locally: 1½" in 20', everything else in 10'). All 14 ga (0.075" wall). Each size telescopes into the next: 1½" in 1¾" in 2", so offcuts become sleeve stubs.</p>
+          <p class="muted lead">Sticks by first-fit / best-fit packing with .25" kerf, in 10' or 20' lengths (20' only makes sense picked up locally: 1.5" in 20', everything else in 10'). All 14 ga (0.075" wall). Each size telescopes into the next: 1.5" in 1.75" in 2", so offcuts become sleeve stubs.</p>
           <div data-fill="stock-table"></div>
           <details style="margin-top:8px"><summary class="muted">Cut plan, 10' sticks</summary><div data-fill="cut-plan-10"></div></details>
           <details style="margin-top:4px"><summary class="muted">Cut plan, 20' sticks</summary><div data-fill="cut-plan-20"></div></details>
@@ -100,9 +100,9 @@
           <div data-fill="weight-table"></div>
           <h3 class="mt">Hardware</h3>
           <ul class="notes">
-            <li>One ⅜" Grade 5 zinc bolt per crossing or T (through both tubes), flange nuts or nylocks. The frame is sized so that is enough; brackets add stiffness, not strength it needs.</li>
-            <li>Straight splices: 12" stub of 1¾" inside the 2" ends, two bolts each side. Keep the 96" sticks whole where you can.</li>
-            <li>Chassis: have a shop weld the 2 rails, 4 cross-members and 4 caster plates as one flat frame from plain 2½" × 14 ga, then paint. ~1 hr of welding. Bolting it instead works too, with the rails stacked on top of the cross-members and the deck ply holding it square.</li>
+            <li>One .375" Grade 5 zinc bolt per crossing or T (through both tubes), flange nuts or nylocks. The frame is sized so that is enough; brackets add stiffness, not strength it needs.</li>
+            <li>Straight splices: 12" stub of 1.75" inside the 2" ends, two bolts each side. Keep the 96" sticks whole where you can.</li>
+            <li>Chassis: have a shop weld the 2 rails, 4 cross-members and 4 caster plates as one flat frame from plain 2.5" × 14 ga, then paint. ~1 hr of welding. Bolting it instead works too, with the rails stacked on top of the cross-members and the deck ply holding it square.</li>
             <li>Casters: four 16" rated ≥ 1,200 lb each, under the rails at 11" from each end. Rigid at the rear, swivel at the front.</li>
             <li>Deck ply: screw to the steel every 6–8" along every panel edge with #12 self-drillers. The decks are the sideways bracing; this is the one place fastener spacing matters.</li>
           </ul>
@@ -141,16 +141,16 @@
             <tr><td class="l">C · crossing plate</td><td data-v="fmt(K('X90'))"></td><td class="l">optional: flat plate with 4 holes where rails cross cross-members. One bolt through the crossing is enough structurally; the plate squares it.</td></tr>
             <tr><td class="l">pin, no bracket</td><td data-v="fmt(K('pin'))"></td><td class="l">cone stringers, long braces and V-braces (odd angles, light loads): flatten 2" of the tube in a vise, one bolt.</td></tr>
           </tbody></table></div>
-          <p class="muted small" style="margin-top:6px">The model places members on their centrelines; the 1½" offset of a lapped post is noise structurally. It is sized with every one of these joints as a pin, so the plates add stiffness and consistency, not strength it needs.</p>
+          <p class="muted small" style="margin-top:6px">The model places members on their centrelines; the 1.5" offset of a lapped post is noise structurally. It is sized with every one of these joints as a pin, so the plates add stiffness and consistency, not strength it needs.</p>
           <h3 class="mt">Sticks meeting at each joint</h3>
           <div class="scroll" data-fill="valence-table"></div>
           <h3 class="mt">Largest joint forces</h3>
           <div class="scroll" data-fill="joint-forces-table"></div>
-          <p class="muted small" style="margin-top:6px">One ⅜" bolt through two 14 ga walls ≈ 3,600 lb in bearing (2.0·d·t·F<sub>u</sub> ÷ 2, two walls). Nothing here is above a third of that.</p>
+          <p class="muted small" style="margin-top:6px">One .375" bolt through two 14 ga walls ≈ 3,600 lb in bearing (2.0·d·t·F<sub>u</sub> ÷ 2, two walls). Nothing here is above a third of that.</p>
           <h3 class="mt">Tightening</h3>
           <ul class="notes">
             <li>These are bearing joints: the bolt shank pushes on the hole edge. Clamp force adds almost nothing, so do not torque to spec.</li>
-            <li>Snug-tight (hand wrench, wall just touching) plus a locking nut or thread locker. Where a bolt passes through a single tube with nothing inside it, a 1¾" sleeve stub inside the 2" tube lets you tighten harder without dimpling.</li>
+            <li>Snug-tight (hand wrench, wall just touching) plus thread locker. Where a bolt passes through a single tube with nothing inside it, a 1.75" sleeve stub inside the 2" tube lets you tighten harder without dimpling.</li>
             <li>Keep ≥ 2 holes (2") from any cut end to the first bolt; edge tear-out, not bolt shear, is the usual failure.</li>
           </ul>
         </div>
@@ -168,7 +168,7 @@
         <div>
           <h2>What changed in v8</h2>
           <ul class="notes">
-            <li>Lower box: a V at every rib from the rail ends up to a 2" deck spine, the deck beams across the apexes. No joists, columns or side diagonals (22 fewer pieces, 30 lb lighter than the side trusses) and the deck beams are better off, propped at mid-span by the spine. Rails stay 2½" (at 2" they go over 100% with a wheel in a pothole); cross-members 2". V's at the end ribs only was tried: 10 lb lighter, but the rails go to 85% and the pothole twist from 0.23" to 0.38", so the interior V's stay.</li>
+            <li>Lower box: a V at every rib from the rail ends up to a 2" deck spine, the deck beams across the apexes. No joists, columns or side diagonals (22 fewer pieces, 30 lb lighter than the side trusses) and the deck beams are better off, propped at mid-span by the spine. Rails stay 2.5" (at 2" they go over 100% with a wheel in a pothole); cross-members 2". V's at the end ribs only was tried: 10 lb lighter, but the rails go to 85% and the pothole twist from 0.23" to 0.38", so the interior V's stay.</li>
             <li>Long braces and the nose X stand on the deck-ring corners, where the chamfer stubs take the load straight to the rail ends.</li>
             <li>Upper chamfer stubs moved off the hatch-beam stations to Y = <span data-v="P.CHAMFER_Y.join(', ')"></span>": the hatch beams now meet the side rails alone (plain TP-90), and each stub lands on bare rail (plain TP-45).</li>
             <li>Three posts per side at Y = <span data-v="P.POST_Y.join(', ')"></span>": one on each body corner and one mid-side. The corner posts give the side ply and the end-wall ply a vertical edge to screw to (without them the two sheets met at a bare seam) and carry the upper-deck corners directly; the mid post laps a continuous rail. Each side skin is two 48 × 55 pieces, one per bay, no horizontal seam. The staggered layout (16, 48, 80) is one line away and models the same. No cross piece over the top deck where someone would sit: rim crosses only at the nose and tail. Upper deck joists reduced to the two hatch sides; the ply spans 32" between the side-to-side beams.</li>
@@ -179,11 +179,11 @@
           </ul>
           <h3 style="margin-top:16px">Earlier versions</h3>
           <ul class="notes">
-            <li>v7: four long braces in the attics under the upper decks, rising to the hatch-edge beams (front pair landing at ±<span data-v="fmt(P.LB_FRONT_X)"></span>", rear pair at ±<span data-v="fmt(P.LB_REAR_X1)"></span>"). They prop the hatch-edge beams at mid-span: sag with someone sitting on the edge went from 0.48" to <span data-v="P.stiffness.hatch_sag_static.toFixed(2)"></span>", pothole twist from 0.55" to <span data-v="P.stiffness.lifted_twist_pinned.toFixed(2)"></span>", and the upper deck frame dropped a size. Each passes through the lower deck ply through a slot; the rear pair sits just outside the tail-door path.</li>
+            <li>v7: four long braces in the attics under the upper decks, rising to the hatch-edge beams (front pair landing at ±<span data-v="fmt(P.LB_FRONT_X)"></span>", rear pair at ±<span data-v="fmt(P.LB_REAR_X1)"></span>"). They prop the hatch-edge beams at mid-span: sag with someone sitting on the edge went from 0.48" to <span data-v="P.stiffness.hatch_sag_static.toFixed(2)"></span>", pothole twist from 0.55" to <span data-v="P.stiffness.lifted_twist_pinned.toFixed(2)"></span>", and the upper deck frame dropped a size. Each passes through the lower deck ply through a slot; the rear pair sits just outside the anal path.</li>
             <li>v7: side-wall diagonals removed. The hard side panels are counted as shear panels instead (<span data-v="fmt(P.SKIN_GT_EFF)"></span> lb/in, fastened along every edge); racking under a rope snatch is <span data-v="P.stiffness.tow_rack_pinned.toFixed(2)"></span>" with them and 0.27" if they did nothing.</li>
-            <li>v6: full octagon. The 2½" chassis ladder sits on the bottom flat (rails at ±<span data-v="P.RAIL_X"></span>", inside the 55"), the 16" casters hang entirely below it as the feet, and the lower deck is a 1½" frame on top of a 20.5"-deep braced box. Deck <span data-v="fmt(-P.Z_GROUND + 2)"></span>" above the road, rim <span data-v="fmt(P.Z_RIM - P.Z_GROUND)"></span>": the current float's numbers. Entry through the tail is a <span data-v="fmt(-P.Z_GROUND + 2)"></span>" step up, so the tail needs two or three steps, as today.</li>
+            <li>v6: full octagon. The 2.5" chassis ladder sits on the bottom flat (rails at ±<span data-v="P.RAIL_X"></span>", inside the 55"), the 16" casters hang entirely below it as the feet, and the lower deck is a 1.5" frame on top of a 20.5"-deep braced box. Deck <span data-v="fmt(-P.Z_GROUND + 2)"></span>" above the road, rim <span data-v="fmt(P.Z_RIM - P.Z_GROUND)"></span>": the current float's numbers. Entry through the anus is a <span data-v="fmt(-P.Z_GROUND + 2)"></span>" step up, so the tail needs two or three steps, as today.</li>
             <li>v5: belly taper to <span data-v="fmt(P.BELLY_CLEAR)"></span>" clearance with coroplast leg sleeves and rubber garage-door-seal hooves to hide the casters; the model still carries 4 lb each for them.</li>
-            <li>v4: you get in through the tail: a <span data-v="fmt(2 * P.DOOR_HALF)"></span>" × <span data-v="P.Z_HI"></span>" door between jambs in the tail wall, and the tail cone is a short flat-floored tunnel to a <span data-v="fmt(P.TAIL_W)"></span>" × <span data-v="fmt(P.TAIL_H)"></span>" flap. Rope-snatch racking: <span data-v="P.stiffness.tow_rack_pinned.toFixed(2)"></span>" with every joint a pin (v3 was 2.1"). Brackets became optional.</li>
+            <li>v4: you get in through the anus: a <span data-v="fmt(2 * P.DOOR_HALF)"></span>" × <span data-v="P.Z_HI"></span>" door between jambs in the tail wall, and the tail cone is a short flat-floored tunnel to a <span data-v="fmt(P.TAIL_W)"></span>" × <span data-v="fmt(P.TAIL_H)"></span>" flap. Rope-snatch racking: <span data-v="P.stiffness.tow_rack_pinned.toFixed(2)"></span>" with every joint a pin. Brackets became optional.</li>
             <li>v3: sized for strength only. Every member family gets the lightest tube that stays under <span data-v="fmt(P.u_target * 100)"></span>% of capacity in every load case; deflection is reported, not limited. Steel went from 1,016 lb (v2, 12 ga) to <span data-v="fmt(P.steel_lb)"></span> lb, all 14 ga. Every diagonal is 45°, so the X-braces cross at 90° and share the chamfer stubs' bracket pattern.</li>
             <li>v2: sides are posts only, three <span data-v="fmt(P.RIBS[1] - P.RIBS[0])"></span>" × <span data-v="P.Z_HI"></span>" bays per side. Upper deck is a <span data-v="P.W"></span>" × <span data-v="P.L"></span>" frame with a <span data-v="fmt(2 * P.JOIST_X)"></span>" × <span data-v="fmt(P.HATCH[1] - P.HATCH[0])"></span>" hatch in the middle, so people sit all the way round.</li>
           </ul>
@@ -206,17 +206,17 @@
           <h2>Build order</h2>
           <p class="muted lead">Four to six people, a flat floor, two sawhorses, a level. Nothing gets lifted that two people cannot carry; the heavy moment is setting the chassis on its wheels.</p>
           <ol class="notes" style="padding-left:20px">
-            <li><strong>Plates and tube first.</strong> Cut every stick to the cut list and label it. Zinc-rich (cold galvanizing) spray on every cut end and every hole you drill, as you go. Flatten the ends of the cone stringers, long braces and V-braces (2" in a vise, drill ⅜"). Put threadlocker on every bolt as you go; nothing gets re-torqued later.</li>
-            <li><strong>Chassis, upside down on sawhorses.</strong> Two 2½" rails, four 2" cross-members: rails stacked on the cross-members, one bolt through each crossing, TL-90 plates at the four corners. Square it by diagonals before the plates go on. Bolt the four caster plates to the underside of the rails with the crush sleeves inside the rail. Fit the belly ply (two sheets, <span data-v="fmt(P.FLAT)"></span>" × 96") to the underside now, while it is face up and easy.</li>
+            <li><strong>Plates and tube first.</strong> Cut every stick to the cut list and label it. Zinc-rich (cold galvanizing) spray on every cut end and every hole you drill, as you go. Flatten the ends of the cone stringers, long braces and V-braces (2" in a vise, drill .375"). Put threadlocker on every bolt as you go; nothing gets re-torqued later.</li>
+            <li><strong>Chassis, upside down on sawhorses.</strong> Two 2.5" rails, four 2" cross-members: rails stacked on the cross-members, one bolt through each crossing, TL-90 plates at the four corners. Square it by diagonals before the plates go on. Bolt the four caster plates to the underside of the rails with the crush sleeves inside the rail. Fit the belly ply (two sheets, <span data-v="fmt(P.FLAT)"></span>" × 96") to the underside now, while it is face up and easy.</li>
             <li><strong>Flip it onto its wheels.</strong> Four people, lift and roll. Chock the wheels. Everything from here is built on the chassis at working height, <span data-v="fmt(-P.Z_GROUND)"></span>" off the floor.</li>
-            <li><strong>Lower box.</strong> At each rib: a V of two 1½" diagonals from the rail ends up to the deck centre (flattened-end pins), the 96" deck beam across their apex, and the two chamfer stubs from the rail ends out to the deck-ring corners (TP-45). Then the 2" deck spine along the four apexes and the deck-edge stringers along the corners. Every rib is a triangle on the rails; check it is square and level before the ply.</li>
+            <li><strong>Lower box.</strong> At each rib: a V of two 1.5" diagonals from the rail ends up to the deck centre (flattened-end pins), the 96" deck beam across their apex, and the two chamfer stubs from the rail ends out to the deck-ring corners (TP-45). Then the 2" deck spine along the four apexes and the deck-edge stringers along the corners. Every rib is a triangle on the rails; check it is square and level before the ply.</li>
             <li><strong>Lower deck ply.</strong> Two 4 × 8 sheets dropped in from above, long way across the beams. Screw to every beam and stringer every 6–8". This is the first diaphragm; the body gets stiff when it goes down.</li>
             <li><strong>Posts and upper frame.</strong> Six posts: four on the body corners (TP-90 to the deck-edge stringer and the side rail, outboard face), two mid-side (TP-90 top and bottom). Then the end beams and the two hatch-edge beams across (TP-90 to the rails), the hatch sides, the nose-wall X-brace, the tail-door jambs.</li>
             <li><strong>Long braces.</strong> Four of them, standing on the deck-ring corners of the end ribs (over the chamfer stubs, bolt through the ply into the beam end) and rising to the hatch-edge beams: front pair to ±<span data-v="fmt(P.LB_FRONT_X)"></span>" on the Y=64 beam, rear pair to ±<span data-v="fmt(P.LB_REAR_X1)"></span>" on the Y=32 beam. Pinned both ends. Their load goes brace → corner → chamfer stub → rail end, never into a beam mid-span.</li>
             <li><strong>Upper deck ply through the top.</strong> The top opening is <span data-v="fmt(P.FLAT)"></span>" wide, a 4 × 8 sheet is 48", so the sheets go in from above, long way across the beams, with the hatch cut out. Screw every 6–8".</li>
-            <li><strong>Rim.</strong> Chamfer stubs (TP-45) at Y = <span data-v="P.CHAMFER_Y.join(', ')"></span>", so the inner pair sit on plain rail between the posts and the hatch beams, then the two rim stringers, cross pieces at the nose and tail only.</li>
-            <li><strong>Nose and tail frames.</strong> Snout and tail frames assembled flat on the floor (TL-90 corners), then the eight stringers each, pinned at both ends. Hang the tail door.</li>
-            <li><strong>Skin, outside in, bottom up.</strong> Lower chamfers, sides (two 48 × 55 pieces per side, each cut from one 4 × 8 sheet; the 48 × 41 offcuts skin the chamfer faces), upper chamfers, cones. Every panel fastened along all four edges, #12 self-drillers every 6–8": the side and chamfer panels are bracing, not decoration, and a sheet edge with nothing behind it is a seam that will work loose. Seal the ply edges before they go on. If you add the side cables, fit them before the side ply: eyebolts through the corner tubes with a 1½" plate washer inside, turnbuckles snug plus half a turn, no more.</li>
+            <li><strong>Rim.</strong> Chamfer stubs (TP-45) at Y = <span data-v="P.CHAMFER_Y.join(', ')"></span>", so the inner pair sit on plain rail between the posts and the hatch beams, then the two rim stringers, cross pieces at the nose and anus only.</li>
+            <li><strong>Nose and tail frames.</strong> Snout and tail frames assembled flat on the floor (TL-90 corners), then the eight stringers each, pinned at both ends. Hang the anal door.</li>
+            <li><strong>Skin, outside in, bottom up.</strong> Lower chamfers, sides (two 48 × 55 pieces per side, each cut from one 4 × 8 sheet; the 48 × 41 offcuts skin the chamfer faces), upper chamfers, cones. Every panel fastened along all four edges, #12 self-drillers every 6–8": the side and chamfer panels are bracing, not decoration, and a sheet edge with nothing behind it is a seam that will work loose. Seal the ply edges before they go on. If you add the side cables, fit them before the side ply: eyebolts through the corner tubes with a 1.5" plate washer inside, turnbuckles snug plus half a turn, no more.</li>
             <li><strong>Finish.</strong> Solvent wipe, self-etching or galvanized-metal primer, then the goldenrod. Cavity wax (Fluid Film, Woolwax, 3M Cavity Wax) through the perforations with the 360° wand <em>after</em> paint, never before: wax under paint lifts it. Plastic caps on the open tube ends; the perforations drain the rest.</li>
           </ol>
           <h3 class="mt">The busiest joint</h3>
@@ -227,10 +227,10 @@
           <p class="muted lead">Flat, 10 ga (0.135") mild steel, zinc plated. Slots instead of holes so the plate lands on the tube's 1" hole pitch at any phase. Two plates per joint, one each face; one bolt passes plate–tube–plate at every slot. DXF files are in the repo at <span class="num">docs/exports/plates/</span>.</p>
           <div data-fill="plates-table"></div>
           <h3 class="mt">Bolts and nuts</h3>
-          <p class="muted lead">All ⅜"-16 Grade 5 zinc hex bolts with serrated flange nuts, <span data-v="fmt(D.hardware.total_bolts)"></span> in total; order the next box size up. Lengths assume 10 ga plates both sides and 14 ga tube. Where there is no plate, a washer sized to the tube face: 1¼" on 1½" tube, 1½" on 1¾", 2" on the 2" and 2½".</p>
+          <p class="muted lead">All .375"-16 Grade 5 zinc hex bolts with serrated flange nuts, <span data-v="fmt(D.hardware.total_bolts)"></span> in total; order the next box size up. Lengths assume 10 ga plates both sides and 14 ga tube. Where there is no plate, a washer sized to the tube face: 1.25" on 1.5" tube, 1.5" on 1.75", 2" on the 2" and 2.5".</p>
           <div class="scroll" data-fill="bolts-table"></div>
           <h3 class="mt">Torque</h3>
-          <p class="muted lead">The rated torque for a ⅜" Grade 5 is about 31 ft·lb, which puts 4,500 lb of clamp on a 0.075" wall and dimples it. These are bearing joints with threadlocker, so the nut only has to stay put. Set a torque wrench and stop there.</p>
+          <p class="muted lead">The rated torque for a .375" Grade 5 is about 31 ft·lb, which puts 4,500 lb of clamp on a 0.075" wall and dimples it. These are bearing joints with threadlocker, so the nut only has to stay put. Set a torque wrench and stop there.</p>
           <table class="sched"><thead><tr><th class="l">Joint</th><th>ft·lb</th><th class="l">Why</th></tr></thead><tbody>
             <tr><td class="l">Plate both sides</td><td>12</td><td class="l">the plates spread the clamp over the tube face; ~1,700 lb clamp, wall stays flat</td></tr>
             <tr><td class="l">Pin or crossing, washers on bare tube</td><td>8</td><td class="l">washer on a single wall; snug, no dimple</td></tr>
@@ -248,8 +248,8 @@
         <div>
           <h2>Loads</h2>
           <ul class="notes">
-            <li>Steel self-weight: 2½" <span data-v="P.sections['2.50x14'].wpf"></span>, 2" <span data-v="P.sections['2.00x14'].wpf"></span>, 1¾" <span data-v="P.sections['1.75x14'].wpf"></span>, 1½" <span data-v="P.sections['1.50x14'].wpf"></span> lb/ft (14 ga).</li>
-            <li>Skin + paint + decoration <span data-v="P.SKIN_PSF"></span> psf on every face including both cones, top open (¾" marine ply is 2.3 psf, so it fits). Deck ply <span data-v="P.DECK_PSF"></span> psf (¾").</li>
+            <li>Steel self-weight: 2.5" <span data-v="P.sections['2.50x14'].wpf"></span>, 2" <span data-v="P.sections['2.00x14'].wpf"></span>, 1.75" <span data-v="P.sections['1.75x14'].wpf"></span>, 1.5" <span data-v="P.sections['1.50x14'].wpf"></span> lb/ft (14 ga).</li>
+            <li>Skin + paint + decoration <span data-v="P.SKIN_PSF"></span> psf on every face including both cones, top open (.75" marine ply is 2.3 psf, so it fits). Deck ply <span data-v="P.DECK_PSF"></span> psf (.75").</li>
             <li>Parked: <span data-v="P.PEOPLE_LOWER"></span> people standing below (<span data-v="fmt(P.PERSON_LB)"></span> lb each, spread) plus one <span data-v="fmt(P.EDGE_PERSON)"></span> lb person sitting at the centre of each hatch edge. Six aboard.</li>
             <li>Moving: one <span data-v="fmt(P.MOVING.lower_center)"></span> lb person mid-deck below and one <span data-v="fmt(P.MOVING.hatch_edge)"></span> lb person at a hatch edge (you said one; this is two). Road shock is <span data-v="P.SHOCK"></span>× that.</li>
             <li>Sway: <span data-v="P.SWAY_G"></span> g sideways, parked crowd. Tow: <span data-v="P.TOW_FRACTION * 2"></span> × moving weight snatched at two eyes on the front rail ends, rope 20° up, with matching inertia.</li>
@@ -261,7 +261,7 @@
           <h2>Model</h2>
           <ul class="notes">
             <li>PyNite 3D frame, 1D beam elements. Two tubes crossing at 90° share one bolt, so every such joint is modelled as a pin: posts, chamfer stubs, cone stringers, V-braces and long braces at both ends; deck beams, rails, joists and X-braces at their ends. Moment exists only inside continuous sticks and in the chassis grillage (welded, or bolted and squared by the ply).</li>
-            <li>Deck plywood modelled as shear panels (effective G·t <span data-v="fmt(P.PLY_GT_EFF)"></span> lb/in for ¾" screwed 6–8" o.c.; APA tables give 60–80k before fastener slip). The skin on the chamfer faces, the belly, the sides and the tail-wall panels beside the door is counted at <span data-v="fmt(P.SKIN_GT_EFF)"></span> lb/in. Remove the chamfer panels and the rim becomes a handrail that sways 2" under a tow snatch.</li>
+            <li>Deck plywood modelled as shear panels (effective G·t <span data-v="fmt(P.PLY_GT_EFF)"></span> lb/in for .75" screwed 6–8" o.c.; APA tables give 60–80k before fastener slip). The skin on the chamfer faces, the belly, the sides and the tail-wall panels beside the door is counted at <span data-v="fmt(P.SKIN_GT_EFF)"></span> lb/in. Remove the chamfer panels and the rim becomes a handrail that sways 2" under a tow snatch.</li>
             <li>Casters are stiff legs from the rails to the road, pinned at the tyre contact. 12 ga section properties from the Unistrut Telespar datasheet (net area at a hole); 14 ga derived from them by the gross-section ratio, so the datasheet's hole knock-down carries over. F<sub>y</sub> = <span data-v="fmt(P.FY / 1000)"></span> ksi; confirm the grade on the 14 ga you actually buy, some generic perforated tube is 33–36 ksi, which would push the chassis back to 12 ga.</li>
             <li>Capacity: yield (P/A + M/S) and AISC E3 column buckling with K = 1 over the node-to-node length. Static, Sway, Tow, Lifted, Stop are checked against ASD allowables (÷1.67); Shock already carries a 2× factor so it is checked against nominal strength. Cables, if enabled, against breaking strength ÷ 5 (÷ 2.5 under Shock).</li>
             <li>Not modelled: local wall dimpling under a bolt, hole slop, skin on the cones (helps), wind on a skinned box.</li>
@@ -273,7 +273,7 @@
             <li>Snout <span data-v="fmt(P.L_NOSE)"></span>" long to a <span data-v="fmt(P.NOSE_W)"></span>" × <span data-v="fmt(P.NOSE_H)"></span>" panel centred on the octagon. Tail <span data-v="fmt(P.L_TAIL)"></span>" long to a <span data-v="fmt(P.TAIL_W)"></span>" × <span data-v="fmt(P.TAIL_H)"></span>" panel. All four are one-line edits.</li>
             <li>Ribs at Y = <span data-v="P.RIBS.join(', ')"></span>". Hatch between <span data-v="P.HATCH[0]"></span>" and <span data-v="P.HATCH[1]"></span>", <span data-v="fmt(2 * P.JOIST_X)"></span>" wide between the joists.</li>
             <li>Casters under the rails at Y = <span data-v="P.CASTER_Y.join(' and ')"></span>", at ±<span data-v="P.RAIL_X"></span>" (<span data-v="fmt(2 * P.RAIL_X)"></span>" track), 16" wheels. Chassis <span data-v="fmt(-P.CHASSIS_Z)"></span>" below the deck ring (<span class="num">UNDERBODY='octagon'</span>); the v5 taper, v4 steel legs and v3 skirt layouts are still in the model.</li>
-            <li>Tail door <span data-v="fmt(2 * P.DOOR_HALF)"></span>" wide; the tail-wall skin beside it is counted as a shear panel like the chamfer skin.</li>
+            <li>Anal door <span data-v="fmt(2 * P.DOOR_HALF)"></span>" wide; the tail-wall skin beside it is counted as a shear panel like the chamfer skin.</li>
           </ul>
           <p class="muted" style="margin-top:10px">Not a stamped design. If people ride on it, have someone qualified look at the rider load case.</p>
         </div>
